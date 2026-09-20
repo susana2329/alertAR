@@ -1,6 +1,20 @@
 :host {
     padding-left: 2%;
     padding-right: 2%;
+    background-color: #F8FAFC;
+}
+
+ion-content {
+    --background: hsl(210, 40%, 98%);
+    --color: black;
+}
+
+.elements {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
 }
 
 ion-header {
@@ -10,10 +24,88 @@ ion-header {
 
 .logo {
     text-align: center;
+    color: black;
 }
 
 .subtitulo {
     padding-left: 5%;
     padding-right: 5%;
+    text-align: center;
+}
+
+.subtitulo h2 {
+    margin-bottom: 0px;
+}
+
+
+.avisoPublic {
+
+    width: 90%;
+    text-align: center;
+    background-color: #2EC12326;
+    border-radius: 10px;
+    height: 90%;
+    padding: 2%;
+
+}
+
+.avisoPublic ion-note {
+    color: #104E04;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    text-align: center;
+    gap: 2%;
+    font-size: 100%;
+}
+
+.escudoPublic img {
+    max-width: 35px;
+
+}
+
+.reportes {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttons-reports {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+ion-card {
+    width: 70%;
+    background-color: #F8FAFC;
+    border: solid 2px #00000021;
+    box-shadow: 5px 8px 10px #00000040;
+    padding-top:10px; 
     
+}
+
+ion-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    height: 180px;
+}
+
+ion-card-content img {
+    height: 100%;
+}
+
+.buttons-reports div {
+    width: 40%;
+    display: flex;
+    justify-content: center;
 }
