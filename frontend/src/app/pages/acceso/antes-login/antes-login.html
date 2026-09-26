@@ -1,0 +1,27 @@
+ <ion-content class="ion-padding">
+  <div class="contenedor">
+    <h1>ALERT<span class="ar">AR</span></h1>
+    <p class="slogan">Que nada te agarre desprevenido</p>
+
+    <ion-button expand="block" (click)="irALogin()">
+      <ion-icon name="person-outline" slot="start"></ion-icon>
+      Iniciar sesión
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" (click)="continuarSinCuenta()">
+      Continuar sin cuenta
+    </ion-button>
+
+    <p class="link-registro">¿No tenés cuenta? <a (click)="irARegistro()">Registrate</a></p>
+
+    <div class="beneficios">
+      <p>Sin iniciar sesión te perdés:</p>
+      <div class="fila-beneficios">
+        <div class="beneficio"><ion-icon name="notifications-outline"></ion-icon><span>Alertas personalizadas</span></div>
+        <div class="beneficio"><ion-icon name="document-text-outline"></ion-icon><span>Reportes</span></div>
+        <div class="beneficio"><ion-icon name="map-outline"></ion-icon><span>Mapa interactivo</span></div>
+        <div class="beneficio"><ion-icon name="list-outline"></ion-icon><span>Tu plan de emergencia</span></div>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,58 @@
+.contenedor {
+    text-align: center;
+    padding-top: 40px;
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #0e2a47;
+}
+
+h1 .ar {
+    color: #3a9d6e;
+}
+
+.slogan {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+ion-button {
+    margin-bottom: 12px;
+}
+
+.link-registro {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.link-registro a {
+    color: #1c6e79;
+    font-weight: bold;
+}
+
+.beneficios {
+    margin-top: 40px;
+    font-size: 13px;
+    color: #555;
+}
+
+.fila-beneficios {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.beneficio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 70px;
+}
+
+.beneficio ion-icon {
+    font-size: 24px;
+    color: #1c6e79;
+    margin-bottom: 5px;
+}
