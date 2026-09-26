@@ -21,7 +21,7 @@
         <div class="escudoPublic">
           <img src="\assets\icon\EscudoProteccion.png" alt="a">
         </div>
-        Tu reporte sera revisado antes de publicarse en el mapa
+        <p>Tu reporte sera revisado antes de publicarse en el mapa</p>
       </ion-note>
     </div>
     <div class="reportes">
@@ -32,59 +32,63 @@
       </ion-title>
       <div class="buttons-reports">
         <div class="cardInundaciones">
-          <ion-card>
-            <ion-card-content>
-              <img src="\assets\b292d3a231900b6789fd1af29f1ce86a.jpg" alt="">
+          <ion-card id="Indundaciones" (click)="creandoReporte($event)">
+            <ion-card-content  (click)="$event.stopPropagation()">
+              <img src="\assets\icon\casa.png" alt="">
               inundaciones
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardCalle">
-          <ion-card>
-            <ion-card-content>
-              <img src="\assets\b292d3a231900b6789fd1af29f1ce86a.jpg" alt="">
+          <ion-card id="Calle-bloqueada" (click)="creandoReporte($event)">
+            <ion-card-content (click)="$event.stopPropagation()" >
+              <img src="\assets\icon\tormenta.png" alt="">
               <p>Calle bloqueada</p>
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardArbol">
-          <ion-card >
+          <ion-card id="Caida-de-arbol" (click)="creandoReporte($event)">
             <ion-card-content>
-            <img src="\assets\b292d3a231900b6789fd1af29f1ce86a.jpg" alt="">
+              <img src="\assets\icon\arbol-malo.png" alt="">
               Caida de arbol
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardCorteLuz">
-          <ion-card>
+          <ion-card id="Corte-de-luz" (click)="creandoReporte($event)">
             <ion-card-content>
-              <img src="\assets\b292d3a231900b6789fd1af29f1ce86a.jpg" alt="">
+              <img src="\assets\icon\foco.png" alt="">
               Corte de luz
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardIncendios">
-          <ion-card>
+          <ion-card id="Incendios" (click)="creandoReporte($event)">
             <ion-card-content>
-              <img src="\assets\b292d3a231900b6789fd1af29f1ce86a.jpg" alt="">
+              <img src="\assets\icon\flama.png" alt="">
               incendios
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardMas">
-          <ion-card>
+          <ion-card id="Mas" (click)="creandoReporte($event)">
             <ion-card-content>
-               <img src="\assets\b292d3a231900b6789fd1af29f1ce86a.jpg" alt="">
+              <img src="\assets\icon\mas.png" alt="">
               Mas
             </ion-card-content>
           </ion-card>
         </div>
       </div>
     </div>
+    <div class="avisoDescrip">
+      <ion-note>
+        <div class="notifoto">
+          <img src="\assets\icon\notificacion.png" alt="">
+        </div>
+        <p>Elige la opcion que mejor describa lo que ves o estas viviendo</p>
+      </ion-note>
+    </div>
   </div>
-  <div class="avisoDescrip">
-    <ion-note>
-      Elige la opcion que mejor describa lo que ves o estas viviendo
-    </ion-note>
-  </div>
+
 </ion-content>

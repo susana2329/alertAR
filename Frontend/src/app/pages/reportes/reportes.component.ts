@@ -1,18 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonContent, IonFooter, IonHeader, IonNote, IonTitle} from '@ionic/angular';
+import { IonCard, IonCardContent, IonContent, IonHeader, IonNote, IonTitle } from '@ionic/angular';
 import { Report } from '../../models/reporte';
-import { IonCardTitle } from '@ionic/angular';
 @Component({
   selector: 'app-reportes',
   templateUrl: './reportes.component.html',
-  standalone: true, 
+  standalone: true,
   styleUrls: ['./reportes.component.scss'],
-  imports: [IonHeader, IonContent, IonCard,IonCardHeader, IonCardContent,IonContent,IonCardTitle,IonTitle,IonButton, IonNote, IonFooter],
+  imports: [IonHeader, IonContent, IonCard, IonCardContent, IonContent, IonTitle, IonNote],
 })
-export class ReportesComponent  implements OnInit {
+export class ReportesComponent implements OnInit {
+  public reporte: Report = {
+    tipo: "",
+    descripcion: "",
+    ubicacion: "",
+    fecha: new Date(),
+    imagen: new File([], '')
+  }
+  constructor() {
+  }
 
-  constructor() { }
+  ngOnInit() { }
 
-  ngOnInit() {}
-
+  creandoReporte(event: Event) {
+    this.reporte.tipo = (event.target as HTMLElement).id
+    console.log(this.reporte.tipo)
+  }
 }
