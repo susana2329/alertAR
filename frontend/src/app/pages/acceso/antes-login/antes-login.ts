@@ -1,17 +1,26 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonButton, IonIcon } from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import { personOutline } from 'ionicons/icons';
+addIcons({ personOutline });
 @Component({
-  selector: 'app-antes-login',
-  standalone: true,
-  imports: [IonContent, IonButton, IonIcon],
-  templateUrl: './antes-login.html',
-  styleUrls: ['./antes-login.css']
+    selector: 'app-antes-login',
+    standalone: true,
+    imports: [IonContent, IonButton, IonIcon],
+    templateUrl: './antes-login.html',
+    styleUrls: ['./antes-login.scss']
 })
 export class AntesLoginPage {
-  constructor(private router: Router) {}
+    constructor(private router: Router) { }
 
-  irALogin() { this.router.navigate(['/acceso/login']); }
-  irARegistro() { this.router.navigate(['/acceso/registro']); }
-  continuarSinCuenta() { this.router.navigate(['/inicio']); }
+    irALogin() {
+        this.router.navigate(['/acceso/login']);
+    }
+    irARegistro() {
+        this.router.navigate(['/acceso/registro']);
+    }
+    continuarSinCuenta() {
+        this.router.navigate(['/inicio']);
+    }
 }

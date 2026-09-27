@@ -1,0 +1,46 @@
+h1 {
+  color: #03294F;
+  font-size: 22px;
+  margin-top: 10px;
+}
+
+.subtitulo {
+  color: #79A2B8;
+  margin-bottom: 20px;
+}
+
+.fila-nombre {
+  display: flex;
+  gap: 10px;
+}
+
+.fila-nombre .campo {
+  flex: 1;
+}
+
+.campo {
+  margin-bottom: 15px;
+  --background: #F8FAFC;
+  --border-radius: 10px;
+}
+
+.campo-checkbox {
+  --background: transparent;
+  margin-bottom: 15px;
+}
+
+.campo-checkbox ion-label {
+  font-size: 12px;
+  color: #03294F;
+  white-space: normal;
+}
+
+.mensaje-error {
+  color: red;
+  font-size: 13px;
+}
+
+.boton-crear {
+  --background: #0E7490;
+  margin-top: 10px;
+}

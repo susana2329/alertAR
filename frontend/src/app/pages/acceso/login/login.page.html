@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/acceso"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h1>Iniciar sesión</h1>
+  <p class="subtitulo">Bienvenido de nuevo</p>
+
+  <ion-item class="campo">
+    <ion-icon name="mail-outline" slot="start"></ion-icon>
+    <ion-input type="email" placeholder="Tumail@gmail.com" [(ngModel)]="email"></ion-input>
+  </ion-item>
+
+  <ion-item class="campo">
+    <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+    <ion-input [type]="mostrarPassword ? 'text' : 'password'" placeholder="Contraseña" [(ngModel)]="password"></ion-input>
+    <ion-icon [name]="mostrarPassword ? 'eye-off-outline' : 'eye-outline'" slot="end" (click)="cambiarVisibilidad()"></ion-icon>
+  </ion-item>
+
+  <p class="olvide">¿Olvidaste tu contraseña?</p>
+
+  <p class="mensaje-error" *ngIf="error">{{ error }}</p>
+
+  <ion-button expand="block" class="boton-login" (click)="iniciarSesion()">Iniciar sesión</ion-button>
+
+  <p class="separador">o continuar con</p>
+
+  <ion-button expand="block" fill="outline" class="boton-google">
+    <ion-icon name="logo-google" slot="start"></ion-icon>
+    Google
+  </ion-button>
+
+  <p class="texto-registro">¿No tenes cuenta? <a (click)="irARegistro()">Registrate</a></p>
+
+</ion-content>

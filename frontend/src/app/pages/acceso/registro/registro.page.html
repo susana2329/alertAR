@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/acceso"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h1>Crear cuenta</h1>
+  <p class="subtitulo">Completa tus datos para comenzar</p>
+
+  <div class="fila-nombre">
+    <ion-item class="campo">
+      <ion-icon name="person-outline" slot="start"></ion-icon>
+      <ion-input placeholder="Tu nombre" [(ngModel)]="nombre"></ion-input>
+    </ion-item>
+
+    <ion-item class="campo">
+      <ion-input placeholder="Tu apellido" [(ngModel)]="apellido"></ion-input>
+    </ion-item>
+  </div>
+
+  <ion-item class="campo">
+    <ion-icon name="mail-outline" slot="start"></ion-icon>
+    <ion-input type="email" placeholder="Tumail@gmail.com" [(ngModel)]="email"></ion-input>
+  </ion-item>
+
+  <ion-item class="campo">
+    <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+    <ion-input [type]="mostrarPassword ? 'text' : 'password'" placeholder="Contraseña" [(ngModel)]="password"></ion-input>
+    <ion-icon [name]="mostrarPassword ? 'eye-off-outline' : 'eye-outline'" slot="end" (click)="cambiarVisibilidadPassword()"></ion-icon>
+  </ion-item>
+
+  <ion-item class="campo">
+    <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+    <ion-input [type]="mostrarConfirmar ? 'text' : 'password'" placeholder="Confirmar contraseña" [(ngModel)]="confirmarPassword"></ion-input>
+    <ion-icon [name]="mostrarConfirmar ? 'eye-off-outline' : 'eye-outline'" slot="end" (click)="cambiarVisibilidadConfirmar()"></ion-icon>
+  </ion-item>
+
+  <ion-item lines="none" class="campo-checkbox">
+    <ion-checkbox slot="start" [(ngModel)]="aceptaTerminos"></ion-checkbox>
+    <ion-label>Acepto los terminos y condiciones y la politica de privacidad</ion-label>
+  </ion-item>
+
+  <p class="mensaje-error" *ngIf="error">{{ error }}</p>
+
+  <ion-button expand="block" class="boton-crear" (click)="crearCuenta()">Crear cuenta</ion-button>
+
+</ion-content>

@@ -1,0 +1,174 @@
+ion-content {
+  --background: #F8FAFC;
+}
+
+.fondo-foto {
+  background-image: url('/assets/image/fondocielo.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  text-align: center;
+  padding: 50px 20px 0 20px;
+}
+
+.wrapper-edificios {
+  position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+}
+
+.fondo-edificios {
+  display: block;
+  width: 100%;
+  height: 140px;
+  margin-top: 10px;
+  object-fit: cover;
+  object-position: center bottom;
+}
+
+.wrapper-edificios::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 35px;
+  background: linear-gradient(to bottom, rgba(248, 250, 252, 0), #F8FAFC);
+  pointer-events: none;
+}
+
+.logo-completo {
+  width: 150px;
+  margin: 0 auto;
+}
+
+.icono-wrapper {
+  position: relative;
+  width: 75px;
+  margin: 0 auto;
+}
+
+.icono-pin {
+  width: 100%;
+  display: block;
+}
+
+.icono-exclamacion {
+  position: absolute;
+  left: 42%;
+  top: 20%;
+  width: 12%;
+}
+
+.icono-mapa {
+  width: 130px;
+  margin-top: -10px;
+}
+
+.wordmark {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.texto-alert-img,
+.texto-ar-img {
+  height: 26px;
+}
+
+.slogan {
+  color: #03294F;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.destacado {
+  color: #0E7490;
+  font-weight: bold;
+}
+
+.fondo-claro {
+  background-color: #F8FAFC;
+  padding: 0 20px 25px 20px;
+}
+
+.boton-principal,
+.boton-secundario {
+  text-transform: none;
+ --border-radius: 16px;
+  min-height: 52px;
+}
+
+.boton-principal {
+  --background: #0E7490;
+  --color: #ffffff;
+  margin-top: -50px;
+  position: relative;
+  z-index: 1;
+}
+
+.boton-secundario {
+  --color: #333333;
+  margin-top: 15px;
+  --border-color: #0E7490;
+}
+
+.texto-registro {
+  text-align: center;
+  font-size: 14px;
+  color: #333333;
+  margin-top: 15px;
+}
+
+.texto-registro a {
+  color: #0E7490;
+  font-weight: bold;
+}
+
+.card-beneficios {
+  background-color: #EFEFEF;
+  border-radius: 16px;
+  padding: 20px 15px;
+  margin-top: 30px;
+}
+
+.texto-beneficios {
+  text-align: left;
+  font-size: 13px;
+  color: #03294F;
+  margin: 0 0 15px 0;
+}
+
+.fila-beneficios {
+  display: flex;
+  justify-content: space-between;
+}
+
+.beneficio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 70px;
+  text-align: center;
+  font-size: 11px;
+  color: #03294F;
+}
+
+.circulo-beneficio {
+  background-color: #D9D9D9;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.circulo-beneficio img {
+  width: 24px;
+  height: 24px;
+}

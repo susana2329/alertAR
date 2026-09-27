@@ -1,0 +1,55 @@
+h1 {
+  color: #03294F;
+  font-size: 22px;
+  margin-top: 10px;
+}
+
+.subtitulo {
+  color: #79A2B8;
+  margin-bottom: 20px;
+}
+
+.campo {
+  margin-bottom: 15px;
+  --background: #F8FAFC;
+  --border-radius: 10px;
+}
+
+.olvide {
+  text-align: right;
+  color: #0E7490;
+  font-size: 13px;
+}
+
+.mensaje-error {
+  color: red;
+  font-size: 13px;
+}
+
+.boton-login {
+  --background: #0E7490;
+  margin-top: 10px;
+}
+
+.separador {
+  text-align: center;
+  color: #79A2B8;
+  margin: 20px 0;
+}
+
+.boton-google {
+  --color: #03294F;
+  --border-color: #79A2B8;
+}
+
+.texto-registro {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #03294F;
+}
+
+.texto-registro a {
+  color: #0E7490;
+  font-weight: bold;
+}

@@ -1,27 +1,71 @@
- <ion-content class="ion-padding">
-  <div class="contenedor">
-    <h1>ALERT<span class="ar">AR</span></h1>
-    <p class="slogan">Que nada te agarre desprevenido</p>
+<ion-content [fullscreen]="true">
 
-    <ion-button expand="block" (click)="irALogin()">
+  <div class="fondo-foto">
+
+    <div class="logo-completo">
+      <div class="icono-wrapper">
+        <img src="assets/image/iconoubicacion.png" alt="Icono ubicacion" class="icono-pin">
+        <img src="assets/image/signoexlamacion.png" alt="Signo exclamacion" class="icono-exclamacion">
+      </div>
+      <img src="assets/image/mapa.png" alt="Mapa" class="icono-mapa">
+      <div class="wordmark">
+        <img src="assets/image/ALERT.png" alt="ALERT" class="texto-alert-img">
+        <img src="assets/image/AR.png" alt="AR" class="texto-ar-img">
+      </div>
+    </div>
+
+    <p class="slogan">Que nada te agarre <span class="destacado">desprevenido</span></p>
+    <div class="wrapper-edificios">
+  <img src="assets/image/fondoedificios.png" alt="" class="fondo-edificios">
+</div>
+  </div>
+
+  <div class="fondo-claro">
+
+    <ion-button expand="block" class="boton-principal" (click)="irALogin()">
       <ion-icon name="person-outline" slot="start"></ion-icon>
       Iniciar sesión
     </ion-button>
 
-    <ion-button expand="block" fill="outline" (click)="continuarSinCuenta()">
+    <ion-button expand="block" fill="outline" class="boton-secundario" (click)="continuarSinCuenta()">
+      <ion-icon name="person-outline" slot="start"></ion-icon>
       Continuar sin cuenta
     </ion-button>
+    <p class="texto-registro">
+      ¿No tenes cuenta? <a (click)="irARegistro()">Registrate</a>
+    </p>
 
-    <p class="link-registro">¿No tenés cuenta? <a (click)="irARegistro()">Registrate</a></p>
+    <div class="card-beneficios">
+      <p class="texto-beneficios">Sin iniciar sesion te perdes:</p>
 
-    <div class="beneficios">
-      <p>Sin iniciar sesión te perdés:</p>
       <div class="fila-beneficios">
-        <div class="beneficio"><ion-icon name="notifications-outline"></ion-icon><span>Alertas personalizadas</span></div>
-        <div class="beneficio"><ion-icon name="document-text-outline"></ion-icon><span>Reportes</span></div>
-        <div class="beneficio"><ion-icon name="map-outline"></ion-icon><span>Mapa interactivo</span></div>
-        <div class="beneficio"><ion-icon name="list-outline"></ion-icon><span>Tu plan de emergencia</span></div>
+        <div class="beneficio">
+          <div class="circulo-beneficio">
+            <img src="assets/icon/iconocampana.png" alt="Alertas personalizadas">
+          </div>
+          <span>Alertas personalizadas</span>
+        </div>
+        <div class="beneficio">
+          <div class="circulo-beneficio">
+            <img src="assets/icon/iconoreportes.png" alt="Reportes">
+          </div>
+          <span>Reportes</span>
+        </div>
+        <div class="beneficio">
+          <div class="circulo-beneficio">
+            <img src="assets/icon/iconoubicacion.png" alt="Mapa interactivo">
+          </div>
+          <span>Mapa interactivo</span>
+        </div>
+        <div class="beneficio">
+          <div class="circulo-beneficio">
+            <img src="assets/icon/iconoplandeemergencia.png" alt="Tu plan de emergencia">
+          </div>
+          <span>Tu plan de emergencia</span>
+        </div>
       </div>
     </div>
+
   </div>
+
 </ion-content>
