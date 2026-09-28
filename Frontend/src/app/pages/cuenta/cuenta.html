@@ -1,0 +1,91 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="custom-toolbar">
+    <ion-title class="ion-text-center">Mi cuenta</ion-title>
+    <ion-icon name="chevron-forward-outline" class="arrow-icon-title"></ion-icon>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="account-container">
+    <div class="profile-container">
+      <ion-avatar class="profile-avatar">
+        <img src='assets/imagcuenta/mockuser.jpg' alt="Perfil de Usuario" />
+      </ion-avatar>
+
+      <div class="profile-info">
+        <h2>{{user.name}}</h2>
+        <p>{{user.email}}</p>
+        <a class="edit-profile-link">Ver y editar perfil</a>
+      </div>
+    </div>
+
+
+    <!--Tarjeta para manejar los REPORTES DEL USUARIO-->
+    <div class="menu-card" routerLink="/reportes">
+      <div class="card-icon-box">
+        <img src='assets/icon/icon-reportes.png' alt="Icono reportes">
+      </div>
+      <div class="card-content">
+        <h3>Mis reportes</h3>
+        <p>Revisa el estado de tus reportes</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+
+
+    <!--Tarjeta para manejar la MOCHILA DEL USUARIO-->
+    <div class="menu-card" routerLink="/mochila">
+      <div class="card-icon-box">
+        <img src='assets/icon/icon-mochila.png' alt="Icono mochila">
+      </div>
+      <div class="card-content">
+        <h3>Mi mochila de emergencia</h3>
+        <p>Revisa y edita tu mochila</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+
+
+    <!--Tarjeta para manejar la CONFIGURACION DEL USUARIO-->
+    <div class="menu-card" routerLink="/configuracion">
+      <div class="card-icon-box">
+        <img src='assets/icon/icon-configuracion.png' alt="Icono confuguracion">
+      </div>
+      <div class="card-content">
+        <h3>Configuración</h3>
+        <p>Configura tus alertas</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+
+
+    <!--Tarjeta para manejar la AYUDA AL USUARIO-->
+    <div class="menu-card" routerLink="/ayuda">
+      <div class="card-icon-box">
+        <img src='assets/icon/icon-ayuda.png' alt="Icono ayuda">
+      </div>
+      <div class="card-content">
+        <h3>Ayuda y soporte</h3>
+        <p>Preguntas frecuentes y contacto</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+
+
+    <!--Tarjeta para manejar las FUENTES DE ALERTAR-->
+    <div class="menu-card" routerLink="/fuentes">
+      <div class="card-icon-box">
+        <img src='assets/icon/icon-info.png' alt="Icono fuentes">
+      </div>
+      <div class="card-content">
+        <h3>Info. de AlertAR</h3>
+        <p>Información</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+  </div>
+
+
+  
+</ion-content>
