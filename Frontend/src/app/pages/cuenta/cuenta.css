@@ -2,10 +2,24 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
+    
 }
 
 ion-content{
     --background: #f8f9fa;
+}
+
+ion-header{
+    position: relative;
+}
+
+ion-title{
+    font-size: 1.15rem;
+    font-weight: 500;
+}
+ion-label{
+    color: #03294F;
+    font-weight: 700;
 }
 
 .custom-toolbar{
@@ -22,8 +36,8 @@ ion-content{
 }
 
 .profile-avatar {
-    width: 105px;
-    height: 105px;
+    width: 90px;
+    height: 90px;
     margin-right: 16px;
     flex-shrink: 0;
 }
@@ -48,7 +62,7 @@ ion-content{
     font-weight:600 ;
     text-decoration: none;
     cursor: pointer;
-    text-decoration: underline;
+   
 }
 
 .menu-card{
@@ -57,7 +71,8 @@ ion-content{
     background: #ffffff;
     padding: 14px 16px;
     border-radius: 16px;
-    box-shadow: 1px solid #7a7979;
+    border: 1px solid #d1d5db;
+    box-shadow: 0px 0px 20px  #bdb6b6;
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
@@ -84,10 +99,11 @@ ion-content{
     color: #999999;
 }
 .arrow-icon-title{
-    font-size: 18px;
-    color: #999999;
+    font-size: 22px;
+    color: #333333;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    padding-left: 4px;
+
 }
 
 .card-icon-box {
@@ -106,5 +122,22 @@ ion-content{
     height: 26px;
     object-fit: contain;
   }
+}
+
+.btn-cerrar-sesion{
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    margin-top: 32px;
+    padding: 0 4px;
+    
+}
+
+.custom-tab-bar{
+    --background: #ffffff;
+    --color: #777777;
+    --color-selected: #0E7490;
+    border-top: 1px solid #f0f0f0;
+
 }
 

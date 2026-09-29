@@ -7,13 +7,10 @@ import { IonContent, IonHeader, IonToolbar, IonTitle, IonAvatar, IonRouterLink, 
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline, logOutOutline,chevronBackOutline, homeOutline,mapOutline,bookmarkOutline,fileTrayFullOutline,personOutline,shieldOutline  } from 'ionicons/icons';
 
-import { MOCK_USER } from '../../mocks/usuario.mock';
-import { UserProfile } from '../../models/usuario.model';
-
 @Component({
-  selector: 'app-cuenta',
-  templateUrl: './cuenta.html',
-  styleUrls: ['./cuenta.css'],
+  selector: 'app-fuentes',
+  templateUrl: './fuentes.html',
+  styleUrls: ['./fuentes.css'],
   standalone: true,
   imports: [
     CommonModule,
@@ -23,35 +20,18 @@ import { UserProfile } from '../../models/usuario.model';
     IonHeader,
     IonToolbar,
     IonTitle, 
-    IonAvatar,
     IonIcon,
     IonButtons,
     IonButton,
     IonTabBar,
     IonLabel,
     IonTabButton
-]
+  ]
 })
-export class CuentaPage implements OnInit {
-  user = MOCK_USER;
+export class FuentesPage implements OnInit {
   constructor() {
-    addIcons({
-      chevronForwardOutline,
-      logOutOutline,
-      chevronBackOutline,
-      homeOutline,
-      mapOutline,
-      fileTrayFullOutline,
-      personOutline,
-      bookmarkOutline,
-      shieldOutline
-    });
-
+    addIcons({ chevronBackOutline });
   }
 
-
-  ngOnInit() {
-    console.log('CuentaPage funcionando correctamente');
-  }
-
+  ngOnInit() {}
 }

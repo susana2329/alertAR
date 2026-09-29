@@ -1,0 +1,52 @@
+.account-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 10px 4px;
+}
+
+h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0E7490;
+    margin: 0 0 4px 0;
+}
+
+p {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0E7490;
+    margin: 0 0 4px 0;
+}
+
+ion-content {
+    --background: #f8f9fa;
+}
+
+ion-header {
+    position: relative;
+}
+
+ion-title {
+    font-size: 1.15rem;
+    font-weight: 500;
+}
+
+ion-label {
+    color: #03294F;
+    font-weight: 700;
+}
+
+.custom-toolbar {
+    --background: #f8f9fa;
+    --color: #1a1a1a;
+}
+
+
+.custom-tab-bar {
+    --background: #ffffff;
+    --color: #777777;
+    --color-selected: #0E7490;
+    border-top: 1px solid #f0f0f0;
+
+}

@@ -1,0 +1,44 @@
+<ion-header>
+    <ion-toolbar class="custom-toolbar">
+        <ion-buttons slot="start">
+            <ion-button routerLink="/cuenta">
+                <ion-icon name="chevron-back-outline"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title class="ion-text-center">Configuración AlertAR</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <div class="account-container">
+        <h2>Configuración</h2>
+        <p>Acá voy a poner las configuraciones😝</p>
+    </div>
+</ion-content>
+
+<ion-tab-bar slot="bottom" class="custom-tab-bar">
+  <ion-tab-button tab="inicio" routerLink="/inicio">
+    <ion-icon name="home-outline"></ion-icon>
+    <ion-label>Inicio</ion-label>
+  </ion-tab-button>
+
+  <ion-tab-button tab="mapa" routerLink="/mapa">
+    <ion-icon name="map-outline"></ion-icon>
+    <ion-label>Mapa</ion-label>
+  </ion-tab-button>
+
+  <ion-tab-button tab="reportar" routerLink="/reportar">
+    <ion-icon name="file-tray-full-outline"></ion-icon>
+    <ion-label>Reportar</ion-label>
+  </ion-tab-button>
+
+  <ion-tab-button tab="prevension" routerLink="/prevension">
+    <ion-icon name="shield-outline"></ion-icon>
+    <ion-label>Prevención</ion-label>
+  </ion-tab-button>
+
+  <ion-tab-button tab="cuenta" routerLink="/cuenta">
+    <ion-icon name="person-outline"></ion-icon>
+    <ion-label>Cuenta</ion-label>
+  </ion-tab-button>
+</ion-tab-bar>
