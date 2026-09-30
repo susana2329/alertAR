@@ -8,9 +8,9 @@
 
     <h1>Mapa de alertas</h1>
 
-    <button class="header-button filter-button" type="button" aria-label="Filtros">
-      ♢
-    </button>
+   <button class="header-button filter-button" type="button" aria-label="Filtros">
+  <ion-icon name="filter-outline"></ion-icon>
+</button>
   </header>
 
  <div class="alert-filters">
@@ -42,7 +42,12 @@
 </button>
 </div>
 
-  <button class="location-button" type="button" aria-label="Mi ubicación">
-    ◉
-  </button>
+  <button
+  class="location-button"
+  type="button"
+  aria-label="Mi ubicación"
+  (click)="centrarEnMiUbicacion()"
+>
+  <ion-icon name="locate-outline"></ion-icon>
+</button>
 </div>  

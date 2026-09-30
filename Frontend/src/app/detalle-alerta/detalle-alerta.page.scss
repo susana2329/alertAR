@@ -13,7 +13,6 @@ ion-content {
   overflow: hidden;
   background: #f4f7f9;
 }
-/* CABECERA */
 
 .detalle-header {
   position: relative;
@@ -74,13 +73,9 @@ ion-content {
   font-size: 70px;
 }
 
-/* CUERPO */
-
 .detalle-body {
   padding: 32px 32px 24px;
 }
-
-/* NIVEL */
 
 .nivel-alerta {
   width: fit-content;
@@ -99,8 +94,6 @@ ion-content {
 .nivel-alerta strong {
   font-weight: 800;
 }
-
-/* INFORMACIÓN */
 
 .info-item {
   display: flex;
@@ -153,8 +146,6 @@ ion-content {
   margin-bottom: 34px;
 }
 
-/* BOTÓN */
-
 .recommendations-button {
   width: 100%;
 
@@ -173,8 +164,6 @@ ion-content {
 
   cursor: pointer;
 }
-
-/* ACTUALIZACIÓN */
 
 .updated {
   margin-top: 10px;

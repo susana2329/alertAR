@@ -4,8 +4,6 @@
 
     <div class="detalle-card">
 
-      <!-- CABECERA -->
-
       <div class="detalle-header">
 
         <button
@@ -25,8 +23,14 @@
           <h1>{{ alerta?.titulo }}</h1>
 
           <span class="fuente">
-            Fuente: {{ alerta?.fuente }}
-          </span>
+  <ng-container *ngIf="alerta?.origen === 'oficial'; else fuenteVecinal">
+    ✓ {{ alerta?.fuente }}
+  </ng-container>
+
+  <ng-template #fuenteVecinal>
+    Fuente: Vecinal
+  </ng-template>
+</span>
 
         </div>
 
@@ -35,8 +39,6 @@
         </div>
 
       </div>
-
-      <!-- CONTENIDO -->
 
       <div class="detalle-body">
 
