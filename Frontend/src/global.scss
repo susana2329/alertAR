@@ -35,3 +35,59 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+.maplibregl-popup-content {
+  padding: 0 !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgb(0 0 0 / 20%);
+  color: #222 !important;
+}
+
+.alerta-popup {
+  width: 260px;
+  padding: 16px;
+  color: #222 !important;
+  background: white;
+}
+
+.alerta-popup h3 {
+  margin: 0 0 8px;
+  color: #222 !important;
+  font-size: 18px;
+}
+
+.alerta-popup .nivel {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #d64545;
+  color: white !important;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.alerta-popup p {
+  margin: 0 0 10px;
+  color: #222 !important;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.alerta-popup .fuente {
+  color: #666 !important;
+  font-size: 12px;
+}
+.alerta-popup__button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #168da3;
+  color: white !important;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}

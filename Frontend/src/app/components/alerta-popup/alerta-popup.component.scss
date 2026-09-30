@@ -1,0 +1,48 @@
+.alerta-popup {
+  width: 260px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
+}
+
+.alerta-popup h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.nivel {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #d64545;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.alerta-popup p {
+  margin: 0 0 10px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.fuente {
+  margin-bottom: 14px;
+  color: #666;
+  font-size: 12px;
+}
+
+.alerta-popup button {
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #168da3;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}

@@ -1,0 +1,132 @@
+<ion-content [fullscreen]="true">
+
+  <div class="detalle-container">
+
+    <div class="detalle-card">
+
+      <!-- CABECERA -->
+
+      <div class="detalle-header">
+
+        <button
+          class="back-button"
+          type="button"
+          (click)="volverAlMapa()"
+        >
+          ←
+        </button>
+
+        <div class="header-info">
+
+          <span class="tipo-alerta">
+            Alerta
+          </span>
+
+          <h1>{{ alerta?.titulo }}</h1>
+
+          <span class="fuente">
+            Fuente: {{ alerta?.fuente }}
+          </span>
+
+        </div>
+
+        <div class="header-icon">
+          ☁
+        </div>
+
+      </div>
+
+      <!-- CONTENIDO -->
+
+      <div class="detalle-body">
+
+        <div class="nivel-alerta">
+          Nivel:
+          <strong>{{ alerta?.nivel }}</strong>
+        </div>
+
+        <div class="info-item">
+
+          <div class="info-icon">
+            ◷
+          </div>
+
+          <div>
+            <span class="info-titulo">Inicio</span>
+
+            <span class="info-valor">
+              {{ alerta?.fechaInicio }}
+            </span>
+          </div>
+
+        </div>
+
+        <div class="info-item">
+
+          <div class="info-icon">
+            ◷
+          </div>
+
+          <div>
+            <span class="info-titulo">Fin estimado</span>
+
+            <span class="info-valor">
+              {{ alerta?.fechaFin || 'Sin determinar' }}
+            </span>
+          </div>
+
+        </div>
+
+        <div class="info-item">
+
+          <div class="info-icon">
+            ●
+          </div>
+
+          <div>
+            <span class="info-titulo">Zona afectada</span>
+
+            <span class="info-valor">
+              {{ alerta?.ubicacion?.latitud }},
+              {{ alerta?.ubicacion?.longitud }}
+            </span>
+          </div>
+
+        </div>
+
+        <div class="info-item info-description">
+
+          <div class="info-icon">
+            ☷
+          </div>
+
+          <div>
+
+            <span class="info-titulo">Descripción</span>
+
+            <span class="info-valor">
+              {{ alerta?.descripcion }}
+            </span>
+
+          </div>
+
+        </div>
+
+        <button
+          class="recommendations-button"
+          type="button"
+        >
+          Ver recomendaciones
+        </button>
+
+        <div class="updated">
+          Actualizado: ahora
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</ion-content>

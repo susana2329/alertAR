@@ -14,4 +14,11 @@ export const routes: Routes = [
     path: 'mapa-test',
     loadComponent: () => import('./mapa-test/mapa-test.page').then( m => m.MapaTestPage)
   },
+  {
+  path: 'detalle-alerta/:id',
+  loadComponent: () =>
+    import('./detalle-alerta/detalle-alerta.page').then(
+      m => m.DetalleAlertaPage
+    )
+},
 ];

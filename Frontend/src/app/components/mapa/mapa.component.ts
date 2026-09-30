@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 
-import { Map, Marker, setWorkerUrl } from 'maplibre-gl';
+import { Map, Marker, Popup, setWorkerUrl } from 'maplibre-gl';
 
 import { Capacitor } from '@capacitor/core';
 
@@ -10,6 +10,7 @@ import { ALERTAS_MOCK } from '../../mocks/alertas.mock';
 
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-mapa',
@@ -19,8 +20,15 @@ import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
   styleUrl: './mapa.component.scss'
 })
 export class MapaComponent implements AfterViewInit, OnDestroy {
+filtroActual: 'todas' | 'oficial' | 'vecinal' = 'todas';
+  constructor(private router: Router) {}
 
   private map?: Map;
+
+private marcadores: {
+  marker: Marker;
+  fuente: 'oficial' | 'vecinal';
+}[] = [];
 
   ngAfterViewInit(): void {
     setWorkerUrl(workerUrl);
@@ -73,35 +81,79 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-private cargarAlertas(): void {
-  ALERTAS_MOCK.forEach((alerta) => {
-    if (!this.map) {
-      return;
+  private cargarAlertas(): void {
+
+    ALERTAS_MOCK.forEach((alerta) => {
+
+      if (!this.map) {
+        return;
+      }
+
+      const popup = new Popup({
+        offset: 25,
+        closeButton: true,
+        closeOnClick: true
+      }).setHTML(`
+  <div class="alerta-popup">
+    <h3>${alerta.titulo}</h3>
+
+    <span class="nivel">
+      ${alerta.nivel}
+    </span>
+
+    <p>${alerta.descripcion}</p>
+
+   <div class="fuente">
+  ${
+    alerta.origen === 'oficial'
+      ? `✓ ${alerta.fuente}`
+      : 'Fuente: Vecinal'
+  }
+</div>
+`)
+
+const marker = new Marker()
+  .setLngLat([
+    alerta.ubicacion.longitud,
+    alerta.ubicacion.latitud
+  ])
+  .setPopup(popup)
+  .addTo(this.map);
+
+this.marcadores.push({
+  marker,
+  fuente: alerta.origen
+});
+
+marker.getElement().addEventListener('click', () => {
+
+  setTimeout(() => {
+
+    const boton = document.getElementById(`ver-alerta-${alerta.id}`);
+
+    boton?.addEventListener('click', () => {
+      this.router.navigate(['/detalle-alerta', alerta.id]);
+    });
+
+  });
+
+});
+
+    });
+  }
+
+filtrarAlertas(filtro: 'todas' | 'oficial' | 'vecinal'): void {  this.filtroActual = filtro;
+
+  this.marcadores.forEach(({ marker, fuente }) => {
+    if (filtro === 'todas' || fuente === filtro) {
+      marker.addTo(this.map!);
+    } else {
+      marker.remove();
     }
-
-    const markerElement = document.createElement('div');
-
-    markerElement.innerText = '●';
-
-    markerElement.style.color = 'red';
-    markerElement.style.fontSize = '50px';
-    markerElement.style.fontWeight = 'bold';
-    markerElement.style.width = '50px';
-    markerElement.style.height = '50px';
-    markerElement.style.zIndex = '9999';
-
-    new Marker({
-      element: markerElement
-    })
-      .setLngLat([
-        alerta.ubicacion.longitud,
-        alerta.ubicacion.latitud
-      ])
-      .addTo(this.map);
   });
 }
 
-ngOnDestroy(): void {
-  this.map?.remove();
-}
+  ngOnDestroy(): void {
+    this.map?.remove();
+  }
 }
