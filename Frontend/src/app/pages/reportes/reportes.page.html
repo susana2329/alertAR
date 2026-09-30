@@ -1,3 +1,4 @@
+
 <ion-header>
   <div class="logo">
     <h1>
@@ -33,15 +34,15 @@
       <div class="buttons-reports">
         <div class="cardInundaciones">
           <ion-card id="Indundaciones" (click)="creandoReporte($event)">
-            <ion-card-content  (click)="$event.stopPropagation()">
+            <ion-card-content (click)="$event.stopPropagation()">
               <img src="\assets\icon\casa.png" alt="">
-              inundaciones
+              <p>Inundaciones </p>
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardCalle">
           <ion-card id="Calle-bloqueada" (click)="creandoReporte($event)">
-            <ion-card-content (click)="$event.stopPropagation()" >
+            <ion-card-content (click)="$event.stopPropagation()">
               <img src="\assets\icon\tormenta.png" alt="">
               <p>Calle bloqueada</p>
             </ion-card-content>
@@ -90,5 +91,5 @@
       </ion-note>
     </div>
   </div>
-
 </ion-content>
+

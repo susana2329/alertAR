@@ -43,11 +43,10 @@ ion-header {
 
 .avisoPublic {
 
-    width: 90%;
     text-align: center;
     background-color: #2EC12326;
     border-radius: 10px;
-    height: 90%;
+    height: 50%;
     padding: 1%;
 
 }
@@ -62,6 +61,8 @@ ion-header {
     text-align: center;
     gap: 2%;
     font-size: 100%;
+    padding-left:10px;
+    padding-right: 10px ; 
 }
 
 .escudoPublic img {
@@ -85,12 +86,12 @@ ion-header {
 }
 
 ion-card {
-    width: 70%;
+    width: 250px;
     background-color: #F8FAFC;
     border: solid 4px #00000021;
     box-shadow: 5px 8px 10px #00000040;
     border-radius: 20px;
-    padding-top:10px; 
+    padding:10px; 
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -104,7 +105,7 @@ ion-card-content {
     justify-content: center;
     align-items: center;
     gap: 5px;
-    height: 130px;
+    height: 120px;
     pointer-events: none;
 }
 
@@ -127,14 +128,16 @@ ion-card-content img {
     text-align: center;
     gap: 2%;
     font-size: 100%;
+    padding-left:10px;
+    padding-right:10px ; 
 }
 
 .avisoDescrip {
-    width: 90%;
     text-align: center;
     background-color: #44DAEE2E;
     border-radius: 10px;
-    padding: 1.5%;
+    padding-left: 1%;
+    padding-right: 1%;
     font-style: #03294F;
 }
 

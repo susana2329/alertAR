@@ -2,6 +2,6 @@ export interface Report{
     tipo: string, 
     descripcion: string, 
     ubicacion: string, 
-    fecha: Date,
+    fecha: Date ,
     imagen: File
 }

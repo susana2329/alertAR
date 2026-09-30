@@ -7,11 +7,18 @@ export const routes: Routes = [
   },
     {
     path: 'reportes',
-    loadComponent: () => import('./pages/reportes/reportes.component').then((m) => m.ReportesComponent),
+    loadComponent: () => import('./pages/reportes/reportes.page').then((m) => m.ReportesPage),
   },
   {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',
   },
+  {
+    path: 'reportes/form',
+    loadComponent: () => import('./pages/reportes-form/reportes-form.page').then( m => m.ReportesFormPage)
+  },
+
+
+
 ];
