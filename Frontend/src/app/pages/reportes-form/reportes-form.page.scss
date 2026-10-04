@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+* {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+:host {
+  --ion-background-color: #F8FAFC;
+}
+
+ion-header,
+ion-toolbar,
+ion-modal,
+ion-card,
+ion-title,
+ion-item {
+  --background: #F8FAFC;
+  --ion-text-color: #000;
+}
+
+ion-header {
+  box-shadow: none;
+  --border-style: none;
+}
+
+ion-title {
+  text-align: center;
+  color: black;
+}
+
+.reporte {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.reporte p {
+  padding-left: 10px;
+}
+
+.imgform {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+.panelfoto {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  padding-top: 2%;
+
+}
+
+.previewimg {
+  display: flex;
+  width: 180px;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.previewimg img {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  border: solid 2px #999999;
+  aspect-ratio: 16/9;
+}
+
+.selectimg {
+  width: 140px;
+  border-radius: 6px;
+  border: solid #999999 2px;
+
+}
+
+.descripform {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2%;
+}
+
+.titulodescripcion {
+  width: 100%;
+}
+
+
+.descripcion {
+  display: flex;
+  width: 90%;
+  justify-content: center;
+  align-items: center;
+  height: 90px;
+}
+
+.descripcion ion-textarea {
+  width: 100%;
+  display: flex;
+  border-radius: 8px;
+  border: 2px solid #999999;
+  outline: none;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 1%;
+  --padding-bottom: 0;
+  --highlight-color-focused: #000000B5;
+
+}
+
+
+
+.ubicacionform {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-top: 2%;
+}
+
+.infoubi {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding-left: 2%;
+}
+
+.campubi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 65%;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.campubi ion-input {
+  width: 100%;
+  color: #000000B5;
+  background-color: #F8FAFC;
+  border-radius: 8px;
+  border: 2px solid #999999;
+  height: 60%;
+}
+
+
+.buttonubi ion-button {
+  width: 65px;
+  --border-radius: 8px;
+  --border-width: 2px;
+  --border-style: solid;
+  --border-color: #999999;
+
+  --background: transparent;
+  --background-activated: transparent;
+  --background-focused: transparent;
+  --background-hover: transparent;
+  --color: #222222;
+}
+
+
+.buttonubi {
+  width: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.fechaform {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-top: 2%;
+}
+
+.buttondia,
+.buttontime {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+ion-datetime-button {
+  --background: transparent;
+  --color: #0E7490;
+}
+ion-datetime {
+  --background: #F8FAFC;
+  --wheel-fade-background-rgb: 248, 250, 252;
+  --wheel-highlight-background: #E2E8F0;
+  --wheel-selected-text-color: #2563EB;
+}
+
+.buttonenviar{
+  width: 100%;
+  display: flex ;
+  justify-content: center;
+  
+}
+.buttonenviar ion-button{ 
+  width: 300px;
+  display: flex;
+  
+}
+.buttonenviar img { 
+  width: 10%;
+}
+ion-textarea,
+ion-input {
+  color: #03294FAD;
+}

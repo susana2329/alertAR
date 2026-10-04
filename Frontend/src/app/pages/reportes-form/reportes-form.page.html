@@ -4,10 +4,102 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">reportes-form</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <div class="reporte">
+    <div class="tituloreporte">
+      <ion-header>
+        <ion-toolbar>Agregar informacion</ion-toolbar>
+      </ion-header>
+    </div>
+    <div class="formularioreporte">
+      <div class="imgform">
+        <ion-label>
+          <p>
+            Foto (opcional)
+          </p>
+        </ion-label>
+        <div class="panelfoto">
+          <div class="previewimg">
+            <img src="assets\perrofeliz.jpg" alt="perro">
+          </div>
+          <div class="selectimg">
+          </div>
+        </div>
+      </div>
+      <div class="descripform">
+        <div class="titulodescripcion">
+          <ion-label>
+            <p>
+              Descripcion *
+            </p>
+          </ion-label>
+        </div>
+        <div class="descripcion">
+          <ion-textarea placeholder="Calle con mucha agua, dificil transitar. Vi una rata ahogandose">
+
+          </ion-textarea>
+
+        </div>
+
+      </div>
+      <div class="ubicacionform">
+        <ion-label>
+          <p>Ubicacion</p>
+        </ion-label>
+        <div class="infoubi">
+          <div class="campubi">
+            <ion-input value="Lugano, Buenos Aires (ubicacion automatica)"></ion-input>
+          </div>
+          <div class="buttonubi">
+            <ion-button><img src="assets\icon\mapas.png" alt="mapita" style="width:100%; height: 27px;"></ion-button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fechaform">
+        <div class="buttondia">
+          <ion-label>
+            <p>Fecha</p>
+          </ion-label>
+          <ion-datetime-button datetime="date"></ion-datetime-button>
+        </div>
+        <div class="buttontime">
+          <ion-label>
+            <p>Hora</p>
+          </ion-label>
+          <ion-datetime-button datetime="time"></ion-datetime-button>
+        </div>
+
+        <ion-modal [keepContentsMounted]="true">
+          <ion-header>
+            <ion-item>
+              <ion-title>
+                <h2>Fecha</h2>
+              </ion-title>
+            </ion-item>
+          </ion-header>
+          <ion-datetime id="date" presentation="date"></ion-datetime>
+          <ion-button>Aceptar</ion-button>
+        </ion-modal>
+
+        <ion-modal [keepContentsMounted]="true">
+          <ion-header>
+            <ion-item>
+              <ion-title>
+                <h2>Hora</h2>
+              </ion-title>
+            </ion-item>
+          </ion-header>
+          <ion-datetime id="time" presentation="time"></ion-datetime>
+          <ion-button>Aceptar</ion-button>
+        </ion-modal>
+      </div>
+    </div>
+  </div>
+  <div class="buttonenviar">
+    <ion-button>
+      <img src="assets\icon\navigate-outline.svg" alt="">
+      Enviar reporte
+    </ion-button>
+  </div>
 </ion-content>
