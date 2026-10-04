@@ -113,8 +113,8 @@ export class InicioPage {
 
   constructor(private router: Router) { }
 
-  verRecomendaciones() {
-    // TODO: this.router.navigate(['/inicio/recomendaciones']); cuando exista la página
+  verRecomendaciones(): void {
+    this.router.navigate(['/inicio/recomendaciones']);
   }
 
   verAlerta(alerta: AlertaCercana) {
