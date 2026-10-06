@@ -4,14 +4,19 @@
 
     <div class="detalle-card">
 
-      <div class="detalle-header">
+      <div
+        class="detalle-header"
+        [class.emergencia]="alerta?.nivel === 'emergencia'"
+        [class.advertencia]="alerta?.nivel === 'advertencia'"
+        [class.precaucion]="alerta?.nivel === 'precaucion'"
+      >
 
         <button
           class="back-button"
           type="button"
           (click)="volverAlMapa()"
         >
-          ←
+          <ion-icon name="arrow-back-outline"></ion-icon>
         </button>
 
         <div class="header-info">
@@ -23,20 +28,20 @@
           <h1>{{ alerta?.titulo }}</h1>
 
           <span class="fuente">
-  <ng-container *ngIf="alerta?.origen === 'oficial'; else fuenteVecinal">
-    ✓ {{ alerta?.fuente }}
-  </ng-container>
+            <ng-container *ngIf="alerta?.origen === 'oficial'; else fuenteVecinal">
+              ✓ {{ alerta?.fuente }}
+            </ng-container>
 
-  <ng-template #fuenteVecinal>
-    Fuente: Vecinal
-  </ng-template>
-</span>
+            <ng-template #fuenteVecinal>
+              Fuente: Vecinal
+            </ng-template>
+          </span>
 
         </div>
 
-        <div class="header-icon">
-          ☁
-        </div>
+       <div class="header-icon">
+  <ion-icon [name]="iconoPorTipo()"></ion-icon>
+</div>
 
       </div>
 
@@ -50,15 +55,15 @@
         <div class="info-item">
 
           <div class="info-icon">
-            ◷
+            <ion-icon name="time-outline"></ion-icon>
           </div>
 
           <div>
-            <span class="info-titulo">Inicio</span>
+           <span class="info-titulo">Inicio</span>
 
-            <span class="info-valor">
-              {{ alerta?.fechaInicio }}
-            </span>
+<span class="info-valor">
+  {{ formatearFecha(alerta?.fechaInicio) }}
+</span>
           </div>
 
         </div>
@@ -66,15 +71,14 @@
         <div class="info-item">
 
           <div class="info-icon">
-            ◷
+            <ion-icon name="time-outline"></ion-icon>
           </div>
 
           <div>
             <span class="info-titulo">Fin estimado</span>
 
             <span class="info-valor">
-              {{ alerta?.fechaFin || 'Sin determinar' }}
-            </span>
+{{ formatearFecha(alerta?.fechaFin) }}            </span>
           </div>
 
         </div>
@@ -82,7 +86,7 @@
         <div class="info-item">
 
           <div class="info-icon">
-            ●
+            <ion-icon name="location-outline"></ion-icon>
           </div>
 
           <div>
@@ -99,7 +103,7 @@
         <div class="info-item info-description">
 
           <div class="info-icon">
-            ☷
+            <ion-icon name="document-text-outline"></ion-icon>
           </div>
 
           <div>

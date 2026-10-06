@@ -1,7 +1,12 @@
 <div class="alerta-popup">
   <h2>{{ alerta.titulo }}</h2>
 
-  <span class="nivel">
+  <span
+    class="nivel"
+    [class.emergencia]="alerta.nivel === 'emergencia'"
+    [class.advertencia]="alerta.nivel === 'advertencia'"
+    [class.precaucion]="alerta.nivel === 'precaucion'"
+  >
     {{ alerta.nivel }}
   </span>
 

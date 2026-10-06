@@ -5,6 +5,7 @@ export const ALERTAS_MOCK: Alerta[] = [
   {
     id: '1',
     titulo: 'Inundación',
+    tipo: 'inundacion',
     nivel: 'emergencia',
     origen: 'oficial',
     fuente: 'INA',
@@ -19,6 +20,7 @@ export const ALERTAS_MOCK: Alerta[] = [
   {
     id: '2',
     titulo: 'Tormenta fuerte',
+    tipo: 'tormenta',
     nivel: 'advertencia',
     origen: 'oficial',
     fuente: 'SMN',
@@ -33,6 +35,7 @@ export const ALERTAS_MOCK: Alerta[] = [
   {
     id: '3',
     titulo: 'Incidente en la vía pública',
+    tipo: 'incidente',
     nivel: 'precaucion',
     origen: 'vecinal',
     descripcion: 'Un vecino reportó un incidente en esta ubicación.',
@@ -46,6 +49,7 @@ export const ALERTAS_MOCK: Alerta[] = [
   {
     id: '4',
     titulo: 'Crecida de río',
+    tipo: 'crecida',
     nivel: 'emergencia',
     origen: 'oficial',
     fuente: 'INA',
@@ -60,6 +64,7 @@ export const ALERTAS_MOCK: Alerta[] = [
   {
     id: '5',
     titulo: 'Árbol caído',
+    tipo: 'arbol',
     nivel: 'precaucion',
     origen: 'vecinal',
     descripcion: 'Se reportó la caída de un árbol que afecta parcialmente la circulación.',
@@ -73,6 +78,7 @@ export const ALERTAS_MOCK: Alerta[] = [
   {
     id: '6',
     titulo: 'Temperaturas elevadas',
+    tipo: 'temperaturas',
     nivel: 'advertencia',
     origen: 'oficial',
     fuente: 'SMN',
@@ -87,6 +93,7 @@ export const ALERTAS_MOCK: Alerta[] = [
   {
     id: '7',
     titulo: 'Corte de tránsito',
+    tipo: 'transito',
     nivel: 'advertencia',
     origen: 'vecinal',
     descripcion: 'Vecinos reportaron un corte de tránsito en la zona.',
@@ -100,6 +107,7 @@ export const ALERTAS_MOCK: Alerta[] = [
   {
     id: '8',
     titulo: 'Alerta meteorológica',
+    tipo: 'meteorologica',
     nivel: 'emergencia',
     origen: 'oficial',
     fuente: 'SMN',

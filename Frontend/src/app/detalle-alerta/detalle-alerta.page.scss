@@ -26,6 +26,18 @@ ion-content {
   color: white;
 }
 
+.detalle-header.emergencia {
+  background: #f23827;
+}
+
+.detalle-header.advertencia {
+  background: #ff7700;
+}
+
+.detalle-header.precaucion {
+  background: #f6c945;
+}
+
 .back-button {
   position: absolute;
   top: 18px;

@@ -136,7 +136,7 @@
 .maplibregl-popup-content {
   padding: 0 !important;
   border-radius: 14px !important;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 4px 18px rgb(0 0 0 / 20%);
 }
 
@@ -145,15 +145,16 @@
   right: 8px;
   font-size: 20px;
 }
-
+.alerta-popup__button {
+  background: red !important;
+}
 .alerta-popup {
   width: 260px;
   padding: 16px;
-}
-
-.alerta-popup h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
+  padding-bottom: 20px;
+  background: white;
+  border-radius: 12px;
+  box-sizing: border-box;
 }
 
 .alerta-popup .nivel {

@@ -3,7 +3,6 @@ import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { Map, Marker, Popup, setWorkerUrl } from 'maplibre-gl';
 
 import { Capacitor } from '@capacitor/core';
-
 import { Geolocation } from '@capacitor/geolocation';
 import { filterOutline } from 'ionicons/icons';
 import { ALERTAS_MOCK } from '../../mocks/alertas.mock';
@@ -19,8 +18,9 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [IonIcon],
   templateUrl: './mapa.component.html',
-  styleUrl: './mapa.component.scss'
-})
+  styleUrl: './mapa.component.scss',
+}
+)
 export class MapaComponent implements AfterViewInit, OnDestroy {
 
   filtroActual: 'todas' | 'oficial' | 'vecinal' = 'todas';
@@ -202,9 +202,16 @@ this.marcadorUsuario = new Marker({
 
     ALERTAS_MOCK.forEach((alerta) => {
 
-      if (!this.map) {
-        return;
-      }
+     if (!this.map) {
+  return;
+}
+
+const colorAlerta = {
+  emergencia: '#ef3b3b',
+  advertencia: '#f59e0b',
+  precaucion: '#f6c945'
+}[alerta.nivel];
+
 
       const popup = new Popup({
         offset: 25,
@@ -215,9 +222,12 @@ this.marcadorUsuario = new Marker({
 
           <h3>${alerta.titulo}</h3>
 
-          <span class="nivel">
-            ${alerta.nivel}
-          </span>
+          <span
+  class="nivel"
+  style="background: ${colorAlerta};"
+>
+  ${alerta.nivel}
+</span>
 
           <p>${alerta.descripcion}</p>
 
@@ -241,11 +251,6 @@ this.marcadorUsuario = new Marker({
 
     const markerElement = document.createElement('div');
 
-    const colorAlerta = {
-      emergencia: '#ef3b3b',
-      advertencia: '#f5a623',
-      precaucion: '#f6c945'
-    }[alerta.nivel];
 
     markerElement.className = `alerta-marker alerta-marker--${alerta.nivel}`;
     markerElement.style.width = '58px';
