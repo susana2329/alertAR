@@ -1,0 +1,58 @@
+:host {
+    --ion-background-color: #F8FAFC;
+}
+
+ion-header {
+    box-shadow: none;
+    --border-style: none;
+}
+
+ion-item {
+    --background: #F8FAFC;
+    --ion-text-color: #000;
+    box-shadow: none;
+    --border-style: none;
+
+}
+ion-content{ 
+    border-radius: 30px;
+}
+
+
+.contbuttonfotos {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    height: 20%;
+}
+
+.subirfoto {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.sacarfoto {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+ion-button {
+    width: 90px;
+    --border-radius: 8px;
+    --border-width: 2px;
+    --border-style: solid;
+    --border-color: #999999;
+    --background: transparent;
+    --background-activated: transparent;
+    --background-focused: transparent;
+    --background-hover: transparent;
+    --color: #222222;
+    height: 60px;
+}

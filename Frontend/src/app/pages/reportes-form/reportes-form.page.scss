@@ -8,6 +8,7 @@
   --ion-background-color: #F8FAFC;
 }
 
+// Cambia el color de fondo y letras de los componentes
 ion-header,
 ion-toolbar,
 ion-modal,
@@ -18,16 +19,25 @@ ion-item {
   --ion-text-color: #000;
 }
 
+//Cambia el color de la letra del input y text area
+ion-textarea,
+ion-input {
+  color: #03294FAD;
+}
+
+// Quita las configuraciones predeterminadas de los headers 
 ion-header {
   box-shadow: none;
   --border-style: none;
 }
 
+// El titulo se centrea y cambia el color de la letra
 ion-title {
   text-align: center;
   color: black;
 }
 
+// Todo el cuerpo del reporte
 .reporte {
   display: flex;
   flex-direction: column;
@@ -36,14 +46,40 @@ ion-title {
   padding-right: 5px;
 }
 
-.reporte p {
-  padding-left: 10px;
+// Configuraciones del aviso
+.avisoPublic {
+  text-align: center;
+  background-color: #44DAEE2E;
+  border-radius: 10px;
+  padding-left: 1%;
+  padding-right: 1%;
+  font-style: #03294F;
 }
 
+.avisoPublic ion-note {
+  color: #03294F;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  text-align: center;
+  gap: 2%;
+  font-size: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.avisoPublic img {
+  max-width: 35px;
+}
+
+//Da orden a la imagen preview y la seleccion de imagenes
 .imgform {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding-top: 2%;
 }
 
 
@@ -77,9 +113,26 @@ ion-title {
   width: 140px;
   border-radius: 6px;
   border: solid #999999 2px;
-
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+.selectimg img {
+  width: 60px;
+}
+
+.selectimg {
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.selectimg:active {
+  transform: scale(0.97);
+  opacity: 0.7;
+}
+
+// Descripccion
 .descripform {
   width: 100%;
   height: 100%;
@@ -96,7 +149,7 @@ ion-title {
 
 .descripcion {
   display: flex;
-  width: 90%;
+  width: 94%;
   justify-content: center;
   align-items: center;
   height: 90px;
@@ -116,7 +169,25 @@ ion-title {
 
 }
 
+//Tipo de reportes
+.formtipo {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-top: 2%;
+}
 
+.inputtipo {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+.inputtipo ion-input{
+  width: 95%;
+  --padding: 100px;
+}
+//Ubicacion
 
 .ubicacionform {
   display: flex;
@@ -138,11 +209,9 @@ ion-title {
   align-items: center;
   width: 65%;
   justify-content: center;
-  align-items: center;
-
 }
 
-.campubi ion-input {
+ion-input {
   width: 100%;
   color: #000000B5;
   background-color: #F8FAFC;
@@ -158,7 +227,6 @@ ion-title {
   --border-width: 2px;
   --border-style: solid;
   --border-color: #999999;
-
   --background: transparent;
   --background-activated: transparent;
   --background-focused: transparent;
@@ -174,7 +242,7 @@ ion-title {
   align-items: center;
 }
 
-
+// Fecha y hora
 .fechaform {
   display: flex;
   justify-content: space-around;
@@ -193,6 +261,7 @@ ion-datetime-button {
   --background: transparent;
   --color: #0E7490;
 }
+
 ion-datetime {
   --background: #F8FAFC;
   --wheel-fade-background-rgb: 248, 250, 252;
@@ -200,21 +269,21 @@ ion-datetime {
   --wheel-selected-text-color: #2563EB;
 }
 
-.buttonenviar{
+
+// Boton para enviar el formulario
+.buttonenviar {
   width: 100%;
-  display: flex ;
+  display: flex;
   justify-content: center;
-  
+  margin-top: 10%;
 }
-.buttonenviar ion-button{ 
+
+.buttonenviar ion-button {
   width: 300px;
   display: flex;
-  
+
 }
-.buttonenviar img { 
+
+.buttonenviar img {
   width: 10%;
-}
-ion-textarea,
-ion-input {
-  color: #03294FAD;
 }

@@ -11,21 +11,43 @@
         <ion-toolbar>Agregar informacion</ion-toolbar>
       </ion-header>
     </div>
+    <div class="avisoPublic">
+      <ion-note>
+        <div class="escudoPublic">
+          <img src="\assets\icon\notificacion.png" alt="a">
+        </div>
+        <p>Los títulos que tengan este símbolo "*" son campos obligatorios.</p>
+      </ion-note>
+    </div>
+    <div class="formtipo">
+      <ion-label>
+        <p>
+          Tipo de reporte *
+        </p>
+      </ion-label>
+      <div class="inputtipo" >
+        <ion-input value="{{tipo}}" [disabled]="bandera" (ionChange)="ingresartipo($event)">
+        </ion-input>
+      </div>
+    </div>
     <div class="formularioreporte">
       <div class="imgform">
         <ion-label>
           <p>
-            Foto (opcional)
+            Foto
           </p>
         </ion-label>
         <div class="panelfoto">
           <div class="previewimg">
             <img src="assets\perrofeliz.jpg" alt="perro">
           </div>
-          <div class="selectimg">
+          <div class="selectimg" (click)="abrirmodal()">
+            <img src="assets\icon\camara.png" alt="">
           </div>
         </div>
       </div>
+
+
       <div class="descripform">
         <div class="titulodescripcion">
           <ion-label>
@@ -35,20 +57,19 @@
           </ion-label>
         </div>
         <div class="descripcion">
-          <ion-textarea placeholder="Calle con mucha agua, dificil transitar. Vi una rata ahogandose">
-
+          <ion-textarea placeholder="Calle con mucha agua, dificil transitar. Vi una rata ahogandose"
+            (ionChange)="descripcion($event)">
           </ion-textarea>
-
         </div>
 
       </div>
       <div class="ubicacionform">
         <ion-label>
-          <p>Ubicacion</p>
+          <p>Ubicacion *</p>
         </ion-label>
         <div class="infoubi">
           <div class="campubi">
-            <ion-input value="Lugano, Buenos Aires (ubicacion automatica)"></ion-input>
+            <ion-input value="Lugano, Buenos Aires (ubicacion automatica)" (ionChange)="ubicacion($event)"></ion-input>
           </div>
           <div class="buttonubi">
             <ion-button><img src="assets\icon\mapas.png" alt="mapita" style="width:100%; height: 27px;"></ion-button>
@@ -59,13 +80,13 @@
       <div class="fechaform">
         <div class="buttondia">
           <ion-label>
-            <p>Fecha</p>
+            <p>Fecha *</p>
           </ion-label>
           <ion-datetime-button datetime="date"></ion-datetime-button>
         </div>
         <div class="buttontime">
           <ion-label>
-            <p>Hora</p>
+            <p>Hora *</p>
           </ion-label>
           <ion-datetime-button datetime="time"></ion-datetime-button>
         </div>
@@ -78,7 +99,7 @@
               </ion-title>
             </ion-item>
           </ion-header>
-          <ion-datetime id="date" presentation="date"></ion-datetime>
+          <ion-datetime id="date" presentation="date" (ionChange)="fecha($event)"></ion-datetime>
           <ion-button>Aceptar</ion-button>
         </ion-modal>
 
@@ -90,14 +111,15 @@
               </ion-title>
             </ion-item>
           </ion-header>
-          <ion-datetime id="time" presentation="time"></ion-datetime>
+          <ion-datetime id="time" presentation="time" (ionChange)="hora($event)"></ion-datetime>
           <ion-button>Aceptar</ion-button>
         </ion-modal>
       </div>
     </div>
   </div>
+
   <div class="buttonenviar">
-    <ion-button>
+    <ion-button (click)="enviar()">
       <img src="assets\icon\navigate-outline.svg" alt="">
       Enviar reporte
     </ion-button>
