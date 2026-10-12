@@ -1,10 +1,13 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
+
   {
-    path: 'home',
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+    path: '',
+    redirectTo: 'acceso',
+    pathMatch: 'full',
   },
+
   {
     path: 'inicio',
     loadComponent: () => import('./pages/inicio/inicio.page').then((m) => m.InicioPage),
@@ -21,5 +24,51 @@ export const routes: Routes = [
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',
+  },
+    path: 'acceso',
+    loadComponent: () => import('./pages/acceso/antes-login/antes-login').then(m => m.AntesLoginPage),
+  },
+  {
+    path: 'acceso/flip',
+    loadComponent: () => import('./pages/acceso/acceso-flip/acceso-flip.page').then(m => m.AccesoFlipPage),
+  },
+  {
+    path: 'acceso/permisos-ubicacion',
+    loadComponent: () => import('./pages/acceso/permisos-ubicacion/permisos-ubicacion.page').then(m => m.PermisosUbicacionPage),
+  },
+
+  {
+    path: 'inicio',
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+  },
+  {
+    path: 'mapa',
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+  },
+  {
+    path: 'reportar',
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+  },
+  {
+    path: 'prevencion',
+    redirectTo: 'prevencion/mochila',
+    pathMatch: 'full',
+  },
+  {
+    path: 'prevencion/mochila',
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+  },
+  {
+    path: 'prevencion/recomendaciones',
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+  },
+  {
+    path: 'cuenta',
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+  },
+
+  {
+    path: '**',
+    redirectTo: 'acceso',
   },
 ];
