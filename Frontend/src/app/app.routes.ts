@@ -9,6 +9,22 @@ export const routes: Routes = [
   },
 
   {
+    path: 'inicio',
+    loadComponent: () => import('./pages/inicio/inicio.page').then((m) => m.InicioPage),
+  },
+  {
+    path: 'inicio/recomendaciones',
+    loadComponent: () => import('./pages/inicio/recomendaciones/recomendaciones.page').then((m) => m.RecomendacionesPage),
+  },
+  {
+    path: 'inicio/recomendaciones/:id',
+    loadComponent: () => import('./pages/inicio/recomendaciones/detalle/detalle-recomendacion.page').then((m) => m.DetalleRecomendacionPage),
+  },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
     path: 'acceso',
     loadComponent: () => import('./pages/acceso/antes-login/antes-login').then(m => m.AntesLoginPage),
   },
