@@ -90,6 +90,6 @@ export class RecomendacionesPage {
   }
 
   verCategoria(categoria: CategoriaEmergencia): void {
-    // TODO: this.router.navigate(['/inicio/recomendaciones', categoria.id]); cuando exista el detalle
+    this.router.navigate(['/inicio/recomendaciones', categoria.id]);
   }
 }
