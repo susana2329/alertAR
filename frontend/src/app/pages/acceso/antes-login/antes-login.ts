@@ -15,12 +15,12 @@ export class AntesLoginPage {
     constructor(private router: Router) { }
 
     irALogin() {
-        this.router.navigate(['/acceso/login']);
+        this.router.navigate(['/acceso/flip']);
     }
     irARegistro() {
-        this.router.navigate(['/acceso/registro']);
+        this.router.navigate(['/acceso/flip']);
     }
     continuarSinCuenta() {
-        this.router.navigate(['/inicio']);
+        this.router.navigate(['/permisos-ubicacion']);
     }
 }
