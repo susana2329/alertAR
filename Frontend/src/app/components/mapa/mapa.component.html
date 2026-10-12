@@ -1,0 +1,53 @@
+<div class="map-container">
+  <div id="map"></div>
+
+  <header class="map-header">
+    <button class="header-button" type="button" aria-label="Volver">
+      ←
+    </button>
+
+    <h1>Mapa de alertas</h1>
+
+   <button class="header-button filter-button" type="button" aria-label="Filtros">
+  <ion-icon name="filter-outline"></ion-icon>
+</button>
+  </header>
+
+ <div class="alert-filters">
+  <button
+    class="filter"
+    [class.active]="filtroActual === 'todas'"
+    type="button"
+    (click)="filtrarAlertas('todas')"
+  >
+    Todas
+  </button>
+
+  <button
+    class="filter"
+    [class.active]="filtroActual === 'oficial'"
+    type="button"
+    (click)="filtrarAlertas('oficial')"
+  >
+    Oficiales
+  </button>
+
+<button
+  class="filter"
+  [class.active]="filtroActual === 'vecinal'"
+  type="button"
+  (click)="filtrarAlertas('vecinal')"
+>
+  Vecinos
+</button>
+</div>
+
+  <button
+  class="location-button"
+  type="button"
+  aria-label="Mi ubicación"
+  (click)="centrarEnMiUbicacion()"
+>
+  <ion-icon name="locate-outline"></ion-icon>
+</button>
+</div>  

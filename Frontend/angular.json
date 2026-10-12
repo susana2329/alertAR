@@ -33,7 +33,11 @@
                 "output": "assets"
               }
             ],
-            "styles": ["src/global.scss", "src/theme/variables.scss"],
+            "styles": [
+  "src/global.scss",
+  "src/theme/variables.scss",
+  "node_modules/maplibre-gl/dist/maplibre-gl.css"
+],
             "scripts": [],
             "browser": "src/main.ts"
           },
@@ -115,7 +119,10 @@
     }
   },
   "cli": {
-    "schematicCollections": ["@ionic/angular-toolkit"]
+    "schematicCollections": [
+      "@ionic/angular-toolkit"
+    ],
+    "analytics": "2e26eebf-668b-477a-87cf-d9c2763193a1"
   },
   "schematics": {
     "@ionic/angular-toolkit:component": {
