@@ -1,0 +1,119 @@
+<ion-header class="ion-no-border">
+    <ion-toolbar class="custom-toolbar">
+        <ion-buttons slot="start">
+            <ion-button routerLink="/cuenta">
+                <ion-icon name="chevron-back-outline"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title class="ion-text-center">Ver Perfil</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <div class="perfil-container">
+
+        <div class="main-config-card profile-hero-card">
+            <div class="avatar-container">
+                <img src='assets/imagcuenta/mockuser.jpg' class="profile-avatar">
+            </div>
+
+            <ion-button class="change-photo-btn">
+                <ion-icon name="camera-outline" slot="start"></ion-icon>
+                Cambiar foto de perfil
+            </ion-button>
+        </div>
+
+        <div class="info-banner">
+            <div class="info-icon-box">
+                <ion-icon name="information-circle-outline"></ion-icon>
+            </div>
+            <p>Para cuidar la seguridad de toda la comunidad, mantenemos tus datos de cuenta verificados. Así ayudamos a
+                que la información de una app de emergencias sea confiable.</p>
+        </div>
+
+
+
+        <p class="section-label">Información personal</p>
+        <div class="main-config-card">
+
+            <div class="config-item">
+                <div class="card-icon-box">
+                    <ion-icon name="person-outline"></ion-icon>
+                </div>
+                <div class="card-content">
+                    <span class="field-label">Nombre</span>
+                    <h3>{{ user.name }}</h3>
+                </div>
+            </div>
+
+            <div class="item-divider"></div>
+
+            <div class="config-item">
+                <div class="card-icon-box">
+                    <ion-icon name="person-outline"></ion-icon>
+                </div>
+                <div class="card-content">
+                    <span class="field-label">Apellido</span>
+                    <h3>{{ user.lastname }}</h3>
+                </div>
+            </div>
+
+            <div class="item-divider"></div>
+            <div class="config-item">
+                <div class="card-icon-box">
+                    <ion-icon name="mail-outline"></ion-icon>
+                </div>
+                <div class="card-content">
+                    <span class="field-label">Correo electrónico</span>
+                    <h3>{{ user.email }}</h3>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="main-config-card google-link-card">
+            <div class="config-item no-padding">
+                <div class="card-icon-box google-icon-box">
+                    <img src="assets/icon/logo-google.png" alt="Google">
+                </div>
+                <div class="card-content">
+                    <h3>Sesión iniciada con Google</h3>
+                    <p>Tu cuenta está vinculada a Google. En AlertAR podés cambiar únicamente tu foto de perfil.</p>
+                </div>
+            </div>
+        </div>
+
+        <ion-button expand="block" class="delete-account-btn" (click)="confirmarEliminarCuenta()">
+            <ion-icon name="trash-outline" slot="start"></ion-icon>
+            Eliminar cuenta
+        </ion-button>
+
+    </div>
+</ion-content>
+
+<ion-tab-bar slot="bottom" class="custom-tab-bar">
+    <ion-tab-button tab="inicio" routerLink="/inicio">
+        <ion-icon name="home-outline"></ion-icon>
+        <ion-label>Inicio</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="mapa" routerLink="/mapa">
+        <ion-icon name="map-outline"></ion-icon>
+        <ion-label>Mapa</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="reportar" routerLink="/reportar">
+        <ion-icon name="file-tray-full-outline"></ion-icon>
+        <ion-label>Reportar</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="prevension" routerLink="/prevension">
+        <ion-icon name="shield-outline"></ion-icon>
+        <ion-label>Prevención</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="cuenta" routerLink="/cuenta">
+        <ion-icon name="person-outline"></ion-icon>
+        <ion-label>Cuenta</ion-label>
+    </ion-tab-button>
+</ion-tab-bar>

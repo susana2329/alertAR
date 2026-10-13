@@ -1,19 +1,112 @@
 <ion-header>
-    <ion-toolbar class="custom-toolbar">
-        <ion-buttons slot="start">
-            <ion-button routerLink="/cuenta">
-                <ion-icon name="chevron-back-outline"></ion-icon>
-            </ion-button>
-        </ion-buttons>
-        <ion-title class="ion-text-center">Configuración AlertAR</ion-title>
-    </ion-toolbar>
+  <ion-toolbar class="custom-toolbar">
+    <ion-buttons slot="start">
+      <ion-button routerLink="/cuenta">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Configuración</ion-title>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-    <div class="account-container">
-        <h2>Configuración</h2>
-        <p>Acá voy a poner las configuraciones😝</p>
+  <div class="config-container">
+    
+    <p class="section-label">Preferencias de notificaciones</p>
+
+    <div class="main-config-card">
+      <div class="config-item">
+        <div class="card-icon-box">
+          <img src="assets/icon/icono-config-alerta.png" alt="Icono alertas">
+        </div>
+        <div class="card-content">
+          <h3>Alertas de emergencia</h3>
+          <p>Recibe alertas importantes</p>
+        </div>
+        <ion-toggle [checked]="true" mode="ios"></ion-toggle>
+      </div>
+
+      <div class="item-divider"></div>
+
+      <div class="config-item">
+        <div class="card-icon-box">
+          <img src="assets/icon/icono-config-recomendaciones.png" alt="Icono recomendaciones">
+        </div>
+        <div class="card-content">
+          <h3>Recomendacion diarias</h3>
+          <p>Consejos segun tu ubicacion</p>
+        </div>
+        <ion-toggle [checked]="true" mode="ios"></ion-toggle>
+      </div>
+
+      <div class="item-divider"></div>
+
+      <div class="config-item">
+        <div class="card-icon-box">
+           <img src="assets/icon/icono-config-reportes.png" alt="Icono reportes">
+        </div>
+        <div class="card-content">
+          <h3>Reportes en tu zona</h3>
+          <p>Nuevos reportes cercanos</p>
+        </div>
+        <ion-toggle [checked]="true" mode="ios"></ion-toggle>
+      </div>
+
+      <div class="item-divider"></div>
+
+      <div class="config-item">
+        <div class="card-icon-box">
+           <img src="assets/icon/icono-config-mochila.png" alt="Icono mochila">
+        </div>
+        <div class="card-content">
+          <h3>Recordatorios mochila</h3>
+          <p>Revisa tu mochila periodicamente</p>
+        </div>
+        <ion-toggle [checked]="false" mode="ios"></ion-toggle>
+      </div>
+
     </div>
+
+    <p class="section-label">Ubicacion</p>
+
+    
+    <div class="main-config-card secondary-card">
+
+      <div class="config-item">
+        <div class="card-icon-box">
+          <img src="assets/icon/icono-config-ubicacion.png" alt="Icono ubicacion">
+        </div>
+        <div class="card-content">
+          <h3>Ubicación actual</h3>
+          <p>Permitir acceso al GPS</p>
+        </div>
+        <ion-toggle [checked]="true" mode="ios" (ionChange)="onUbicacionChange($event)"></ion-toggle>
+      </div>
+
+      <div class="item-divider"></div>
+       
+      <div class="config-item">
+        <div class="card-icon-box">
+          <img src="assets/icon/icono-config-actualizacion.png" alt="Icono actualizacion">
+        </div>
+        <div class="card-content">
+          <h3>Actualizar frecuencia</h3>
+          <p>Intervalo de sincronización</p>
+        </div>
+
+        <ion-select interface="popover" value="1h" class="custom-select" (ionChange)="onFrecuenciaChange($event)">
+          <ion-select-option value="30m">Cada 30 min</ion-select-option>
+          <ion-select-option value="1h">Cada 1 hora</ion-select-option>
+          <ion-select-option value="2h">Cada 2 horas</ion-select-option>
+          <ion-select-option value="5h">Cada 5 horas</ion-select-option>
+          <ion-select-option value="10h">Cada 10 horas</ion-select-option>
+          <ion-select-option value="24h">Cada 24 horas</ion-select-option>
+        </ion-select>
+      </div>
+
+    </div>
+
+  </div>
 </ion-content>
 
 <ion-tab-bar slot="bottom" class="custom-tab-bar">

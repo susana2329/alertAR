@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonAvatar, IonRouterLink, IonIcon, IonButton, IonButtons, IonTabBar, IonLabel, IonTabButton } from '@ionic/angular';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonTabBar, IonTabButton, IonLabel, IonAccordionGroup,IonAccordion,IonItem } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { chevronForwardOutline, logOutOutline,chevronBackOutline, homeOutline,mapOutline,bookmarkOutline,fileTrayFullOutline,personOutline,shieldOutline  } from 'ionicons/icons';
+import { chevronBackOutline, chevronForwardOutline, homeOutline, mapOutline, fileTrayFullOutline, shieldOutline, personOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-fuentes',
@@ -14,24 +12,34 @@ import { chevronForwardOutline, logOutOutline,chevronBackOutline, homeOutline,ma
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     RouterLink,
     IonContent,
     IonHeader,
     IonToolbar,
-    IonTitle, 
-    IonIcon,
+    IonTitle,
     IonButtons,
     IonButton,
+    IonIcon,
     IonTabBar,
+    IonTabButton,
     IonLabel,
-    IonTabButton
+    IonAccordionGroup,
+    IonAccordion,
+    IonItem
   ]
 })
 export class FuentesPage implements OnInit {
   constructor() {
-    addIcons({ chevronBackOutline });
+    addIcons({
+      chevronBackOutline,
+      chevronForwardOutline,
+      homeOutline,
+      mapOutline,
+      fileTrayFullOutline,
+      shieldOutline,
+      personOutline
+    });
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 }

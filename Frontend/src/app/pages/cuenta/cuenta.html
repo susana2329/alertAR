@@ -18,9 +18,12 @@
       </ion-avatar>
 
       <div class="profile-info">
-        <h2>{{user.name}}</h2>
+        <h2>{{user.name}} {{user.lastname}}</h2>
         <p>{{user.email}}</p>
-        <a class="edit-profile-link">Ver y editar perfil</a>
+        <div routerLink="/perfil">
+          <a class="edit-profile-link">Ver y editar perfil</a>
+        </div>
+        
       </div>
     </div>
 
@@ -64,26 +67,26 @@
     </div>
 
 
-    <!--Tarjeta para manejar la AYUDA AL USUARIO-->
-    <div class="menu-card" routerLink="/ayuda">
+    <!--Tarjeta para manejar las FUENTES OFICIALES-->
+    <div class="menu-card" routerLink="/fuentes">
       <div class="card-icon-box">
-        <img src='assets/icon/icon-ayuda.png' alt="Icono ayuda">
+        <img src='assets/icon/fuentes.png' alt="Icono ayuda">
       </div>
       <div class="card-content">
-        <h3>Ayuda y soporte</h3>
-        <p>Preguntas frecuentes y contacto</p>
+        <h3>Fuentes Oficiales</h3>
+        <p>Información oficial</p>
       </div>
       <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
     </div>
 
 
     <!--Tarjeta para manejar las FUENTES DE ALERTAR-->
-    <div class="menu-card" routerLink="/fuentes">
+    <div class="menu-card" routerLink="/informacion">
       <div class="card-icon-box">
         <img src='assets/icon/icon-info.png' alt="Icono fuentes">
       </div>
       <div class="card-content">
-        <h3>Info. de AlertAR</h3>
+        <h3>Sobre AlertAR</h3>
         <p>Información</p>
       </div>
       <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
@@ -91,12 +94,12 @@
   </div>
 
 <div class="btn-cerrar-sesion">
-  <ion-button expand="block" fill="outline" color="danger" routerLink="/acceso">
-    <ion-icon slot="start" name="log-out-outline"></ion-icon>
-    Cerrar Sesión
-  </ion-button>
-</div>
-  
+    <ion-button expand="block" fill="outline" color="danger" (click)="confirmarCerrarSesion()">
+      <ion-icon slot="start" name="log-out-outline"></ion-icon>
+      Cerrar Sesión
+    </ion-button>
+  </div>
+
 </ion-content>
 
 <ion-tab-bar slot="bottom" class="custom-tab-bar">
