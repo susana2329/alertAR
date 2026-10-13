@@ -1,4 +1,4 @@
-/* ---------- Barra (igual en los 3 diseños) ---------- */
+
 .barra {
   position: fixed;
   left: 0;
@@ -55,7 +55,6 @@
   transition: color 0.3s ease;
 }
 
-/* Se mueve de tab en tab: mide el 20% porque son 5 tabs */
 .indicador {
   position: absolute;
   top: 0;
@@ -67,7 +66,6 @@
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Flechita de Prevencion */
 .mas {
   position: absolute;
   top: 5px;
@@ -81,7 +79,6 @@
   transform: rotate(180deg);
 }
 
-/* ---------- Diseño 1: circulo que se desliza ---------- */
 .diseno-circulo .indicador::before {
   content: '';
   position: absolute;
@@ -103,7 +100,6 @@
   color: #0E7490;
 }
 
-/* ---------- Diseño 2: icono que sube y flota ---------- */
 .diseno-flotante .indicador {
   display: none;
 }
@@ -123,7 +119,6 @@
   color: #0E7490;
 }
 
-/* ---------- Diseño 3: luz que baja desde arriba ---------- */
 .diseno-luz .indicador::before {
   content: '';
   position: absolute;
@@ -155,7 +150,6 @@
   color: #0E7490;
 }
 
-/* ---------- Menu de Prevencion (Mi mochila / Recomendaciones) ---------- */
 .fondo-menu {
   position: fixed;
   top: 0;
@@ -181,7 +175,7 @@
   animation: abrir-menu 0.2s ease;
 }
 
-/* Triangulito que apunta a la tab de Prevencion */
+
 .menu-prevencion::after {
   content: '';
   position: absolute;
@@ -229,7 +223,6 @@
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-/* Para quien tiene activada la opcion de reducir movimiento en su celular */
 @media (prefers-reduced-motion: reduce) {
   .icono,
   .icono ion-icon,

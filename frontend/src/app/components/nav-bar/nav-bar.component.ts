@@ -15,28 +15,23 @@ addIcons({ homeOutline, mapOutline, addCircleOutline, shieldCheckmarkOutline, pe
 })
 export class NavBarComponent {
 
-  // Diseño de la barra, probá cambiando esta palabra: 'circulo' | 'flotante' | 'luz'
   diseno = 'circulo';
 
   tabs = [
     { nombre: 'Inicio', ruta: '/inicio', icono: 'home-outline', conMenu: false },
-    { nombre: 'Mapa', ruta: '/mapa', icono: 'map-outline', conMenu: false },
+    { nombre: 'Mapa', ruta: '/mapa-test', icono: 'map-outline', conMenu: false },
     { nombre: 'Reportar', ruta: '/reportar', icono: 'add-circle-outline', conMenu: false },
     { nombre: 'Prevencion', ruta: '/prevencion', icono: 'shield-checkmark-outline', conMenu: true },
     { nombre: 'Cuenta', ruta: '/cuenta', icono: 'person-outline', conMenu: false }
   ];
-
-  // Las dos opciones que se abren al tocar Prevencion
   opcionesPrevencion = [
     { nombre: 'Mi mochila', ruta: '/prevencion/mochila', icono: 'bag-handle-outline' },
     { nombre: 'Recomendaciones', ruta: '/prevencion/recomendaciones', icono: 'bulb-outline' }
   ];
 
-  // Son signals porque cambian solos (al navegar), no por un click
   url = signal('');
   menuAbierto = signal(false);
 
-  // Que tab esta activa (-1 = ninguna, o sea que estamos en una pantalla sin barra)
   indice = computed(() => this.tabs.findIndex(tab => this.url().startsWith(tab.ruta)));
   visible = computed(() => this.indice() !== -1);
 
@@ -50,7 +45,6 @@ export class NavBarComponent {
       }
     });
 
-    // Cuando la barra se ve, las paginas dejan lugar abajo para que no las tape (ver global.scss)
     effect(() => {
       document.body.classList.toggle('con-barra', this.visible());
     });
