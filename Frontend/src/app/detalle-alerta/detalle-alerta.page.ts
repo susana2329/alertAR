@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { ALERTAS_MOCK } from '../mocks/alertas.mock';
 import { Alerta } from '../models/alerta.model';
+import { CommonModule } from '@angular/common'; 
 
 
 import {
@@ -24,7 +25,7 @@ import {
   selector: 'app-detalle-alerta',
   templateUrl: './detalle-alerta.page.html',
   styleUrls: ['./detalle-alerta.page.scss'],
-  imports: [IonContent, IonIcon]
+  imports: [CommonModule, IonContent, IonIcon]
 })
 export class DetalleAlertaPage implements OnInit {
 
@@ -66,10 +67,10 @@ export class DetalleAlertaPage implements OnInit {
   switch (this.alerta?.tipo) {
     case 'inundacion':
     case 'crecida':
-      return 'water-outline';
+      return 'water';
 
     case 'tormenta':
-      return 'rainy-outline';
+      return 'rainy-outline'; 
 
     case 'temperaturas':
       return 'thermometer-outline';

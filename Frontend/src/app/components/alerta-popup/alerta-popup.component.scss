@@ -1,15 +1,20 @@
+
 .alerta-popup {
   width: 260px;
+  max-width: calc(100vw - 64px);
+  box-sizing: border-box;
   padding: 16px;
+  overflow-wrap: break-word;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgb(0 0 0 / 20%);
 }
 
-.alerta-popup h2 {
+.alerta-popup h3 {
   margin: 0 0 8px;
   font-size: 18px;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .nivel {
@@ -39,6 +44,8 @@
   margin: 0 0 10px;
   font-size: 14px;
   line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .fuente {
@@ -48,7 +55,9 @@
 }
 
 .alerta-popup button {
+  display: block;
   width: 100%;
+  box-sizing: border-box;
   padding: 9px 12px;
   border: 0;
   border-radius: 8px;
@@ -56,4 +65,16 @@
   color: white;
   font-size: 14px;
   cursor: pointer;
+}
+
+.maplibregl-popup-content {
+  box-sizing: border-box;
+  max-width: calc(100vw - 32px);
+  padding: 0;
+}
+
+.maplibregl-popup-close-button {
+  z-index: 1;
+  padding: 4px 8px;
+  font-size: 18px;
 }
