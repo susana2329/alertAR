@@ -131,6 +131,16 @@ ion-title {
   transform: scale(0.97);
   opacity: 0.7;
 }
+.buttonimage{
+  display: flex;
+  position: absolute;
+  justify-content: space-evenly;
+  width: 100%;
+}
+.buttonimage ion-button{
+  --background: transparent;
+  border:#999999 solid 1px
+}
 
 // Descripccion
 .descripform {
@@ -161,11 +171,11 @@ ion-title {
   border-radius: 8px;
   border: 2px solid #999999;
   outline: none;
-  --padding-start: 0;
-  --padding-end: 0;
-  --padding-top: 1%;
-  --padding-bottom: 0;
-  --highlight-color-focused: #000000B5;
+      --padding-start: 8px;
+    --padding-end: 8px;
+    --padding-top: 4px;
+    --padding-bottom: 4px;
+    --highlight-color-focused: #000000B5;
 
 }
 
@@ -286,4 +296,7 @@ ion-datetime {
 
 .buttonenviar img {
   width: 10%;
+}
+ion-modal.modal{
+  border-radius: 30px;
 }

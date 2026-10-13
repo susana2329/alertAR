@@ -10,9 +10,6 @@ import {
   IonButton,
   IonDatetime,
   IonDatetimeButton,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
   IonTextarea,
   IonItem,
   IonInput,
@@ -24,6 +21,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IonModal } from '@ionic/angular/common';
 import { ModalController } from '@ionic/angular';
 import { ModalPhotosComponent } from '../../components/modal-photos/modal-photos.component'
+import { ModalConfirmacionComponent } from '../../components/modal-confirmacion/modal-confirmacion.component'
 @Component({
   selector: 'app-reportes-form',
   templateUrl: './reportes-form.page.html',
@@ -42,7 +40,8 @@ import { ModalPhotosComponent } from '../../components/modal-photos/modal-photos
     IonTextarea,
     IonItem,
     IonInput,
-    IonNote
+    IonNote,
+    ModalPhotosComponent
   ]
 })
 export class ReportesFormPage implements OnInit {
@@ -51,8 +50,8 @@ export class ReportesFormPage implements OnInit {
     tipo: "",
     descripcion: "",
     ubicacion: "",
-    fecha: new Date,
-    imagen: new File([], '')
+    fecha: new Date(),
+    imagen: []
   }
   public bandera!: boolean
 
@@ -69,40 +68,53 @@ export class ReportesFormPage implements OnInit {
       this.bandera = true
       this.reporte.tipo = this.tipo
     }
+    console.log(this.fecha)
   }
+
+
+
   ingresartipo(event: Event) {
     if (this.bandera == false) {
       this.reporte.tipo = (event as CustomEvent).detail.value
       console.log(this.reporte.tipo)
     }
   }
-  descripcion(event: Event) {
-    this.reporte.descripcion = (event as CustomEvent).detail.value
-  }
+
+
+
+
   ubicacion(event: Event) {
     this.reporte.ubicacion = (event as CustomEvent).detail.value
   }
-  hora(event: Event) {
-    console.log(event as PointerEvent)
-  }
+
+
+
   fecha(event: Event) {
-    console.log(event as PointerEvent)
+    this.reporte.fecha = new Date((event as CustomEvent).detail.value)
+    console.log(this.reporte.fecha)
   }
-  async construccionmodal() {
+
+
+
+  async abrirmodalphotos() {
     const modalbuttons = await this.modal.create({
       component: ModalPhotosComponent,
       initialBreakpoint: 0.3,
-
+      breakpoints : [0.25, 0.5, 0.75, 1]
     })
-
     await modalbuttons.present()
   }
-  abrirmodal() {
-    this.construccionmodal()
+  guardarfotos(event: object[]) {
+    console.log("vino de hijo", event)
   }
-  enviar() {
 
 
+
+  async confirmarreport() {
+    const modalcomfirmar = await this.modal.create({
+      component: ModalConfirmacionComponent,
+    })
+    await modalcomfirmar.present()
   }
 
 }

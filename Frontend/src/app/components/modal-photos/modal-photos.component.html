@@ -11,7 +11,7 @@
           Sacar una foto
         </p>
       </ion-label>
-      <ion-button>
+      <ion-button (click)="tomarfoto()">
         <ion-icon size="large" name="camera-outline"></ion-icon>
       </ion-button>
     </div>
@@ -20,9 +20,10 @@
       <ion-label>
         <p>Seleccionar una foto</p>
       </ion-label>
-      <ion-button>
+      <ion-button (click)="selecfoto()">
         <ion-icon size="large" name="image-outline"></ion-icon>
       </ion-button>
+
     </div>
   </div>
 </ion-content>

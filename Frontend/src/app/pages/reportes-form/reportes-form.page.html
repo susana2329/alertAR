@@ -25,7 +25,7 @@
           Tipo de reporte *
         </p>
       </ion-label>
-      <div class="inputtipo" >
+      <div class="inputtipo">
         <ion-input value="{{tipo}}" [disabled]="bandera" (ionChange)="ingresartipo($event)">
         </ion-input>
       </div>
@@ -39,9 +39,22 @@
         </ion-label>
         <div class="panelfoto">
           <div class="previewimg">
+            <div class="buttonimage">
+              <div>
+                <ion-button>
+                  🡠
+                </ion-button>
+              </div>
+              <div class="adelantarimg">
+                <ion-button>
+                  🡢
+                </ion-button>
+              </div>
+            </div>
             <img src="assets\perrofeliz.jpg" alt="perro">
+
           </div>
-          <div class="selectimg" (click)="abrirmodal()">
+          <div class="selectimg" (click)="abrirmodalphotos()">
             <img src="assets\icon\camara.png" alt="">
           </div>
         </div>
@@ -57,8 +70,8 @@
           </ion-label>
         </div>
         <div class="descripcion">
-          <ion-textarea placeholder="Calle con mucha agua, dificil transitar. Vi una rata ahogandose"
-            (ionChange)="descripcion($event)">
+          <ion-textarea placeholder="Calle con mucha agua, dificil transitar. Vi una rata ahogandose" maxlength="200"
+            [counter]="true" [(ngModel)]="reporte.descripcion">
           </ion-textarea>
         </div>
 
@@ -82,13 +95,7 @@
           <ion-label>
             <p>Fecha *</p>
           </ion-label>
-          <ion-datetime-button datetime="date"></ion-datetime-button>
-        </div>
-        <div class="buttontime">
-          <ion-label>
-            <p>Hora *</p>
-          </ion-label>
-          <ion-datetime-button datetime="time"></ion-datetime-button>
+          <ion-datetime-button datetime="datetime"></ion-datetime-button>
         </div>
 
         <ion-modal [keepContentsMounted]="true">
@@ -99,19 +106,7 @@
               </ion-title>
             </ion-item>
           </ion-header>
-          <ion-datetime id="date" presentation="date" (ionChange)="fecha($event)"></ion-datetime>
-          <ion-button>Aceptar</ion-button>
-        </ion-modal>
-
-        <ion-modal [keepContentsMounted]="true">
-          <ion-header>
-            <ion-item>
-              <ion-title>
-                <h2>Hora</h2>
-              </ion-title>
-            </ion-item>
-          </ion-header>
-          <ion-datetime id="time" presentation="time" (ionChange)="hora($event)"></ion-datetime>
+          <ion-datetime id="datetime" (ionChange)="fecha($event)"></ion-datetime>
           <ion-button>Aceptar</ion-button>
         </ion-modal>
       </div>
@@ -119,9 +114,10 @@
   </div>
 
   <div class="buttonenviar">
-    <ion-button (click)="enviar()">
+    <ion-button (click)="confirmarreport()">
       <img src="assets\icon\navigate-outline.svg" alt="">
       Enviar reporte
     </ion-button>
   </div>
 </ion-content>
+<app-modal-photos (fotosguardadas)="guardarfotos($event)"></app-modal-photos>

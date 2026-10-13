@@ -3,5 +3,5 @@ export interface Report{
     descripcion: string, 
     ubicacion: string, 
     fecha: Date ,
-    imagen: File
+    imagen: string[]
 }

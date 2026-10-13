@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key> NSCameraUsageDescription<key>
+	<string>Permisos para usar la camara<string>
+
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Permisos para guardar fotos en tu galería.</string>	
+
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Permisos para acceder a tus fotos para adjuntarlas a los reportes.</string>
   <key>CAPACITOR_DEBUG</key>
 	<string>$(CAPACITOR_DEBUG)</string>
 	<key>CFBundleDevelopmentRegion</key>
