@@ -35,21 +35,8 @@ export const routes: Routes = [
   },
 // cuando vayan subiendo las demas pages
   {
-    path: 'mapa',
-    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
-  },
-  {
-    path: 'reportar',
-    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
-  },
-  {
-    path: 'prevencion',
-    redirectTo: 'prevencion/mochila',
-    pathMatch: 'full',
-  },
-  {
     path: 'mapa-test',
-    loadComponent: () => import('./mapa-test/mapa-test.page').then( m => m.MapaTestPage)
+    loadComponent: () => import('./mapa-test/mapa-test.page').then(m => m.MapaTestPage),
   },
   {
   path: 'detalle-alerta/:id',
@@ -58,7 +45,7 @@ export const routes: Routes = [
       m => m.DetalleAlertaPage
     )
 },
-];
+{
     path: 'prevencion/mochila',
     loadComponent: () => import('./home/home.page').then(m => m.HomePage),
   },
