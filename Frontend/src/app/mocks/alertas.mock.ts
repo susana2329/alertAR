@@ -1,122 +1,90 @@
 import { Alerta } from '../models/alerta.model';
 
-export const ALERTAS_MOCK: Alerta[] = [
+const TITULOS = [
+  { titulo: 'Inundación', tipo: 'inundacion' },
+  { titulo: 'Tormenta fuerte', tipo: 'tormenta' },
+  { titulo: 'Incidente en la vía pública', tipo: 'incidente' },
+  { titulo: 'Crecida de río', tipo: 'crecida' },
+  { titulo: 'Árbol caído', tipo: 'arbol' },
+  { titulo: 'Temperaturas elevadas', tipo: 'temperaturas' },
+  { titulo: 'Corte de tránsito', tipo: 'transito' },
+  { titulo: 'Alerta meteorológica', tipo: 'meteorologica' },
+];
 
-  {
-    id: '1',
-    titulo: 'Inundación',
-    tipo: 'inundacion',
-    nivel: 'emergencia',
-    origen: 'oficial',
-    fuente: 'INA',
-    descripcion: 'Zona afectada por acumulación de agua.',
-    fechaInicio: '2026-09-19T18:00:00',
-    ubicacion: {
-      latitud: -34.6792,
-      longitud: -58.4627
-    }
-  },
+const NIVELES = ['emergencia', 'advertencia', 'precaucion'] as const;
+const FUENTES = ['SMN', 'INA'] as const;
 
-  {
-    id: '2',
-    titulo: 'Tormenta fuerte',
-    tipo: 'tormenta',
-    nivel: 'advertencia',
-    origen: 'oficial',
-    fuente: 'SMN',
-    descripcion: 'Se esperan lluvias intensas y actividad eléctrica en la zona.',
-    fechaInicio: '2026-09-19T19:00:00',
-    ubicacion: {
-      latitud: -34.6705,
-      longitud: -58.4550
-    }
-  },
+const ZONAS = [
+  { latitud: -34.5885, longitud: -58.4305 },
+  { latitud: -34.5628, longitud: -58.4567 },
+  { latitud: -34.6037, longitud: -58.3816 },
+  { latitud: -34.6095, longitud: -58.3974 },
+  { latitud: -34.6185, longitud: -58.4350 },
+  { latitud: -34.6275, longitud: -58.4620 },
+  { latitud: -34.6560, longitud: -58.4770 },
+  { latitud: -34.6390, longitud: -58.3650 },
+  { latitud: -34.5750, longitud: -58.4850 },
+  { latitud: -34.6100, longitud: -58.4550 },
+  { latitud: -34.5900, longitud: -58.3900 },
+  { latitud: -34.6740, longitud: -58.4500 },
+];
 
-  {
-    id: '3',
-    titulo: 'Incidente en la vía pública',
-    tipo: 'incidente',
-    nivel: 'precaucion',
-    origen: 'vecinal',
-    descripcion: 'Un vecino reportó un incidente en esta ubicación.',
-    fechaInicio: '2026-09-19T20:00:00',
-    ubicacion: {
-      latitud: -34.6860,
-      longitud: -58.4700
-    }
-  },
+let semilla = 20261012;
 
-  {
-    id: '4',
-    titulo: 'Crecida de río',
-    tipo: 'crecida',
-    nivel: 'emergencia',
-    origen: 'oficial',
-    fuente: 'INA',
-    descripcion: 'Se registró un aumento significativo del nivel del agua.',
-    fechaInicio: '2026-09-19T20:30:00',
-    ubicacion: {
-      latitud: -34.6650,
-      longitud: -58.4750
-    }
-  },
+function aleatorio(): number {
+  semilla = (semilla * 16807) % 2147483647;
+  return (semilla - 1) / 2147483646;
+}
 
-  {
-    id: '5',
-    titulo: 'Árbol caído',
-    tipo: 'arbol',
-    nivel: 'precaucion',
-    origen: 'vecinal',
-    descripcion: 'Se reportó la caída de un árbol que afecta parcialmente la circulación.',
-    fechaInicio: '2026-09-19T21:00:00',
-    ubicacion: {
-      latitud: -34.6920,
-      longitud: -58.4580
-    }
-  },
+function desplazamientoNormal(): number {
+  let suma = 0;
 
-  {
-    id: '6',
-    titulo: 'Temperaturas elevadas',
-    tipo: 'temperaturas',
-    nivel: 'advertencia',
-    origen: 'oficial',
-    fuente: 'SMN',
-    descripcion: 'Se esperan temperaturas elevadas durante las próximas horas.',
-    fechaInicio: '2026-09-19T21:30:00',
-    ubicacion: {
-      latitud: -34.6740,
-      longitud: -58.4680
-    }
-  },
-
-  {
-    id: '7',
-    titulo: 'Corte de tránsito',
-    tipo: 'transito',
-    nivel: 'advertencia',
-    origen: 'vecinal',
-    descripcion: 'Vecinos reportaron un corte de tránsito en la zona.',
-    fechaInicio: '2026-09-19T22:00:00',
-    ubicacion: {
-      latitud: -34.6820,
-      longitud: -58.4500
-    }
-  },
-
-  {
-    id: '8',
-    titulo: 'Alerta meteorológica',
-    tipo: 'meteorologica',
-    nivel: 'emergencia',
-    origen: 'oficial',
-    fuente: 'SMN',
-    descripcion: 'Condiciones meteorológicas adversas previstas para la zona.',
-    fechaInicio: '2026-09-19T22:30:00',
-    ubicacion: {
-      latitud: -34.6900,
-      longitud: -58.4750
-    }
+  for (let i = 0; i < 6; i++) {
+    suma += aleatorio();
   }
 
-];
+  return (suma - 3) * 0.0025;
+}
+
+export const ALERTAS_MOCK: Alerta[] = Array.from(
+  { length: 100 },
+  (_, i) => {
+    const base = TITULOS[i % TITULOS.length];
+    const origen = i % 3 === 0 ? 'oficial' : 'vecinal';
+
+    let latitud: number;
+    let longitud: number;
+
+    if (aleatorio() < 0.75) {
+      const zona = ZONAS[Math.floor(aleatorio() * ZONAS.length)];
+
+      latitud = zona.latitud + desplazamientoNormal();
+      longitud = zona.longitud + desplazamientoNormal();
+    } else {
+      latitud = -34.555 + aleatorio() * 0.135;
+      longitud = -58.530 + aleatorio() * 0.180;
+    }
+
+    return {
+      id: String(i + 1),
+      titulo: `${base.titulo} #${i + 1}`,
+      tipo: base.tipo,
+      nivel: NIVELES[i % NIVELES.length],
+      origen,
+      ...(origen === 'oficial'
+        ? { fuente: FUENTES[i % FUENTES.length] }
+        : {}),
+      descripcion:
+        i % 4 === 0
+          ? 'Se reporta una situación que podría afectar significativamente la circulación y la seguridad de los vecinos de la zona.'
+          : `Alerta de prueba ${i + 1}. Se necesita verificar la situación y evaluar su impacto en el área afectada.`,
+      fechaInicio: new Date(
+        Date.UTC(2026, 8, 19, 18, 0) + i * 5 * 60 * 1000
+      ).toISOString(),
+      ubicacion: {
+        latitud,
+        longitud,
+      },
+    } as Alerta;
+  }
+);
