@@ -1,10 +1,11 @@
-import { Component, Output, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IonButton, IonContent, IonHeader, IonIcon, IonItem, IonLabel } from '@ionic/angular';
-import { imageOutline, options } from 'ionicons/icons';
+import { imageOutline, options, arrowBackOutline } from 'ionicons/icons';
 import { cameraOutline } from 'ionicons/icons'
 import { addIcons } from 'ionicons';
 import { Camera } from '@capacitor/camera'
 import { __metadata } from 'tslib';
+import { ModalController } from '@ionic/angular';
 @Component({
   selector: 'app-modal-photos',
   templateUrl: './modal-photos.component.html',
@@ -12,12 +13,15 @@ import { __metadata } from 'tslib';
   imports: [IonContent, IonButton, IonIcon, IonHeader, IonItem, IonLabel],
 })
 export class ModalPhotosComponent implements OnInit {
-  public fotos: object[] = []
-  @Output() fotosguardadas = new EventEmitter<object[]>()
-  constructor() {
+  public fotos: Blob[] = []
+  public imagen?: string = ""
+  public blob?: Blob
+  public url?: string
+  constructor(private modalController: ModalController) {
     addIcons({
       'image-outline': imageOutline,
-      'camera-outline': cameraOutline
+      'camera-outline': cameraOutline,
+      'arrow-back-outline': arrowBackOutline
     })
   }
   ngOnInit() {
@@ -29,16 +33,18 @@ export class ModalPhotosComponent implements OnInit {
       const result = await Camera.takePhoto({
         quality: 90,
         includeMetadata: true,
-
       })
-
       if (this.fotos.length < 3) {
-        this.fotos.push(result)
-        console.log(result)
+
+        this.blob = await this.base64blob(result.thumbnail!)
+        this.fotos.push(this.blob)
+        await this.modalController.dismiss(this.fotos);
       }
+
       else {
         console.log("Solo se puede subir 3 fotoss")
       }
+
     }
     catch (a) {
       const error = a as any
@@ -46,6 +52,9 @@ export class ModalPhotosComponent implements OnInit {
       console.error('takePhoto failed:', message);
     }
   }
+
+
+
   async selecfoto() {
     try {
       const { results } = await Camera.chooseFromGallery({
@@ -53,15 +62,25 @@ export class ModalPhotosComponent implements OnInit {
         limit: 3,
         includeMetadata: true,
       });
+      if (results.length === 0) {
+        console.info('No se seleccionó ninguna foto.')
+        return
+      }
+      console.log("el resultado es",results)
       for (const item of results) {
-        if (this.fotos.length < 3) {
-          this.fotos.push(item)
+        if (this.fotos.length < 3 ) {
+          console.log(item)
+          this.blob = await this.base64blob(item.thumbnail!)
+          this.fotos.push(this.blob)
+          console.log(this.fotos)
         }
         else {
           console.log("Solo se puede subir 3 fotoss")
-          break
+          
         }
       }
+      await this.modalController.dismiss(this.fotos)
+      console.log("fotos",this.fotos)
 
     } catch (e) {
       const error = e as any;
@@ -69,10 +88,9 @@ export class ModalPhotosComponent implements OnInit {
       console.error('chooseFromGallery failed:', message);
     }
   }
-  enviar() {
-    this.fotosguardadas.emit([{
-      prueba: "osdaaodsoads"
-    }])
+  async base64blob(data: string) {
+    const res = await fetch(`data:image/jpeg;base64,${data}`);
+    this.blob = await res.blob();
+    return this.blob
   }
-
 }

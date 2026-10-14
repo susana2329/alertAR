@@ -29,8 +29,22 @@ ion-input {
 ion-header {
   box-shadow: none;
   --border-style: none;
+  display: flex;
 }
-
+.buttonatras{
+  display: flex;
+  background-color: #F8FAFC;
+}
+.logo{
+  width: 100%;
+}
+.buttonatras ion-button{ 
+   --background: #F8FAFC;
+  --background-activated: transparent;
+  --background-focused: transparent;
+  --background-hover: transparent;
+  --box-shadow:none; 
+}
 // El titulo se centrea y cambia el color de la letra
 ion-title {
   text-align: center;
@@ -135,11 +149,14 @@ ion-title {
   display: flex;
   position: absolute;
   justify-content: space-evenly;
-  width: 100%;
+  width: 90%;
+  
 }
 .buttonimage ion-button{
   --background: transparent;
-  border:#999999 solid 1px
+  border:#999999 solid 1px; 
+  border-radius: 3px;
+
 }
 
 // Descripccion

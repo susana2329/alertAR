@@ -1,7 +1,16 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>{{tipo}}</ion-title>
-  </ion-toolbar>
+  <div class="buttonatras">
+    <ion-button (click)="volver()">
+      <ion-icon  size="small" name="arrow-back-outline">
+      </ion-icon>
+    </ion-button>
+  </div>
+  <div class="logo">
+    <ion-toolbar>
+      <ion-title>{{tipo}}</ion-title>
+    </ion-toolbar>
+  </div>
+
 </ion-header>
 
 <ion-content>
@@ -39,19 +48,19 @@
         </ion-label>
         <div class="panelfoto">
           <div class="previewimg">
-            <div class="buttonimage">
+            <div class="buttonimage" >
               <div>
-                <ion-button>
+                <ion-button (click)="atrasfoto()">
                   🡠
                 </ion-button>
               </div>
               <div class="adelantarimg">
-                <ion-button>
+                <ion-button (click)="siguientefoto()">
                   🡢
                 </ion-button>
               </div>
             </div>
-            <img src="assets\perrofeliz.jpg" alt="perro">
+            <img [src]="previewimg[contador] || previewimg[0] || 'assets/icon/camara.png'" alt="Vista previa de foto">
 
           </div>
           <div class="selectimg" (click)="abrirmodalphotos()">
@@ -82,7 +91,7 @@
         </ion-label>
         <div class="infoubi">
           <div class="campubi">
-            <ion-input value="Lugano, Buenos Aires (ubicacion automatica)" (ionChange)="ubicacion($event)"></ion-input>
+            <ion-input [(ngModel)]="reporte.ubicacion"></ion-input>
           </div>
           <div class="buttonubi">
             <ion-button><img src="assets\icon\mapas.png" alt="mapita" style="width:100%; height: 27px;"></ion-button>
@@ -120,4 +129,3 @@
     </ion-button>
   </div>
 </ion-content>
-<app-modal-photos (fotosguardadas)="guardarfotos($event)"></app-modal-photos>
