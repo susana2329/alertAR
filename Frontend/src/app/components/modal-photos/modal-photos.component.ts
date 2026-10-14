@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IonButton, IonContent, IonHeader, IonIcon, IonItem, IonLabel } from '@ionic/angular';
-import { imageOutline, options, arrowBackOutline } from 'ionicons/icons';
+import { imageOutline, arrowBackOutline } from 'ionicons/icons';
 import { cameraOutline } from 'ionicons/icons'
 import { addIcons } from 'ionicons';
 import { Camera } from '@capacitor/camera'

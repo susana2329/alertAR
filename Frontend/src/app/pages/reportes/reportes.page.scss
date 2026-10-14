@@ -1,8 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 
 * {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
+
 :host {
     padding-left: 2%;
     padding-right: 2%;
@@ -26,13 +27,28 @@ ion-content {
 }
 
 ion-header {
+    display: flex;
     box-shadow: none;
     --border-style: none;
 }
-
+.buttonatras{
+    display: flex;
+    width: 20%;
+    justify-content: center;
+}
+.buttonatras ion-button{ 
+    --background: #F8FAFC;
+    width: 100%;
+}
 .logo {
-    text-align: center;
-    color: black;
+    width: 80%;
+    display: flex;
+    justify-content: space-around;
+}
+
+svg {
+    width:60%;
+    height: 50px;
 }
 
 .subtitulo {
@@ -66,8 +82,8 @@ ion-header {
     text-align: center;
     gap: 2%;
     font-size: 100%;
-    padding-left:10px;
-    padding-right: 10px ; 
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .escudoPublic img {
@@ -96,12 +112,13 @@ ion-card {
     border: solid 4px #00000021;
     box-shadow: 5px 8px 10px #00000040;
     border-radius: 20px;
-    padding:10px; 
+    padding: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
+
 ion-card:active {
-  transform: scale(0.94);
+    transform: scale(0.94);
 }
 
 ion-card-content {
@@ -123,7 +140,8 @@ ion-card-content img {
     display: flex;
     justify-content: center;
 }
-.avisoDescrip ion-note{ 
+
+.avisoDescrip ion-note {
     color: #03294F;
     width: 100%;
     display: flex;
@@ -133,8 +151,8 @@ ion-card-content img {
     text-align: center;
     gap: 2%;
     font-size: 100%;
-    padding-left:10px;
-    padding-right:10px ; 
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .avisoDescrip {
