@@ -1,0 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+* {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+:host {
+    padding-left: 2%;
+    padding-right: 2%;
+    background-color: #F8FAFC;
+}
+
+ion-content {
+    --background: hsl(210, 40%, 98%);
+    --color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.elements {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+ion-header {
+    display: flex;
+    box-shadow: none;
+    --border-style: none;
+}
+.buttonatras{
+    display: flex;
+    width: 20%;
+    justify-content: center;
+}
+.buttonatras ion-button{ 
+    --background: #F8FAFC;
+    width: 100%;
+}
+.logo {
+    width: 80%;
+    display: flex;
+    justify-content: space-around;
+}
+
+svg {
+    width:60%;
+    height: 50px;
+}
+
+.subtitulo {
+    padding-left: 5%;
+    padding-right: 5%;
+    text-align: center;
+}
+
+.subtitulo h2 {
+    margin-bottom: 0px;
+}
+
+
+.avisoPublic {
+
+    text-align: center;
+    background-color: #2EC12326;
+    border-radius: 10px;
+    height: 50%;
+    padding: 1%;
+
+}
+
+.avisoPublic ion-note {
+    color: #104E04;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    text-align: center;
+    gap: 2%;
+    font-size: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.escudoPublic img {
+    max-width: 35px;
+}
+
+.reportes {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttons-reports {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+ion-card {
+    width: 250px;
+    background-color: #F8FAFC;
+    border: solid 4px #00000021;
+    box-shadow: 5px 8px 10px #00000040;
+    border-radius: 20px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+ion-card:active {
+    transform: scale(0.94);
+}
+
+ion-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    height: 120px;
+    pointer-events: none;
+}
+
+ion-card-content img {
+    height: 50%;
+}
+
+.buttons-reports div {
+    width: 40%;
+    display: flex;
+    justify-content: center;
+}
+
+.avisoDescrip ion-note {
+    color: #03294F;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    text-align: center;
+    gap: 2%;
+    font-size: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.avisoDescrip {
+    text-align: center;
+    background-color: #44DAEE2E;
+    border-radius: 10px;
+    padding-left: 1%;
+    padding-right: 1%;
+    font-style: #03294F;
+}
+
+.notifoto img {
+    max-width: 35px;
+}
