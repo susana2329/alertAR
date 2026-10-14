@@ -23,6 +23,9 @@ ion-item {
 ion-textarea,
 ion-input {
   color: #03294FAD;
+  --highlight-color-focused: #999999;
+  --highlight-color-valid: #999999;
+  --highlight-color-invalid: #999999;
 }
 
 // Quita las configuraciones predeterminadas de los headers 
@@ -31,20 +34,24 @@ ion-header {
   --border-style: none;
   display: flex;
 }
-.buttonatras{
+
+.buttonatras {
   display: flex;
   background-color: #F8FAFC;
 }
-.logo{
+
+.logo {
   width: 100%;
 }
-.buttonatras ion-button{ 
-   --background: #F8FAFC;
+
+.buttonatras ion-button {
+  --background: #F8FAFC;
   --background-activated: transparent;
   --background-focused: transparent;
   --background-hover: transparent;
-  --box-shadow:none; 
+  --box-shadow: none;
 }
+
 // El titulo se centrea y cambia el color de la letra
 ion-title {
   text-align: center;
@@ -145,16 +152,18 @@ ion-title {
   transform: scale(0.97);
   opacity: 0.7;
 }
-.buttonimage{
+
+.buttonimage {
   display: flex;
   position: absolute;
   justify-content: space-evenly;
   width: 90%;
-  
+
 }
-.buttonimage ion-button{
+
+.buttonimage ion-button {
   --background: transparent;
-  border:#999999 solid 1px; 
+  border: #999999 solid 1px;
   border-radius: 3px;
 
 }
@@ -188,12 +197,13 @@ ion-title {
   border-radius: 8px;
   border: 2px solid #999999;
   outline: none;
-      --padding-start: 8px;
-    --padding-end: 8px;
-    --padding-top: 4px;
-    --padding-bottom: 4px;
-    --highlight-color-focused: #000000B5;
-
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  --background-activated: transparent;
+  --background-focused: transparent;
+  --background-hover: transparent;
 }
 
 //Tipo de reportes
@@ -210,10 +220,12 @@ ion-title {
   width: 100%;
   align-items: center;
 }
-.inputtipo ion-input{
+
+.inputtipo ion-input {
   width: 95%;
   --padding: 100px;
 }
+
 //Ubicacion
 
 .ubicacionform {
@@ -314,6 +326,7 @@ ion-datetime {
 .buttonenviar img {
   width: 10%;
 }
-ion-modal.modal{
+
+ion-modal.modal {
   border-radius: 30px;
 }

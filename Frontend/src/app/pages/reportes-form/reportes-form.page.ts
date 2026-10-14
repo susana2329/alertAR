@@ -19,6 +19,7 @@ import {
 import { Report } from '../../models/reporte';
 import { ActivatedRoute } from '@angular/router';
 import { IonModal } from '@ionic/angular/common';
+import { ToastController } from '@ionic/angular';
 import { ModalController } from '@ionic/angular';
 import { ModalPhotosComponent } from '../../components/modal-photos/modal-photos.component'
 import { ModalConfirmacionComponent } from '../../components/modal-confirmacion/modal-confirmacion.component'
@@ -45,8 +46,7 @@ import { addIcons } from 'ionicons';
     IonItem,
     IonInput,
     IonNote,
-    IonIcon
-  ]
+    IonIcon]
 })
 export class ReportesFormPage implements OnInit {
   public tipo: string = ""
@@ -55,14 +55,15 @@ export class ReportesFormPage implements OnInit {
     descripcion: "",
     ubicacion: "Lugano, Buenos Aires (ubicacion automatica)",
     fecha: new Date(),
-    imagen: []
+    imagen: [],
+    estado: "En revicion"
   }
   public previewimg: string[] = []
   public bandera!: boolean
   component = ReportesPage
   public contador = 0
 
-  constructor(private router: ActivatedRoute, private modal: ModalController, private location: Location) {
+  constructor(private router: ActivatedRoute, private modal: ModalController, private location: Location, private toastcontrol: ToastController) {
     addIcons({
       'arrow-back-outline': arrowBackOutline
     })
@@ -136,7 +137,7 @@ export class ReportesFormPage implements OnInit {
     this.contador = 0
   }
 
-  async confirmarreport() {
+  async crearModal() {
     const modalcomfirmar = await this.modal.create({
       component: ModalConfirmacionComponent,
       componentProps: {
@@ -145,12 +146,30 @@ export class ReportesFormPage implements OnInit {
     })
     await modalcomfirmar.present()
   }
+  async confirmarreport() {
+    if (this.reporte.descripcion) {
+      await this.crearModal()
+    }
+    else {
+      await this.toast()
+    }
+
+  }
   siguientefoto() {
     this.contador = this.contador + 1
- 
+
     if (this.contador == this.reporte.imagen.length) {
       this.contador = 0
     }
+  }
+  async toast() {
+    const toast = await this.toastcontrol.create({
+      message: '¡Error! Tenés que completar la descripción.',
+      duration: 3000,
+      position: 'top',
+      color: 'danger'
+    })
+    await toast.present()
   }
   atrasfoto() {
     this.contador = this.contador - 1
@@ -158,6 +177,7 @@ export class ReportesFormPage implements OnInit {
       this.contador = this.reporte.imagen.length - 1
     }
   }
+
   volver() {
     this.location.back()
   }

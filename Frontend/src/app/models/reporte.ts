@@ -3,5 +3,6 @@ export interface Report{
     descripcion: string, 
     ubicacion: string, 
     fecha: Date ,
-    imagen: Blob[]
+    imagen: Blob[], 
+    estado: 'En revicion' | 'Revisado'
 }

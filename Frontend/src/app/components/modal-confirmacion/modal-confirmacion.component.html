@@ -31,7 +31,7 @@
 
 
         <div class="foto">
-            <img *ngIf="fotos.length" [src]="fotos[contador]" alt="Foto del reporte">
+            <img  [src]="fotos[contador]" alt="Foto del reporte">
         </div>
         <div class="buttonadelante">
             <ion-button (click)="fotosiguiente()">🡢</ion-button>
@@ -45,7 +45,7 @@
         </ion-label>
         <div class="text">
 
-            <ion-textarea value="{{reporte.descripcion}}" [disabled]="true">
+            <ion-textarea value="{{reporte.descripcion}}" [disabled]="true" maxlength="200" [counter]="true">
             </ion-textarea>
         </div>
     </div>
@@ -76,10 +76,20 @@
             </div>
         </div>
     </div>
+    <div class="Estado">
+        <ion-label>
+            <p>
+                Estado de reporte
+            </p>
+        </ion-label>
+        <ion-input  [value]="reporte.estado" [disabled]="true">
+
+        </ion-input>
+    </div>
 </ion-content>
 <ion-footer>
-    <div class="buttonconfirma">
-        <ion-button>
+    <div class="buttonconfirma" >
+        <ion-button >
             Confirmar
         </ion-button>
     </div>
