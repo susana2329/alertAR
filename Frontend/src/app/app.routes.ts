@@ -1,24 +1,65 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  {
-    path: 'home',
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
-  },
-    {
-    path: 'reportes',
-    loadComponent: () => import('./pages/reportes/reportes.page').then((m) => m.ReportesPage),
-  },
+
   {
     path: '',
-    redirectTo: 'reportes',
+    redirectTo: 'acceso',
     pathMatch: 'full',
   },
+
   {
-    path: 'reportes/form',
-    loadComponent: () => import('./pages/reportes-form/reportes-form.page').then( m => m.ReportesFormPage)
+    path: 'acceso',
+    loadComponent: () => import('./pages/acceso/antes-login/antes-login').then(m => m.AntesLoginPage),
+  },
+  {
+    path: 'acceso/flip',
+    loadComponent: () => import('./pages/acceso/acceso-flip/acceso-flip.page').then(m => m.AccesoFlipPage),
+  },
+  {
+    path: 'acceso/permisos-ubicacion',
+    loadComponent: () => import('./pages/acceso/permisos-ubicacion/permisos-ubicacion.page').then(m => m.PermisosUbicacionPage),
   },
 
+  {
+    path: 'inicio',
+    loadComponent: () => import('./pages/inicio/inicio.page').then((m) => m.InicioPage),
+  },
+  {
+    path: 'inicio/recomendaciones',
+    loadComponent: () => import('./pages/inicio/recomendaciones/recomendaciones.page').then((m) => m.RecomendacionesPage),
+  },
+  {
+    path: 'inicio/recomendaciones/:id',
+    loadComponent: () => import('./pages/inicio/recomendaciones/detalle/detalle-recomendacion.page').then((m) => m.DetalleRecomendacionPage),
+  },
+// cuando vayan subiendo las demas pages
+  {
+    path: 'mapa-test',
+    loadComponent: () => import('./mapa-test/mapa-test.page').then(m => m.MapaTestPage),
+  },
+  {
+  path: 'detalle-alerta/:id',
+  loadComponent: () =>
+    import('./detalle-alerta/detalle-alerta.page').then(
+      m => m.DetalleAlertaPage
+    )
+},
+{
+    path: 'prevencion/mochila',
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+  },
+  {
+    path: 'prevencion/recomendaciones',
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+  },
+  {
+    path: 'cuenta',
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+  },
 
-
+  {
+    path: '**',
+    redirectTo: 'acceso',
+  },
 ];

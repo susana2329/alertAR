@@ -1,0 +1,140 @@
+
+<div class="map-container">
+  <div id="map"></div>
+
+  <header class="map-header">
+    <h1>Mapa de alertas</h1>
+
+    <button
+      class="header-button theme-toggle"
+      type="button"
+      aria-label="Seleccionar estilo del mapa"
+      [attr.aria-expanded]="selectorEstilosAbierto"
+      (click)="selectorEstilosAbierto = !selectorEstilosAbierto"
+    >
+      <ion-icon name="layers-outline"></ion-icon>
+    </button>
+  </header>
+
+  @if (selectorEstilosAbierto) {
+    <div class="map-style-selector">
+      <p class="map-style-selector__title">Estilo del mapa</p>
+
+      <button
+        type="button"
+        class="map-style-option"
+        [class.active]="estiloMapaActual === 'voyager'"
+        (click)="cambiarEstiloMapa('voyager')"
+      >
+        <span class="map-style-preview map-style-preview--voyager"></span>
+        <span>Voyager</span>
+        @if (estiloMapaActual === 'voyager') {
+          <ion-icon name="checkmark-circle"></ion-icon>
+        }
+      </button>
+
+      <button
+        type="button"
+        class="map-style-option"
+        [class.active]="estiloMapaActual === 'light'"
+        (click)="cambiarEstiloMapa('light')"
+      >
+        <span class="map-style-preview map-style-preview--light"></span>
+        <span>Claro</span>
+        @if (estiloMapaActual === 'light') {
+          <ion-icon name="checkmark-circle"></ion-icon>
+        }
+      </button>
+
+      <button
+        type="button"
+        class="map-style-option"
+        [class.active]="estiloMapaActual === 'dark'"
+        (click)="cambiarEstiloMapa('dark')"
+      >
+        <span class="map-style-preview map-style-preview--dark"></span>
+        <span>Oscuro</span>
+        @if (estiloMapaActual === 'dark') {
+          <ion-icon name="checkmark-circle"></ion-icon>
+        }
+      </button>
+
+      <button
+        type="button"
+        class="map-style-option"
+        [class.active]="estiloMapaActual === 'lightNoLabels'"
+        (click)="cambiarEstiloMapa('lightNoLabels')"
+      >
+        <span class="map-style-preview map-style-preview--light"></span>
+        <span>Claro sin etiquetas</span>
+        @if (estiloMapaActual === 'lightNoLabels') {
+          <ion-icon name="checkmark-circle"></ion-icon>
+        }
+      </button>
+
+      <button
+        type="button"
+        class="map-style-option"
+        [class.active]="estiloMapaActual === 'darkNoLabels'"
+        (click)="cambiarEstiloMapa('darkNoLabels')"
+      >
+        <span class="map-style-preview map-style-preview--dark"></span>
+        <span>Oscuro sin etiquetas</span>
+        @if (estiloMapaActual === 'darkNoLabels') {
+          <ion-icon name="checkmark-circle"></ion-icon>
+        }
+      </button>
+
+      <button
+        type="button"
+        class="map-style-option"
+        [class.active]="estiloMapaActual === 'satellite'"
+        (click)="cambiarEstiloMapa('satellite')"
+      >
+        <span class="map-style-preview map-style-preview--satellite"></span>
+        <span>Satélite</span>
+        @if (estiloMapaActual === 'satellite') {
+          <ion-icon name="checkmark-circle"></ion-icon>
+        }
+      </button>
+    </div>
+  }
+
+  <div class="alert-filters">
+    <button
+      class="filter"
+      [class.active]="filtroActual === 'todas'"
+      type="button"
+      (click)="filtrarAlertas('todas')"
+    >
+      Todas
+    </button>
+
+    <button
+      class="filter"
+      [class.active]="filtroActual === 'oficial'"
+      type="button"
+      (click)="filtrarAlertas('oficial')"
+    >
+      Oficiales
+    </button>
+
+    <button
+      class="filter"
+      [class.active]="filtroActual === 'vecinal'"
+      type="button"
+      (click)="filtrarAlertas('vecinal')"
+    >
+      Vecinos
+    </button>
+  </div>
+
+  <button
+    class="location-button"
+    type="button"
+    aria-label="Mi ubicación"
+    (click)="centrarEnMiUbicacion()"
+  >
+    <ion-icon name="locate-outline"></ion-icon>
+  </button>
+</div>
