@@ -53,8 +53,10 @@ ion-header {
 }
 
 // El titulo se centrea y cambia el color de la letra
+
 ion-title {
   text-align: center;
+  padding-right: 50px;
   color: black;
 }
 
@@ -331,9 +333,16 @@ ion-datetime {
 }
 
 .buttonenviar ion-button {
-  width: 300px;
   display: flex;
-
+  width: 90%;
+  height: 48px;
+  margin: 0;
+  --border-radius: 8px;
+  --background: #0E7490;
+  --color: #fff;
+  font-weight: 700;
+  text-transform: none;
+  
 }
 
 .buttonenviar img {

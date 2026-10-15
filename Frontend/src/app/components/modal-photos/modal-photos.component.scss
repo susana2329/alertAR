@@ -7,14 +7,20 @@ ion-header {
     --border-style: none;
 }
 
-ion-item {
+ion-item, ion-title, ion-toolbar {
     --background: #F8FAFC;
     --ion-text-color: #000;
     box-shadow: none;
     --border-style: none;
 
 }
-ion-content{ 
+
+ion-title {
+    text-align: center;
+
+}
+
+ion-content {
     border-radius: 30px;
 }
 

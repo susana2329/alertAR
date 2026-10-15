@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonButton, IonContent, IonHeader, IonIcon, IonItem, IonLabel } from '@ionic/angular';
+import { IonButton, IonContent, IonHeader, IonIcon, IonLabel, IonTitle, IonToolbar } from '@ionic/angular';
 import { imageOutline, arrowBackOutline } from 'ionicons/icons';
 import { cameraOutline } from 'ionicons/icons'
 import { addIcons } from 'ionicons';
@@ -10,7 +10,7 @@ import { ModalController } from '@ionic/angular';
   selector: 'app-modal-photos',
   templateUrl: './modal-photos.component.html',
   styleUrls: ['./modal-photos.component.scss'],
-  imports: [IonContent, IonButton, IonIcon, IonHeader, IonItem, IonLabel],
+  imports: [IonContent, IonButton, IonIcon, IonHeader, IonLabel, IonTitle, IonToolbar],
 })
 export class ModalPhotosComponent implements OnInit {
   public fotos: Blob[] = []

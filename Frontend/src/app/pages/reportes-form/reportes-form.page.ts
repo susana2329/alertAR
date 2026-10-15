@@ -15,6 +15,7 @@ import {
   IonInput,
   IonIcon,
   IonNote,
+  IonFooter,
 } from '@ionic/angular';
 import { Report } from '../../models/reporte';
 import { ActivatedRoute } from '@angular/router';
@@ -46,7 +47,8 @@ import { addIcons } from 'ionicons';
     IonItem,
     IonInput,
     IonNote,
-    IonIcon]
+    IonIcon,
+    IonFooter]
 })
 export class ReportesFormPage implements OnInit {
   public tipo: string = ""
@@ -156,6 +158,10 @@ export class ReportesFormPage implements OnInit {
 
   }
   siguientefoto() {
+    if (this.reporte.imagen.length === 0) {
+      return
+    }
+
     this.contador = this.contador + 1
 
     if (this.contador == this.reporte.imagen.length) {
@@ -172,6 +178,10 @@ export class ReportesFormPage implements OnInit {
     await toast.present()
   }
   atrasfoto() {
+    if (this.reporte.imagen.length === 0) {
+      return
+    }
+
     this.contador = this.contador - 1
     if (this.contador < 0) {
       this.contador = this.reporte.imagen.length - 1
