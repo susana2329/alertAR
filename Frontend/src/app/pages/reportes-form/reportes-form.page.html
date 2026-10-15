@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <div class="buttonatras">
     <ion-button (click)="volver()">
-      <ion-icon  size="small" name="arrow-back-outline">
+      <ion-icon size="small" name="arrow-back-outline">
       </ion-icon>
     </ion-button>
   </div>
@@ -48,7 +48,7 @@
         </ion-label>
         <div class="panelfoto">
           <div class="previewimg">
-            <div class="buttonimage" >
+            <div class="buttonimage">
               <div>
                 <ion-button (click)="atrasfoto()">
                   🡠
@@ -60,7 +60,7 @@
                 </ion-button>
               </div>
             </div>
-            
+
             <img [src]="previewimg[contador] || previewimg[0] || 'assets/icon/camara.png'" alt="Vista previa de foto">
 
           </div>
@@ -95,17 +95,18 @@
             <ion-input [(ngModel)]="reporte.ubicacion"></ion-input>
           </div>
           <div class="buttonubi">
-            
+
             <ion-button><img src="assets\icon\mapas.png" alt="mapita" style="width:100%; height: 27px;"></ion-button>
           </div>
         </div>
       </div>
 
       <div class="fechaform">
+        <ion-label>
+          <p>Fecha *</p>
+        </ion-label>
         <div class="buttondia">
-          <ion-label>
-            <p>Fecha *</p>
-          </ion-label>
+
           <ion-datetime-button datetime="datetime"></ion-datetime-button>
         </div>
 

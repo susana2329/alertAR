@@ -23,7 +23,7 @@ ion-item {
 ion-textarea,
 ion-input {
   color: #03294FAD;
-  --highlight-color-focused: #999999;
+  --highlight-color-focused: transparent;
   --highlight-color-valid: #999999;
   --highlight-color-invalid: #999999;
 }
@@ -56,6 +56,7 @@ ion-header {
 ion-title {
   text-align: center;
   color: black;
+  padding-right: 20%;
 }
 
 // Todo el cuerpo del reporte
@@ -227,6 +228,7 @@ ion-title {
   --background-activated: transparent;
   --background-focused: transparent;
   --background-hover: transparent;
+  --keyboard-offset: 0px;
 }
 
 //Tipo de reportes
@@ -308,8 +310,9 @@ ion-input {
 .fechaform {
   display: flex;
   justify-content: space-around;
-  align-items: center;
   padding-top: 2%;
+  flex-direction: column;
+  padding-top: 7px;
 }
 
 .buttondia,
