@@ -33,6 +33,14 @@ export const routes: Routes = [
     path: 'inicio/recomendaciones/:id',
     loadComponent: () => import('./pages/inicio/recomendaciones/detalle/detalle-recomendacion.page').then((m) => m.DetalleRecomendacionPage),
   },
+  {
+    path: 'reportes/form',
+    loadComponent: () => import('./pages/reportes-form/reportes-form.page').then( m => m.ReportesFormPage)
+  }, {
+    path: 'reportes',
+    loadComponent: () => import('./pages/reportes/reportes.page').then((m) => m.ReportesPage),
+  },
+
 // cuando vayan subiendo las demas pages
   {
     path: 'mapa-test',
