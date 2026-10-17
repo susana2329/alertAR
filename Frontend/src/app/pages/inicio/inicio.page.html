@@ -5,7 +5,12 @@
         <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title class="app-logo">ALERT<span class="ar">AR</span></ion-title>
+    <ion-title class="app-logo">
+      <span class="logo-imgs" role="img" aria-label="AlertAR">
+        <img src="assets/image/ALERT.png" alt="" class="logo-alert">
+        <img src="assets/image/AR.png" alt="" class="logo-ar">
+      </span>
+    </ion-title>
     <ion-buttons slot="end">
       <ion-button>
         <ion-icon name="notifications-outline" slot="icon-only"></ion-icon>
@@ -18,8 +23,13 @@
   <div class="location-row">
     <ion-icon name="location-outline"></ion-icon>
     <div>
-      <p class="location-name">{{ ubicacion }}</p>
-      <p class="location-updated">Actualizado: {{ ultimaActualizacion }}</p>
+      @if (sesion.ubicacionPermitida()) {
+        <p class="location-name">{{ ubicacion }}</p>
+        <p class="location-updated">Actualizado: {{ ultimaActualizacion }}</p>
+      } @else {
+        <p class="location-name">Ubicación desactivada</p>
+        <p class="location-updated">Mostrando solo alertas importantes</p>
+      }
     </div>
   </div>
 
@@ -32,7 +42,7 @@
       </div>
       <ion-icon name="rainy" class="weather-icon"></ion-icon>
     </div>
-    <ion-button expand="block" class="recommendations-btn" (click)="verRecomendaciones()">
+    <ion-button expand="block" class="recommendations-btn" (click)="verRecomendaciones(alertaPrincipal.tipo)">
       Ver recomendaciones
     </ion-button>
   </div>
@@ -42,19 +52,33 @@
     <a class="see-map-link" routerLink="/mapa">Ver mapa</a>
   </div>
 
-  <div class="alerts-list">
-    <div class="alert-item" *ngFor="let alerta of alertasCercanas" (click)="verAlerta(alerta)">
-      <ion-icon [name]="alerta.icon" [style.color]="alerta.iconColor" class="alert-icon"></ion-icon>
-      <div class="alert-info">
-        <div class="alert-row">
-          <h4>{{ alerta.titulo }}</h4>
-          <span class="distance">{{ alerta.distancia }}</span>
-        </div>
-        <div class="alert-row">
-          <p class="subtext">{{ alerta.subtextoIzquierda }}</p>
-          <span class="subtext" [class.highlighted]="alerta.rightHighlighted">{{ alerta.subtextoDerecha }}</span>
+  @if (sesion.ubicacionPermitida()) {
+    <div class="alerts-list">
+      <div class="alert-item" *ngFor="let alerta of alertasCercanas" (click)="verAlerta(alerta)">
+        <ion-icon [name]="alerta.icon" [style.color]="alerta.iconColor" class="alert-icon"></ion-icon>
+        <div class="alert-info">
+          <div class="alert-row">
+            <h4>{{ alerta.titulo }}</h4>
+            <span class="distance">{{ alerta.distancia }}</span>
+          </div>
+          <div class="alert-row">
+            <p class="subtext">{{ alerta.subtextoIzquierda }}</p>
+            <span class="subtext" [class.highlighted]="alerta.rightHighlighted">{{ alerta.subtextoDerecha }}</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  } @else {
+
+    <div class="sin-ubicacion">
+      <ion-icon name="location-outline" class="sin-ubicacion-icono"></ion-icon>
+      <p class="sin-ubicacion-titulo">Activá tu ubicación</p>
+      <p class="sin-ubicacion-texto">Para ver las alertas que hay cerca tuyo necesitamos saber dónde estás.</p>
+      <ion-button size="small" class="sin-ubicacion-boton" (click)="activarUbicacion()">Activar ubicación</ion-button>
+
+      @if (mensajeUbicacion()) {
+        <p class="sin-ubicacion-error">{{ mensajeUbicacion() }}</p>
+      }
+    </div>
+  }
 </ion-content>
