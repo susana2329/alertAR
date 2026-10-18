@@ -40,6 +40,15 @@ export const routes: Routes = [
   },
 
   {
+    path: 'reportes/form',
+    loadComponent: () => import('./pages/reportes-form/reportes-form.page').then( m => m.ReportesFormPage)
+  }, {
+    path: 'reportes',
+    loadComponent: () => import('./pages/reportes/reportes.page').then((m) => m.ReportesPage),
+  },
+
+// cuando vayan subiendo las demas pages
+  {
     path: 'mapa',
     canActivate: [soloConSesion],
     loadComponent: () => import('./mapa-test/mapa-test.page').then(m => m.MapaTestPage),

@@ -1,0 +1,97 @@
+<ion-header>
+    <ion-toolbar>
+        <ion-title>
+            <h2>
+                Confirmacion
+            </h2>
+        </ion-title>
+    </ion-toolbar>
+
+</ion-header>
+<ion-content>
+    <div class="tiporeport">
+        <ion-label>
+            <p>Tipo de reporte</p>
+        </ion-label>
+        <div>
+            <ion-input value="{{reporte.tipo}}" [disabled]="true">
+
+            </ion-input>
+        </div>
+    </div>
+    <div class="fotoscarrucel">
+        <ion-label>
+            <p>Imagenes</p>
+        </ion-label>
+        <div class="buttonatras">
+            <ion-button (click)="fotoatras()">
+                🡠
+            </ion-button>
+        </div>
+
+
+        <div class="foto">
+            <img  [src]="fotos[contador]" alt="Foto del reporte">
+        </div>
+        <div class="buttonadelante">
+            <ion-button (click)="fotosiguiente()">🡢</ion-button>
+        </div>
+    </div>
+    <div class="textarea">
+        <ion-label>
+            <p>
+                Descripcion
+            </p>
+        </ion-label>
+        <div class="text">
+
+            <ion-textarea value="{{reporte.descripcion}}" [disabled]="true" maxlength="200">
+            </ion-textarea>
+        </div>
+    </div>
+    <div>
+        <ion-label>
+            <p>
+                Ubicacion
+            </p>
+        </ion-label>
+        <div class="ubicacion">
+            <ion-input value="{{reporte.ubicacion}}" [disabled]="true"></ion-input>
+        </div>
+
+    </div>
+
+    <div class="fecha">
+        <ion-label>
+            <p>
+                Fecha
+            </p>
+        </ion-label>
+        <div class="fechacomponent">
+            <ion-datetime-button datetime="datetime" [disabled]="true"></ion-datetime-button>
+            <div>
+                <ion-modal [keepContentsMounted]="true">
+                    <ion-datetime id="datetime" [value]="fechaiso"></ion-datetime>
+                </ion-modal>
+            </div>
+        </div>
+    </div>
+    <div class="Estado">
+        <ion-label>
+            <p>
+                Estado de reporte
+            </p>
+        </ion-label>
+        <ion-input  [value]="reporte.estado" [disabled]="true">
+
+        </ion-input>
+    </div>
+</ion-content>
+<ion-footer>
+    <div class="buttonconfirma" >
+        <ion-button >
+            Confirmar
+        </ion-button>
+    </div>
+
+</ion-footer>
