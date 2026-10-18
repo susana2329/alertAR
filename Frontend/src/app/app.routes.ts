@@ -1,11 +1,16 @@
+import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
+import { SesionService } from './services/sesion.service';
+import { soloConSesion } from './guards/sesion.guard';
+
+const arranque = () => (inject(SesionService).logueado() ? '/inicio' : '/acceso');
 
 export const routes: Routes = [
 
   {
     path: '',
-    redirectTo: 'acceso',
     pathMatch: 'full',
+    redirectTo: arranque,
   },
 
   {
@@ -33,6 +38,7 @@ export const routes: Routes = [
     path: 'inicio/recomendaciones/:id',
     loadComponent: () => import('./pages/inicio/recomendaciones/detalle/detalle-recomendacion.page').then((m) => m.DetalleRecomendacionPage),
   },
+
   {
     path: 'reportes/form',
     loadComponent: () => import('./pages/reportes-form/reportes-form.page').then( m => m.ReportesFormPage)
@@ -43,31 +49,38 @@ export const routes: Routes = [
 
 // cuando vayan subiendo las demas pages
   {
-    path: 'mapa-test',
+    path: 'mapa',
+    canActivate: [soloConSesion],
     loadComponent: () => import('./mapa-test/mapa-test.page').then(m => m.MapaTestPage),
   },
   {
-  path: 'detalle-alerta/:id',
-  loadComponent: () =>
-    import('./detalle-alerta/detalle-alerta.page').then(
-      m => m.DetalleAlertaPage
-    )
-},
-{
+    path: 'reportar',
+    canActivate: [soloConSesion],
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+  },
+  {
+    path: 'prevencion',
+    redirectTo: 'prevencion/mochila',
+    pathMatch: 'full',
+  },
+  {
     path: 'prevencion/mochila',
+    canActivate: [soloConSesion],
     loadComponent: () => import('./home/home.page').then(m => m.HomePage),
   },
   {
     path: 'prevencion/recomendaciones',
+    canActivate: [soloConSesion],
     loadComponent: () => import('./home/home.page').then(m => m.HomePage),
   },
   {
     path: 'cuenta',
+    canActivate: [soloConSesion],
     loadComponent: () => import('./home/home.page').then(m => m.HomePage),
   },
 
   {
     path: '**',
-    redirectTo: 'acceso',
+    redirectTo: arranque,
   },
 ];
