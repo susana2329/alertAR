@@ -1,0 +1,8 @@
+export interface Report{  
+    tipo: string, 
+    descripcion: string, 
+    ubicacion: string, 
+    fecha: Date ,
+    imagen: Blob[], 
+    estado: 'En revicion' | 'Revisado'
+}
