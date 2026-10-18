@@ -12,7 +12,7 @@ import { chevronBackOutline, cameraOutline, informationCircleOutline, personOutl
 @Component({
     selector: 'app-perfil',
     templateUrl: './perfil.html',
-    styleUrls: ['./perfil.css'],
+    styleUrls: ['./perfil.scss'],
     standalone: true,
     imports:[
         CommonModule,

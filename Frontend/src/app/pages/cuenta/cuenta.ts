@@ -13,7 +13,7 @@ import { UserProfile } from '../../models/usuario.model';
 @Component({
   selector: 'app-cuenta',
   templateUrl: './cuenta.html',
-  styleUrls: ['./cuenta.css'],
+  styleUrls: ['./cuenta.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -61,7 +61,7 @@ export class CuentaPage implements OnInit {
   async confirmarCerrarSesion(){
     const alert = await this.alertController.create({
       header: 'Cerrar Sesión',
-      message: '¿Estás seguro de que querés cerrar sesión',
+      message: '¿Estás seguro de que querés cerrar sesión?',
       buttons:[
         {
           text: 'Cancelar',

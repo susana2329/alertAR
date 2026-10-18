@@ -8,7 +8,7 @@ import { chevronBackOutline, chevronForwardOutline, homeOutline, mapOutline, fil
 @Component({
   selector: 'app-fuentes',
   templateUrl: './fuentes.html',
-  styleUrls: ['./fuentes.css'],
+  styleUrls: ['./fuentes.scss'],
   standalone: true,
   imports: [
     CommonModule,

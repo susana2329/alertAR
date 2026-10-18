@@ -10,7 +10,7 @@ import { chevronBackOutline, chevronForwardOutline, notificationsOutline, medkit
 @Component({
   selector: 'app-configuracion',
   templateUrl: './configuracion.html',
-  styleUrls: ['./configuracion.css'],
+  styleUrls: ['./configuracion.scss'],
   standalone: true,
   imports: [
     CommonModule,

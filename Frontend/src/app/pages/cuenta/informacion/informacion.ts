@@ -10,7 +10,7 @@ import { chevronBackOutline, chevronForwardOutline, openOutline,informationCircl
 @Component({
   selector: 'app-informacion',
   templateUrl: './informacion.html',
-  styleUrls: ['./informacion.css'],
+  styleUrls: ['./informacion.scss'],
   standalone: true,
   imports: [
     CommonModule,
