@@ -8,7 +8,8 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
 
-  {
+{
+
     path: 'acceso',
     loadComponent: () => import('./pages/acceso/antes-login/antes-login').then(m => m.AntesLoginPage),
   },
@@ -63,8 +64,26 @@ export const routes: Routes = [
   },
   {
     path: 'cuenta',
-    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+    loadComponent: () => import('./pages/cuenta/cuenta').then((m) => m.CuentaPage),
   },
+
+  {
+    path: 'fuentes',
+    loadComponent: () => import('./pages/cuenta/fuentes/fuentes').then(m => m.FuentesPage)
+  },
+
+{
+  path: 'configuracion',
+  loadComponent: () => import('./pages/cuenta/configuracion/configuracion').then(m => m.ConfiguracionPage)
+},
+{
+  path: 'informacion',
+  loadComponent: () => import('./pages/cuenta/informacion/informacion').then(m => m.InformacionPage)
+},
+{
+  path: 'perfil',
+  loadComponent: () => import('./pages/cuenta/perfil/perfil').then(m => m.PerfilPage)
+},
 
   {
     path: '**',

@@ -1,0 +1,155 @@
+.account-container{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+ion-content{
+    --background: #f8f9fa;
+}
+
+ion-header{
+    position: relative;
+}
+
+ion-toolbar ion-title {
+    position: absolute !important;
+    left: 0;
+    right: 0;
+    text-align: center;
+    width: 100%;
+    pointer-events: none; 
+}
+ion-label{
+    color: #03294F;
+    font-weight: 700;
+}
+
+.custom-toolbar{
+    --background: #f8f9fa;
+    --color: #1a1a1a;
+}
+
+
+.profile-container {
+    display: flex;
+    align-items: center;
+    margin: 10px 8px 0; 
+    padding: 0 4px;
+}
+
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+
+.profile-info{
+    h2{
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0 0 6.5px 0;
+    }
+    p{
+        font-size: 0.9rem;
+        color: #666666;
+        margin: 0 0 7px 0;
+    }
+}
+
+.edit-profile-link{
+    font-size: 0.85rem;
+    color: #0E7490;
+    font-weight:600 ;
+    text-decoration: none;
+    cursor: pointer;
+   
+}
+
+.menu-card{
+    display:flex ;
+    align-items: center;
+    background: #ffffff;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid #d1d5db;
+    box-shadow: 0px 0px 20px  #bdb6b6;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-content{
+    flex-grow: 1;
+
+    h3{
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0 0 3px 0;
+    }
+
+    p{
+        font-size: 0.95rem;
+        color: #777777;
+        margin: 0;
+    }
+}
+
+.arrow-icon{
+    font-size: 18px;
+    color: #999999;
+}
+.arrow-icon-title{
+    font-size: 22px;
+    color: #333333;
+    cursor: pointer;
+    padding-left: 4px;
+
+}
+
+.card-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #f4f5f8; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 14px;
+  flex-shrink: 0;
+
+  img {
+    width: 26px; 
+    height: 26px;
+    object-fit: contain;
+  }
+}
+
+.btn-cerrar-sesion {
+    margin-top: 24px;
+    padding: 0 4px 24px;
+}
+
+.logout-button {
+    --background: #fdecec;
+    --color: #d32f2f;
+    --border-radius: 14px;
+    --box-shadow: none;
+    height: 50px;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+
+
+.custom-tab-bar{
+    --background: #ffffff;
+    --color: #777777;
+    --color-selected: #0E7490;
+    border-top: 1px solid #f0f0f0;
+
+}
+

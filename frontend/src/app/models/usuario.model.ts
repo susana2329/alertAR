@@ -1,6 +1,6 @@
-export interface Usuario {
-  nombre: string;
-  apellido: string;
-  email: string;
-  password: string;
+export interface UserProfile{
+    name: string;
+    lastname: string;
+    email: string;
+    avartUrl: string;
 }

@@ -1,0 +1,130 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="custom-toolbar">
+    <ion-buttons slot="start">
+      <ion-button routerLink="/home">
+        <ion-icon name="chevron-back-outline" class="arrow-icon-title"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Mi Cuenta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <div class="account-container">
+    <div class="profile-container">
+      <ion-avatar class="profile-avatar">
+        <img src='assets/imagcuenta/mockuser.jpg' alt="Perfil de Usuario" />
+      </ion-avatar>
+
+      <div class="profile-info">
+        <h2>{{user.name}} {{user.lastname}}</h2>
+        <p>{{user.email}}</p>
+        <div routerLink="/perfil">
+          <a class="edit-profile-link">Ver y editar perfil</a>
+        </div>
+        
+      </div>
+    </div>
+
+
+    <!--Tarjeta para manejar los REPORTES DEL USUARIO-->
+    <div class="menu-card" routerLink="/reportes">
+      <div class="card-icon-box">
+        <img src='assets/icon/icon-reportes.png' alt="Icono reportes">
+      </div>
+      <div class="card-content">
+        <h3>Mis reportes</h3>
+        <p>Revisa el estado de tus reportes</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+
+
+    <!--Tarjeta para manejar la MOCHILA DEL USUARIO-->
+    <div class="menu-card" routerLink="/mochila">
+      <div class="card-icon-box">
+        <img src='assets/icon/icon-mochila.png' alt="Icono mochila">
+      </div>
+      <div class="card-content">
+        <h3>Mi mochila de emergencia</h3>
+        <p>Revisa y edita tu mochila</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+
+
+    <!--Tarjeta para manejar la CONFIGURACION DEL USUARIO-->
+    <div class="menu-card" routerLink="/configuracion">
+      <div class="card-icon-box">
+        <img src='assets/icon/icon-configuracion.png' alt="Icono confuguracion">
+      </div>
+      <div class="card-content">
+        <h3>Configuración</h3>
+        <p>Configura tus alertas</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+
+
+    <!--Tarjeta para manejar las FUENTES OFICIALES-->
+    <div class="menu-card" routerLink="/fuentes">
+      <div class="card-icon-box">
+        <img src='assets/icon/fuentes.png' alt="Icono ayuda">
+      </div>
+      <div class="card-content">
+        <h3>Fuentes Oficiales</h3>
+        <p>Información oficial</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+
+
+    <!--Tarjeta para manejar las FUENTES DE ALERTAR-->
+    <div class="menu-card" routerLink="/informacion">
+      <div class="card-icon-box">
+        <img src='assets/icon/icon-info.png' alt="Icono fuentes">
+      </div>
+      <div class="card-content">
+        <h3>Sobre AlertAR</h3>
+        <p>Información</p>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+    </div>
+  </div>
+
+<div class="btn-cerrar-sesion">
+  <ion-button expand="block" fill="solid" class="logout-button" (click)="confirmarCerrarSesion()">
+    <ion-icon slot="start" name="log-out-outline"></ion-icon>
+    Cerrar sesión
+  </ion-button>
+  </div>
+
+</ion-content>
+
+<ion-tab-bar slot="bottom" class="custom-tab-bar">
+  <ion-tab-button tab="inicio" routerLink="/inicio">
+    <ion-icon name="home-outline"></ion-icon>
+    <ion-label>Inicio</ion-label>
+  </ion-tab-button>
+
+  <ion-tab-button tab="mapa" routerLink="/mapa">
+    <ion-icon name="map-outline"></ion-icon>
+    <ion-label>Mapa</ion-label>
+  </ion-tab-button>
+
+  <ion-tab-button tab="reportar" routerLink="/reportar">
+    <ion-icon name="file-tray-full-outline"></ion-icon>
+    <ion-label>Reportar</ion-label>
+  </ion-tab-button>
+
+  <ion-tab-button tab="prevension" routerLink="/prevension">
+    <ion-icon name="shield-outline"></ion-icon>
+    <ion-label>Prevención</ion-label>
+  </ion-tab-button>
+
+  <ion-tab-button tab="cuenta" routerLink="/cuenta">
+    <ion-icon name="person-outline"></ion-icon>
+    <ion-label>Cuenta</ion-label>
+  </ion-tab-button>
+</ion-tab-bar>
