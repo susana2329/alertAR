@@ -31,6 +31,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/inicio/inicio.page').then((m) => m.InicioPage),
   },
   {
+    
     path: 'inicio/recomendaciones',
     loadComponent: () => import('./pages/inicio/recomendaciones/recomendaciones.page').then((m) => m.RecomendacionesPage),
   },
@@ -40,23 +41,22 @@ export const routes: Routes = [
   },
 
   {
-    path: 'reportes/form',
-    loadComponent: () => import('./pages/reportes-form/reportes-form.page').then( m => m.ReportesFormPage)
-  }, {
     path: 'reportes',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para hacer un reporte' },
     loadComponent: () => import('./pages/reportes/reportes.page').then((m) => m.ReportesPage),
   },
-
-// cuando vayan subiendo las demas pages
+  {
+    path: 'reportes/form',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para hacer un reporte' },
+    loadComponent: () => import('./pages/reportes-form/reportes-form.page').then((m) => m.ReportesFormPage),
+  },
   {
     path: 'mapa',
     canActivate: [soloConSesion],
+    data: { aviso: 'Para usar el mapa interactivo' },
     loadComponent: () => import('./mapa-test/mapa-test.page').then(m => m.MapaTestPage),
-  },
-  {
-    path: 'reportar',
-    canActivate: [soloConSesion],
-    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
   },
   {
     path: 'prevencion',
@@ -66,17 +66,20 @@ export const routes: Routes = [
   {
     path: 'prevencion/mochila',
     canActivate: [soloConSesion],
-    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+    data: { aviso: 'Para ver tu mochila de emergencia' },
+    loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
   },
   {
     path: 'prevencion/recomendaciones',
     canActivate: [soloConSesion],
-    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+    data: { aviso: 'Para ver tus recomendaciones' },
+    loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
   },
   {
     path: 'cuenta',
     canActivate: [soloConSesion],
-    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+    data: { aviso: 'Para ver tu cuenta' },
+    loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
   },
 
   {
