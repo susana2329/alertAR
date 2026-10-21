@@ -76,12 +76,26 @@ export class RecomendacionesPage {
   // alerta climática actual (ej: vino desde una alerta de lluvias intensas).
   categorias: CategoriaEmergencia[] = [
     { id: 'inundaciones', nombre: 'Inundaciones', icon: 'water-outline', iconColor: '#03294F' },
-    { id: 'tormentas', nombre: 'Tormentas', icon: 'thunderstorm', iconColor: '#FFFFFF', activa: true },
+    { id: 'tormentas', nombre: 'Tormentas', icon: 'thunderstorm', iconColor: '#03294F'},
     { id: 'sismos', nombre: 'Sismos', icon: 'pulse-outline', iconColor: '#79A288' },
     { id: 'incendios', nombre: 'Incendios', icon: 'flame-outline', iconColor: '#EE4129' },
     { id: 'olas-calor', nombre: 'Olas de calor', icon: 'sunny-outline', iconColor: '#F2A93B' },
     { id: 'viento-fuerte', nombre: 'Viento fuerte', icon: 'viento-custom', iconColor: '#0E7490' },
   ];
+
+  get categoriasFiltradas(): CategoriaEmergencia[] {
+    const termino = this.normalizar(this.terminoBusqueda);
+    if (!termino) return this.categorias;
+    return this.categorias.filter(c => this.normalizar(c.nombre).includes(termino));
+  }
+
+  private normalizar(texto: string | null | undefined): string {
+    return (texto ?? '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
 
   constructor(private router: Router) {}
 

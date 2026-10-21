@@ -28,7 +28,20 @@ ion-toolbar {
   --background: #EEF0F3;
   --border-radius: 12px;
   --box-shadow: none;
+  --color: #03294F;
+  --placeholder-color: #03294F;
+  --placeholder-opacity: 0.6;
+  --icon-color: #03294F;
+  --clear-button-color: #03294F;
   padding: 0 0 20px;
+}
+
+.sin-resultados {
+  text-align: center;
+  font-size: 14px;
+  color: #03294F;
+  opacity: 0.6;
+  margin: 24px 0;
 }
 
 .section-title {

@@ -25,11 +25,13 @@
   <div class="categorias-grid">
     <div
       class="categoria-card"
-      *ngFor="let categoria of categorias"
-      [class.activa]="categoria.activa"
+      *ngFor="let categoria of categoriasFiltradas"
       (click)="verCategoria(categoria)"
     >
-      <div class="icon-circle" [style.background]="categoria.activa ? '#03294F' : '#EEF0F3'">
+    <p class="sin-resultados" *ngIf="categoriasFiltradas.length === 0">
+      No encontramos recomendaciones para "{{ terminoBusqueda }}"
+    </p>
+      <div class="icon-circle" style="background: #EEF0F3">
         <ion-icon
           *ngIf="categoria.id !== 'viento-fuerte'"
           [name]="categoria.icon"

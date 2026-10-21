@@ -8,17 +8,6 @@
   padding: 0 22px 40px;
 }
 
-// Fondo: usa la ilustración si hay "imagen"; si no, un degradé cielo gris -> agua.
-.fondo {
-  position: absolute;
-  inset: 0;
-  background-color: #2B93AE;
-  background-image: linear-gradient(to bottom, #3B4046 0, #747C83 150px, #2B93AE 210px);
-  background-repeat: no-repeat;
-  background-size: 100% auto;
-  background-position: top center;
-}
-
 .barra {
   position: relative;
   display: flex;
