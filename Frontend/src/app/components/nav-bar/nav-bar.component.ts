@@ -20,7 +20,7 @@ export class NavBarComponent {
   tabs = [
     { nombre: 'Inicio', ruta: '/inicio', icono: 'home-outline', conMenu: false },
     { nombre: 'Mapa', ruta: '/mapa-test', icono: 'map-outline', conMenu: false },
-    { nombre: 'Reportar', ruta: '/reportar', icono: 'add-circle-outline', conMenu: false },
+    { nombre: 'Reportar', ruta: '/reportes', icono: 'add-circle-outline', conMenu: false },
     { nombre: 'Prevencion', ruta: '/prevencion', icono: 'shield-checkmark-outline', conMenu: true },
     { nombre: 'Cuenta', ruta: '/cuenta', icono: 'person-outline', conMenu: false }
   ];
