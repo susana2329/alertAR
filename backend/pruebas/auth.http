@@ -1,0 +1,24 @@
+### Registro con correo
+POST http://localhost:3000/api/auth/registro
+Content-Type: application/json
+
+{
+  "nombre": "Prueba",
+  "apellido": "Uno",
+  "email": "prueba1@gmail.com",
+  "password": "clave123"
+}
+
+### Login con correo
+# @name login
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "prueba1@gmail.com",
+  "password": "clave123"
+}
+
+### Quien soy (usa el token que devolvió el login)
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer {{login.response.body.$.token}}

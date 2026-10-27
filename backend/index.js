@@ -7,7 +7,7 @@ const app = express();
 
 app.use(cors({ origin: 'http://localhost:8100' }));
 app.use(express.json());
-app.use('/api/auth', require('./src/routes/auth'));
+app.use('/api/auth', require('./src/routes/auth.router'));
 
 getMongoDBConnection();
 
