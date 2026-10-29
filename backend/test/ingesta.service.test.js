@@ -69,7 +69,7 @@ test('registra errores y resultados de persistencia por separado para cada fuent
     assert.equal(resumen.SMN.cantidadNormalizada, 1);
     assert.deepEqual(resumen.SMN.error, { etapa: 'persistencia', mensaje: 'No se pudo persistir ningún documento CAP válido' });
     assert.deepEqual(resumen.SMN.erroresPersistencia, [{ url: 'cap.xml', mensaje: 'validación rechazada' }]);
-    assert.deepEqual(resumen.INA.persistencia, { guardados: 1 });
+    assert.deepEqual(resumen.INA.persistencia, [{ guardados: 1 }]);
     assert.equal(resumen.INPRES.estado, 'completada');
     assert.equal(resumen.INPRES.cantidadNormalizada, 0);
 });
@@ -245,7 +245,7 @@ test('incorpora rechazos por registro INPRES al resumen y persiste los ítems v�
         obtenerSismosINPRES: async () => xmlINPRES,
         normalizarINPRES,
         guardarOficiales: async alertas => {
-            if (alertas.some(alerta => alerta.fuente === 'INPRES')) persistidas = alertas;
+            if (alertas.some(alerta => alerta.fuente === 'INPRES')) (persistidas ??= []).push(...alertas);
             return alertas.map(alerta => ({ guardado: alerta.claveIdempotencia }));
         }
     });
@@ -259,4 +259,27 @@ test('incorpora rechazos por registro INPRES al resumen y persiste los ítems v�
     assert.deepEqual(persistidas.map(alerta => alerta.claveIdempotencia), [
         'INPRES:20261021003000', 'INPRES:20261021003200'
     ]);
+});
+
+test('un fallo de persistencia INA por estación no bloquea las demás mediciones', async () => {
+    const intentados = [];
+    const documento = { type: 'FeatureCollection', features: [
+        { id: 'a', geometry: { type: 'Point', coordinates: [-60, -35] }, properties: { unid: 1, fecha: '2026-10-21T00:00:00Z' } },
+        { id: 'b', geometry: { type: 'Point', coordinates: [-61, -36] }, properties: { unid: 2, fecha: '2026-10-21T00:00:00Z' } }
+    ] };
+    const resumen = await ejecutarIngesta({
+        obtenerDocumentoSMN: async () => '<rss><channel/></rss>', extraerEnlacesCAP,
+        obtenerObservacionesINA: async () => documento,
+        obtenerSismosINPRES: async () => '<lista/>', normalizarINPRES: () => [],
+        guardarOficiales: async ([registro]) => {
+            intentados.push(registro.identificadorFuente);
+            if (registro.identificadorFuente === '1') throw new Error('estación rechazada');
+            return [registro];
+        }
+    });
+    assert.deepEqual(intentados.sort(), ['1', '2']);
+    assert.equal(resumen.INA.estado, 'parcial');
+    assert.equal(resumen.INA.erroresPersistencia.length, 1);
+    assert.equal(resumen.INA.cantidadGuardada, 1);
+    assert.equal(resumen.INA.cantidadFallida, 1);
 });

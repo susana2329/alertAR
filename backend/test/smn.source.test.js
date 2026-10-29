@@ -11,10 +11,12 @@ test('extrae y deduplica enlaces CAP válidos, resolviendo referencias relativas
       <item><link>http://ssl.smn.gob.ar/feeds/CAP/xml_generados/http.xml</link></item>
       <item><link>https://ssl.smn.gob.ar/feeds/CAP/otros/no.xml</link></item>
       <item><link>https://ssl.smn.gob.ar/feeds/CAP/xml_generados/sin-extension</link></item>
+      <item><link>https://ssl.smn.gob.ar/feeds/CAP/avisocortoplazo/aviso.xml</link></item>
     </channel></rss>`;
     assert.deepEqual(extraerEnlacesCAP(xml), [
         'https://ssl.smn.gob.ar/feeds/CAP/xml_generados/uno.xml',
         'https://ssl.smn.gob.ar/feeds/CAP/xml_generados/dos.xml'
+        ,'https://ssl.smn.gob.ar/feeds/CAP/avisocortoplazo/aviso.xml'
     ]);
 });
 

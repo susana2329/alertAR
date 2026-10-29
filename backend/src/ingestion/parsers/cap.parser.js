@@ -93,13 +93,14 @@ function parsearCAP(xml) {
 
     const infos = comoArray(cap.info);
 
-   const areas = infos.flatMap(info =>
+   const areas = infos.flatMap((info, infoIndex) =>
     comoArray(info.area).map(area => {
         const poligonos = comoArray(area.polygon)
             .map(extraerPoligono)
             .filter(Boolean);
 
         return {
+            infoIndex,
             descripcion: texto(area.areaDesc),
             poligonos
         };

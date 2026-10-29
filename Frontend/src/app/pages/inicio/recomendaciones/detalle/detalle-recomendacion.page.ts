@@ -34,7 +34,6 @@ const SIN_CONTENIDO: Record<SeccionId, string[]> = { antes: [], durante: [], des
 const EMERGENCIAS: Record<string, Emergencia> = {
   inundaciones: {
     titulo: 'Inundaciones',
-    // imagen: 'img/inundaciones-fondo.png',
     contenido: {
       // OJO: "antes" y "despues" son texto borrador, validar con fuentes oficiales (Defensa Civil).
       antes: [

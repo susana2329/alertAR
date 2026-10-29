@@ -36,11 +36,41 @@
   margin-bottom: 10px;
   padding: 4px 8px;
   border-radius: 6px;
-  background: #d64545;
-  color: white !important;
+  background: #eef2f4;
+  color: #596b74 !important;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
+}
+
+.alerta-popup .nivel.nivel--rojo {
+  border: 1px solid #efc5c4;
+  background: #fde9e8;
+  color: #a41f27 !important;
+}
+
+.alerta-popup .nivel.nivel--naranja {
+  border: 1px solid #f0d1aa;
+  background: #fff0df;
+  color: #874300 !important;
+}
+
+.alerta-popup .nivel.nivel--amarillo {
+  border: 1px solid #eadb9b;
+  background: #fff7d8;
+  color: #675100 !important;
+}
+
+.alerta-popup .nivel.nivel--azul {
+  border: 1px solid #bfd8ee;
+  background: #eaf4fc;
+  color: #20649f !important;
+}
+
+.alerta-popup .nivel.nivel--neutro {
+  border: 1px solid #d8e0e3;
+  background: #eef2f4;
+  color: #596b74 !important;
 }
 
 .alerta-popup p {
@@ -48,6 +78,50 @@
   color: #222 !important;
   font-size: 14px;
   line-height: 1.4;
+}
+
+.sismo-popup {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #e1eaec;
+  border-radius: 12px;
+  background: #f7fbfb;
+}
+
+.sismo-popup__icono {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  font-size: 26px;
+}
+
+.sismo-popup__datos,
+.sismo-popup__dato {
+  display: flex;
+  min-width: 0;
+}
+
+.sismo-popup__datos {
+  gap: 12px;
+}
+
+.sismo-popup__dato {
+  flex-direction: column;
+}
+
+.sismo-popup__etiqueta {
+  color: #68717d;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.sismo-popup__dato strong {
+  color: #202833;
+  font-size: 14px;
+  overflow-wrap: anywhere;
 }
 
 .alerta-popup .fuente {

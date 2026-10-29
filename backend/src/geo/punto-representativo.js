@@ -25,7 +25,7 @@ function obtenerPuntoRepresentativo(geometria) {
         return { latitud, longitud };
     }
 
-    if (geometria.type !== 'Polygon') {
+    if (!['Polygon', 'MultiPolygon'].includes(geometria.type)) {
         throw new Error(`Geometría no soportada: ${geometria.type}`);
     }
 

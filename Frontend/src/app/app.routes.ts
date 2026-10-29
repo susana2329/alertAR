@@ -42,7 +42,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/reportes/reportes.page').then((m) => m.ReportesPage),
   },
 
-// cuando vayan subiendo las demas pages
   {
     path: 'mapa-test',
     loadComponent: () => import('./mapa-test/mapa-test.page').then(m => m.MapaTestPage),

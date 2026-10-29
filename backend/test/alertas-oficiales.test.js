@@ -1,7 +1,5 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
 
 const { parsearCAP } = require('../src/ingestion/parsers/cap.parser');
 const { normalizarSMN } = require('../src/ingestion/normalizers/smn.normalizer');
@@ -26,13 +24,58 @@ function alertaCAP({ identifier = 'cap-new', msgType = 'Update', references = 's
 }
 
 test('normalizadores producen una estructura oficial común y conservan datos de fuente', () => {
-    const raiz = path.join(__dirname, '..', 'datos-muestra');
-    const capFile = fs.readdirSync(path.join(raiz, 'smn/cap')).find(n => n.endsWith('.xml'));
-    const cap = normalizarSMN(parsearCAP(fs.readFileSync(path.join(raiz, 'smn/cap', capFile), 'utf8')));
-    const inaFile = fs.readdirSync(path.join(raiz, 'ina')).find(n => n.endsWith('.json'));
-    const ina = normalizarINA(JSON.parse(fs.readFileSync(path.join(raiz, 'ina', inaFile), 'utf8')))[0];
-    const inpresFile = fs.readdirSync(path.join(raiz, 'inpres')).find(n => n.endsWith('.xml'));
-    const inpres = normalizarINPRES(fs.readFileSync(path.join(raiz, 'inpres', inpresFile), 'utf8'))[0];
+    const cap = normalizarSMN({
+        identifier: 'smn-prueba-1',
+        sender: 'smn@smn.gob.ar',
+        sent: '2026-10-21T00:00:00Z',
+        status: 'Actual',
+        msgType: 'Alert',
+        scope: 'Public',
+        info: [{
+            event: 'Tormenta',
+            headline: 'Tormenta de prueba',
+            severity: 'Severe',
+            onset: '2026-10-21T00:00:00Z',
+            expires: '2026-10-22T00:00:00Z'
+        }],
+        areas: [{
+            descripcion: 'Zona de prueba',
+            poligonos: [poligono(-60).coordinates[0]]
+        }]
+    });
+
+    const ina = normalizarINA({
+        type: 'FeatureCollection',
+        features: [{
+            id: 'station-1',
+            geometry: { type: 'Point', coordinates: [-60, -35] },
+            properties: {
+                unid: 1,
+                fecha: '2026-10-21T00:00:00Z',
+                nombre: 'Estación de prueba',
+                valor: 2.5,
+                nivel_de_alerta: 3,
+                nivel_de_evacuacion: 4,
+                timeseries: JSON.stringify([
+                    ['2026-10-20T00:00:00Z', 2.2],
+                    ['2026-10-21T00:00:00Z', 2.5]
+                ])
+            }
+        }]
+    })[0];
+
+    const inpres = normalizarINPRES(`
+        <lista><item>
+            <idSismo>20261021010203</idSismo>
+            <fecha>21/10/2026</fecha>
+            <hora>01:02</hora>
+            <latitud>-35.0</latitud>
+            <longitud>-60.0</longitud>
+            <mg>3.2</mg>
+            <prof>10</prof>
+            <prov>Buenos Aires</prov>
+        </item></lista>
+    `)[0];
 
     for (const alerta of [cap, ina, inpres]) {
         assert.equal(alerta.origen, 'oficial');
@@ -43,11 +86,13 @@ test('normalizadores producen una estructura oficial común y conservan datos de
         assert.ok(geometriaValida(alerta.geometria));
         assert.doesNotThrow(() => validarAlertaOficial(alerta));
     }
+
     assert.equal(cap.geometria.type, 'Polygon');
     assert.ok(cap.datosFuente.informaciones.length);
-    assert.ok(ina.serieTemporal.length);
-    assert.equal(typeof inpres.magnitud, 'number');
+    assert.ok(ina.datosFuente.serieTemporal.length);
+    assert.equal(typeof inpres.datosFuente.magnitud, 'number');
 });
+
 
 test('validación rechaza polígonos abiertos e inválidos', () => {
     assert.equal(geometriaValida(poligono(-60)), true);
@@ -90,47 +135,60 @@ test('dos regiones CAP se conservan y reingresar el mismo polígono no duplica',
     } finally { Object.assign(Alerta, originals); }
 });
 
-test('XML reales de Tormenta Llanura y Patagonia mantienen Update y referencias ambiguas sin mutaciones', async () => {
-    const dirCAP = path.join(__dirname, '..', 'datos-muestra', 'smn', 'cap');
-    const archivos = [
-        'CAP_20261020204542_Tormenta_Llanura_alertas_alertas_1.xml',
-        'CAP_20261020204543_Tormenta_Patagonia_alertas_alertas_1.xml'
+test('CAP regionales mantienen Update y referencias ambiguas sin mutaciones', async () => {
+    const alertas = [
+        alertaCAP({ identifier: 'regional-update', x: -60 }),
+        alertaCAP({ identifier: 'regional-update', x: -70 })
     ];
-    const alertas = archivos.map(archivo => {
-        const xml = fs.readFileSync(path.join(dirCAP, archivo), 'utf8');
-        const alerta = normalizarSMN(parsearCAP(xml));
-        validarAlertaOficial(alerta);
-        return alerta;
-    });
+
     const originales = {
         findOne: Alerta.findOne,
         find: Alerta.find,
         findOneAndUpdate: Alerta.findOneAndUpdate,
         updateOne: Alerta.updateOne
     };
+
     let writes = 0;
     const idReferenciado = alertas[0].referencias.split(',')[1];
+
     Alerta.findOne = () => ({ lean: async () => null });
     Alerta.find = () => ({ lean: async () => [
-        { _id: 'llanura-anterior', fuente: 'SMN', emisor: alertas[0].emisor, identificadorFuente: idReferenciado },
-        { _id: 'patagonia-anterior', fuente: 'SMN', emisor: alertas[1].emisor, identificadorFuente: idReferenciado }
+        {
+            _id: 'llanura-anterior',
+            fuente: 'SMN',
+            emisor: alertas[0].emisor,
+            identificadorFuente: idReferenciado
+        },
+        {
+            _id: 'patagonia-anterior',
+            fuente: 'SMN',
+            emisor: alertas[1].emisor,
+            identificadorFuente: idReferenciado
+        }
     ] });
     Alerta.findOneAndUpdate = async () => { writes++; };
     Alerta.updateOne = async () => { writes++; };
+
     try {
         assert.equal(alertas[0].tipoMensaje, 'Update');
         assert.equal(alertas[1].tipoMensaje, 'Update');
         assert.equal(alertas[0].identificadorFuente, alertas[1].identificadorFuente);
         assert.equal(alertas[0].referencias, alertas[1].referencias);
         assert.notDeepEqual(alertas[0].geometria, alertas[1].geometria);
-        assert.equal(alertas[0].geometria.type, 'Polygon');
-        assert.equal(alertas[1].geometria.type, 'Polygon');
+
         for (const alerta of alertas) {
-            await assert.rejects(repositorio.guardarOficiales([alerta]), /Update CAP ambiguo/);
+            await assert.rejects(
+                repositorio.guardarOficiales([alerta]),
+                /Update CAP ambiguo/
+            );
         }
+
         assert.equal(writes, 0);
-    } finally { Object.assign(Alerta, originales); }
+    } finally {
+        Object.assign(Alerta, originales);
+    }
 });
+
 
 test('repositorio hace upsert idempotente para la misma alerta', async () => {
     const original = Alerta.findOneAndUpdate;

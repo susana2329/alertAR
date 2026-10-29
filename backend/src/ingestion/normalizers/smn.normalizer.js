@@ -6,6 +6,15 @@ function fecha(valor) {
     return Number.isNaN(resultado.getTime()) ? null : resultado;
 }
 
+function clasificarFenomeno(evento) {
+    const texto = String(evento ?? '').toLocaleLowerCase('es');
+    if (/tormenta/.test(texto)) return 'tormenta';
+    if (/nevada|nieve/.test(texto)) return 'nevada';
+    if (/inundaci/.test(texto)) return 'inundacion';
+    if (/crecida/.test(texto)) return 'crecida';
+    return 'meteorologica';
+}
+
 function normalizarSMN(cap) {
     if (!cap || typeof cap !== "object" || !cap.identifier) {
         throw new Error("Documento CAP sin identifier");
@@ -24,6 +33,7 @@ function normalizarSMN(cap) {
         vencimiento: info.expires ?? null
     }));
     const areas = (cap.areas ?? []).map(area => ({
+        infoIndex: area.infoIndex ?? null,
         descripcion: area.descripcion ?? null,
         geometrías: (area.poligonos ?? []).map(coordenadas => ({
             type: 'Polygon', coordinates: [coordenadas]
@@ -31,12 +41,15 @@ function normalizarSMN(cap) {
     }));
     const geometrías = areas.flatMap(area => area.geometrías);
     const esCancelacion = cap.msgType === 'Cancel';
-    if (!esCancelacion && geometrías.length !== 1) {
-        throw new Error(`CAP ${cap.identifier}: se esperaba exactamente un Polygon; se recibieron ${geometrías.length}`);
+    if (!esCancelacion && geometrías.length === 0) {
+        throw new Error(`CAP ${cap.identifier}: no contiene polígonos válidos`);
     }
     const infoPrincipal = informaciones[0] ?? {};
     const fechaInicio = fecha(infoPrincipal.inicio) || fecha(cap.sent);
     const fechaFin = fecha(infoPrincipal.vencimiento);
+    if (!esCancelacion && !fechaInicio) throw new Error(`CAP ${cap.identifier}: no tiene fecha de inicio ni fecha de emisión válida`);
+    if (infoPrincipal.vencimiento && !fechaFin) throw new Error(`CAP ${cap.identifier}: vencimiento inválido`);
+    if (fechaInicio && fechaFin && fechaFin < fechaInicio) throw new Error(`CAP ${cap.identifier}: vencimiento anterior al inicio`);
     const alerta = {
         fuente: 'SMN', origen: 'oficial',
         identificadorFuente: cap.identifier,
@@ -45,18 +58,25 @@ function normalizarSMN(cap) {
         tipoMensaje: cap.msgType ?? null,
         referencias: cap.references ?? null,
         titulo: infoPrincipal.titulo || infoPrincipal.evento || cap.identifier,
-        tipo: 'meteorologica',
-        nivel: ({ Extreme: 'emergencia', Severe: 'advertencia', Moderate: 'precaucion', Minor: 'informativo' })[infoPrincipal.severidadOriginal] || 'informativo',
+        tipo: clasificarFenomeno(infoPrincipal.evento || infoPrincipal.titulo),
+        naturaleza: cap.status === 'Actual' && ['Alert', 'Update'].includes(cap.msgType) ? 'alerta' : 'contexto',
+        nivel: ({ Extreme: 'emergencia', Severe: 'advertencia', Moderate: 'precaucion', Minor: 'informativo' })[infoPrincipal.severidadOriginal] || 'desconocido',
         descripcion: infoPrincipal.descripcion || '',
         fechaInicio,
         fechaFin,
-        geometria: geometrías[0] ?? null,
+        geometria: geometrías.length > 1
+            ? { type: 'MultiPolygon', coordinates: geometrías.map(g => g.coordinates) }
+            : geometrías[0] ?? null,
         claveIdempotencia: null,
         datosFuente: {
             fechaEmision: cap.sent ?? null,
             alcance: cap.scope ?? null,
             informaciones,
-            areas
+            areas: areas.map(area => ({
+                infoIndex: area.infoIndex ?? null,
+                descripcion: area.descripcion,
+                geometrías: area.geometrías
+            }))
         }
     };
     alerta.claveIdempotencia = esCancelacion

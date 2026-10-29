@@ -37,6 +37,57 @@ test('mapea un Point conservando sus coordenadas', async () => {
     assert.equal(alertas[0].geometria.type, 'Point');
 });
 
+test('presenta códigos de tendencia INA en lenguaje claro y conserva intactos los datos técnicos', async () => {
+    const datosFuente = {
+        estacion: { nombre: 'SFranTOR', rio: 'San Francisco' },
+        medicion: { tendencia: 'crece' },
+        estadoFuente: { estado: '', codigo: 'x', condicion: 'crece:x' }
+    };
+    const documento = {
+        _id: { toString: () => 'ina-1' },
+        fuente: 'INA',
+        titulo: 'SFranTOR',
+        tipo: 'observacion',
+        nivel: 'informativo',
+        origen: 'oficial',
+        descripcion: 'crece:x',
+        fechaInicio: new Date('2026-10-21T12:00:00Z'),
+        geometria: { type: 'Point', coordinates: [-58.3, -34.7] },
+        datosFuente
+    };
+    alertaRepository.obtenerTodas = async () => [documento];
+
+    const [alerta] = await alertaService.listarAlertas();
+
+    assert.equal(alerta.titulo, 'Estación del río San Francisco');
+    assert.equal(alerta.descripcion, 'La altura registrada está en aumento.');
+    assert.deepEqual(documento.datosFuente, datosFuente);
+});
+
+test('no inventa tendencia INA si el código técnico no puede interpretarse', async () => {
+    alertaRepository.obtenerTodas = async () => [{
+        _id: { toString: () => 'ina-2' },
+        fuente: 'INA',
+        titulo: 'SFranTOR',
+        tipo: 'observacion',
+        nivel: 'informativo',
+        origen: 'oficial',
+        descripcion: 'crece:x',
+        fechaInicio: new Date('2026-10-21T12:00:00Z'),
+        geometria: { type: 'Point', coordinates: [-58.3, -34.7] },
+        datosFuente: {
+            estacion: { nombre: 'SFranTOR', rio: null },
+            medicion: { tendencia: 'codigo-desconocido' },
+            estadoFuente: { estado: '', codigo: 'x', condicion: 'crece:x' }
+        }
+    }];
+
+    const [alerta] = await alertaService.listarAlertas();
+
+    assert.equal(alerta.titulo, 'Estación hidrológica INA');
+    assert.equal(alerta.descripcion, 'El INA registró una medición de altura en esta estación; no hay una tendencia interpretable disponible.');
+});
+
 test('calcula un punto interior y conserva el Polygon', async () => {
     const geometria = {
         type: 'Polygon',
@@ -68,7 +119,7 @@ test('calcula un punto interior y conserva el Polygon', async () => {
     assert.deepEqual(alertas[0].geometria, geometria);
 });
 
-test('excluye alertas sin ubicación válida', async () => {
+test('expone registros sin geometría con ubicación nula para conservar el dato', async () => {
     alertaRepository.obtenerTodas = async () => [{
         _id: { toString: () => 'sin-ubicacion' },
         titulo: 'Alerta incompleta',
@@ -83,5 +134,8 @@ test('excluye alertas sin ubicación válida', async () => {
 
     const alertas = await alertaService.listarAlertas();
 
-    assert.deepEqual(alertas, []);
+    assert.equal(alertas.length, 1);
+    assert.equal(alertas[0].ubicacion, null);
+    assert.equal(alertas[0].nivel, 'informativo');
+    assert.equal(alertas[0].color, 'azul');
 });

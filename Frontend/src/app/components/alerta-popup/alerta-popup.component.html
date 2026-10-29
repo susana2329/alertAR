@@ -3,11 +3,9 @@
 
   <span
     class="nivel"
-    [class.emergencia]="alerta.nivel === 'emergencia'"
-    [class.advertencia]="alerta.nivel === 'advertencia'"
-    [class.precaucion]="alerta.nivel === 'precaucion'"
+    [ngClass]="'nivel--' + colorEstadoVisual"
   >
-    {{ alerta.nivel }}
+    {{ etiquetaPresentacion }}
   </span>
 
   <p>{{ alerta.descripcion }}</p>

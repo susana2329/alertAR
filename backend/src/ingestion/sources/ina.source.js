@@ -26,8 +26,7 @@ async function obtenerObservacionesINA(timeoutMs = 20000) {
 
         const datos = await response.json();
 
-        if (datos.type !== 'FeatureCollection' ||
-            !Array.isArray(datos.features)) {
+        if (datos.type !== 'FeatureCollection' || !Array.isArray(datos.features)) {
             throw new Error('INA devolvió un GeoJSON inválido');
         }
 

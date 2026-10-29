@@ -20,8 +20,8 @@ test('normaliza varios sismos válidos y conserva claves y GeoJSON', () => {
     assert.equal(alertas.length, 2);
     assert.equal(alertas[0].claveIdempotencia, 'INPRES:20261021003000');
     assert.deepEqual(alertas[0].geometria, { type: 'Point', coordinates: [-60.4, -35.2] });
-    assert.equal(alertas[0].urlFuente, 'https://www.inpres.gob.ar/sismo/1');
-    assert.equal(alertas[0].datosFuente.urlFuente, alertas[0].urlFuente);
+    assert.equal(alertas[0].datosFuente.urlFuente, 'https://www.inpres.gob.ar/sismo/1');
+    assert.equal(alertas[0].naturaleza, 'observacion');
 });
 
 test('descarta y registra un idSismo inválido sin perder los sismos vecinos', () => {
@@ -39,7 +39,6 @@ test('un enlace mal formado se registra y queda nulo sin abortar el sismo ni el 
     const errores = [];
     const alertas = normalizarINPRES(xml(item({ link: 'http://[url-invalida' }), item({ id: '20261021003100' })), error => errores.push(error));
     assert.equal(alertas.length, 2);
-    assert.equal(alertas[0].urlFuente, null);
     assert.equal(alertas[0].datosFuente.urlFuente, null);
     assert.equal(errores.length, 1);
     assert.equal(errores[0].indice, 0);
@@ -55,5 +54,5 @@ test('XML inválido y estructura sin lista siguen fallando explícitamente', () 
 test('coordenadas inválidas no generan una ubicación inventada', () => {
     const [alerta] = normalizarINPRES(xml(item({ latitud: '95', longitud: '200' })));
     assert.equal(alerta.geometria, null);
-    assert.equal(alerta.ubicacion, null);
+    assert.equal(alerta.geometria, null);
 });

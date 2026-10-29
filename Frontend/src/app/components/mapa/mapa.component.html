@@ -2,6 +2,19 @@
 <div class="map-container">
   <div id="map"></div>
 
+  @if (estadoAlertas !== 'cargado' || alertas.length === 0) {
+    <section class="alertas-status" aria-live="polite">
+      @if (estadoAlertas === 'cargando') {
+        <p>Cargando alertas…</p>
+      } @else if (estadoAlertas === 'error') {
+        <p>{{ mensajeError }}</p>
+        <button type="button" (click)="cargarAlertas()">Reintentar</button>
+      } @else {
+        <p>No hay alertas disponibles.</p>
+      }
+    </section>
+  }
+
   <header class="map-header">
     <h1>Mapa de alertas</h1>
 
@@ -15,6 +28,18 @@
       <ion-icon name="layers-outline"></ion-icon>
     </button>
   </header>
+
+  @if (modoCobertura) {
+    <button
+      class="coverage-back-button"
+      type="button"
+      aria-label="Volver a las alertas"
+      (click)="volverAAlertas()"
+    >
+      <span aria-hidden="true">←</span>
+      Volver a las alertas
+    </button>
+  }
 
   @if (selectorEstilosAbierto) {
     <div class="map-style-selector">

@@ -8,7 +8,6 @@ describe('MapaTestPage', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MapaTestPage);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

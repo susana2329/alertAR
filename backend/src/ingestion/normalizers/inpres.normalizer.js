@@ -93,6 +93,7 @@ function normalizarINPRES(xml, registrarError = () => {}) {
                 claveIdempotencia: `INPRES:${identificador}`,
                 titulo: `Sismo ${identificador}`,
                 tipo: 'sismo',
+                naturaleza: 'observacion',
                 nivel: 'informativo',
                 descripcion: texto(item.prov) ? `Sismo en ${texto(item.prov)}` : 'Evento sísmico',
                 fechaInicio,
@@ -105,17 +106,14 @@ function normalizarINPRES(xml, registrarError = () => {}) {
                     magnitud: numero(item.mg),
                     profundidad: numero(item.prof),
                     provincia: texto(item.prov),
-                    urlFuente
-                },
-                fechaHoraFuente,
-                fechaFuente,
-                horaFuente: horaLocal,
-                fechaHoraIdentificador,
-                magnitud: numero(item.mg),
-                profundidad: numero(item.prof),
-                provincia: texto(item.prov),
-                ubicacion,
-                urlFuente
+                    urlFuente,
+                    valoresOriginales: {
+                        latitud: texto(item.latitud), longitud: texto(item.longitud),
+                        magnitud: texto(item.mg), profundidad: texto(item.prof),
+                        fecha: texto(item.fecha), hora: texto(item.hora), provincia: texto(item.prov),
+                        enlace: texto(item.link)
+                    }
+                }
             }];
         } catch (error) {
             reportarError({ indice, identificador: identificador ?? null, mensaje: error.message });

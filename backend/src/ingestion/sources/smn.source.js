@@ -63,7 +63,7 @@ function extraerEnlacesCAP(xml) {
             try {
                 const url = new URL(texto.trim(), SMN_URL);
                 if (url.protocol !== 'https:' || url.host !== 'ssl.smn.gob.ar') continue;
-                if (!url.pathname.startsWith('/feeds/CAP/xml_generados/')) continue;
+                if (!/^\/feeds\/CAP\/(?:xml_generados|avisocortoplazo)\//.test(url.pathname)) continue;
                 if (!url.pathname.endsWith('.xml')) continue;
                 enlaces.add(url.href);
             } catch {

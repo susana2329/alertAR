@@ -41,8 +41,11 @@ test('inicia una ronda sincrónicamente y programa el intervalo configurado', as
     assert.equal(reloj.estado.intervalo, 1234);
     await siguienteTurno();
     assert.equal(logger.infos.length, 1);
-    assert.deepEqual(logger.infos[0][1].SMN, {
-        estado: 'completada', error: null, erroresDocumentos: [], erroresPersistencia: [], erroresRegistros: []
+    assert.equal(logger.infos[0][0], 'ingesta_completada');
+    assert.deepEqual(logger.infos[0][1].fuentes.SMN, {
+        estado: 'completada', inicio: null, fin: null, duracionMs: null, recibidos: null,
+        normalizados: 0, guardados: 0, actualizados: 0, eliminados: 0, omitidos: 0, fallidos: 0,
+        error: null, erroresDocumentos: [], erroresPersistencia: [], erroresRegistros: []
     });
     programador.detener();
 });
@@ -110,12 +113,13 @@ test('registra excepciones de una ronda y sigue ejecutando en ticks posteriores'
     });
     programador.iniciar();
     await siguienteTurno();
-    assert.deepEqual(logger.errores[0], ['[Ingesta] Falló la ronda:', 'fallo de prueba']);
+    assert.equal(logger.errores[0][0], 'ingesta_fallida');
+    assert.equal(logger.errores[0][1].mensaje, 'fallo de prueba');
     reloj.estado.callback();
     await siguienteTurno();
     assert.equal(rondas, 2);
     assert.equal(logger.infos.length, 1);
-    assert.equal(logger.infos[0][1].INA.erroresDocumentos[0].mensaje, 'CAP inaccesible');
+    assert.equal(logger.infos[0][1].fuentes.INA.erroresDocumentos[0].mensaje, 'CAP inaccesible');
     programador.detener();
 });
 

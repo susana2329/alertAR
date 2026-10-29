@@ -11,14 +11,17 @@ function identificadoresReferenciados(referencias) {
     return [...new Set(ids)];
 }
 
-async function guardarUna(alerta) {
+async function guardarUna(alerta, observadores = {}) {
     validarAlertaOficial(alerta);
     const filtroClave = { claveIdempotencia: alerta.claveIdempotencia };
 
     if (alerta.fuente !== 'SMN') {
-        return Alerta.findOneAndUpdate(filtroClave, { $set: alerta }, {
+        const existente = observadores.onResultado ? await Alerta.exists(filtroClave) : null;
+        const documento = await Alerta.findOneAndUpdate(filtroClave, { $set: alerta }, {
             upsert: true, returnDocument: 'after', runValidators: true, setDefaultsOnInsert: true
         });
+        observadores.onResultado?.(existente ? 'actualizada' : 'guardada', alerta);
+        return documento;
     }
 
     if (alerta.tipoMensaje === 'Cancel') {
@@ -38,12 +41,14 @@ async function guardarUna(alerta) {
         }
         if (destinos.length === 0) return { cancelada: false, motivo: 'referencia-no-encontrada' };
         await Alerta.deleteMany({ _id: { $in: destinos.map(doc => doc._id) } });
+        observadores.onResultado?.('cancelada', alerta);
         return { cancelada: true, identificadores: destinos.map(doc => doc.identificadorFuente) };
     }
 
     const repetida = await Alerta.findOne(filtroClave).lean();
     if (repetida) {
         await Alerta.updateOne({ _id: repetida._id }, { $set: alerta }, { runValidators: true });
+        observadores.onResultado?.('actualizada', alerta);
         return { ...repetida, ...alerta };
     }
 
@@ -58,6 +63,7 @@ async function guardarUna(alerta) {
             }
             if (destinos.length === 1) {
                 await Alerta.updateOne({ _id: destinos[0]._id }, { $set: alerta }, { runValidators: true });
+                observadores.onResultado?.('actualizada', alerta);
                 return { ...destinos[0], ...alerta };
             }
         }
@@ -66,15 +72,17 @@ async function guardarUna(alerta) {
         });
     }
 
-    return Alerta.findOneAndUpdate(filtroClave, { $set: alerta }, {
+    const documento = await Alerta.findOneAndUpdate(filtroClave, { $set: alerta }, {
         upsert: true, returnDocument: 'after', runValidators: true, setDefaultsOnInsert: true
     });
+    observadores.onResultado?.('guardada', alerta);
+    return documento;
 }
 
-exports.guardarOficiales = async alertas => {
+exports.guardarOficiales = async (alertas, observadores = {}) => {
     if (!Array.isArray(alertas)) throw new Error('Se esperaba una lista de alertas oficiales');
     const resultado = [];
-    for (const alerta of alertas) resultado.push(await guardarUna(alerta));
+    for (const alerta of alertas) resultado.push(await guardarUna(alerta, observadores));
     return resultado;
 };
 

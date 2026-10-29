@@ -17,29 +17,6 @@
   overflow-wrap: anywhere;
 }
 
-.nivel {
-  display: inline-block;
-  margin-bottom: 10px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  color: white;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.nivel.emergencia {
-  background: #ef3b3b;
-}
-
-.nivel.advertencia {
-  background: #f59e0b;
-}
-
-.nivel.precaucion {
-  background: #f6c945;
-}
-
 .alerta-popup p {
   margin: 0 0 10px;
   font-size: 14px;
