@@ -8,7 +8,6 @@
   --ion-background-color: #F8FAFC;
 }
 
-// Cambia el color de fondo y letras de los componentes
 ion-header,
 ion-toolbar,
 ion-modal,
@@ -19,7 +18,6 @@ ion-item {
   --ion-text-color: #000;
 }
 
-//Cambia el color de la letra del input y text area
 ion-textarea,
 ion-input {
   color: #03294FAD;
@@ -28,7 +26,6 @@ ion-input {
   --highlight-color-invalid: #999999;
 }
 
-// Quita las configuraciones predeterminadas de los headers 
 ion-header {
   box-shadow: none;
   --border-style: none;
@@ -52,14 +49,12 @@ ion-header {
   --box-shadow: none;
 }
 
-// El titulo se centrea y cambia el color de la letra
 ion-title {
   text-align: center;
   color: black;
   padding-right: 20%;
 }
 
-// Todo el cuerpo del reporte
 .reporte {
   display: flex;
   flex-direction: column;
@@ -68,7 +63,6 @@ ion-title {
   padding-right: 5px;
 }
 
-// Configuraciones del aviso
 .avisoPublic {
   text-align: center;
   background-color: #44DAEE2E;
@@ -96,7 +90,6 @@ ion-title {
   max-width: 35px;
 }
 
-//Da orden a la imagen preview y la seleccion de imagenes
 .imgform {
   display: flex;
   flex-direction: column;
@@ -192,7 +185,6 @@ ion-title {
   --box-shadow: 0 1px 4px rgba(3, 41, 79, 0.2);
 }
 
-// Descripccion
 .descripform {
   width: 100%;
   height: 100%;
@@ -231,7 +223,6 @@ ion-title {
   --keyboard-offset: 0px;
 }
 
-//Tipo de reportes
 .formtipo {
   display: flex;
   flex-direction: column;
@@ -251,7 +242,6 @@ ion-title {
   --padding: 100px;
 }
 
-//Ubicacion
 
 .ubicacionform {
   display: flex;
@@ -306,7 +296,6 @@ ion-input {
   align-items: center;
 }
 
-// Fecha y hora
 .fechaform {
   display: flex;
   justify-content: space-around;
@@ -335,7 +324,6 @@ ion-datetime {
 }
 
 
-// Boton para enviar el formulario
 .buttonenviar {
   width: 100%;
   display: flex;

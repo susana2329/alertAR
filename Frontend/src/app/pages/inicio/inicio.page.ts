@@ -118,6 +118,5 @@ export class InicioPage {
   }
 
   verAlerta(alerta: AlertaCercana) {
-    // TODO: this.router.navigate(['/inicio/detalle-alerta']); cuando exista la página
   }
 }

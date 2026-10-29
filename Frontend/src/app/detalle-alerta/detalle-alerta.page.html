@@ -1,125 +1,163 @@
-
 <ion-content [fullscreen]="true">
-  <div class="detalle-container">
-    <div class="detalle-card">
-
-      <div
-        class="detalle-header"
-        [class.emergencia]="alerta?.nivel === 'emergencia'"
-        [class.advertencia]="alerta?.nivel === 'advertencia'"
-        [class.precaucion]="alerta?.nivel === 'precaucion'"
-      >
-        <div class="header-top">
-          <button
-            class="back-button"
-            type="button"
-            aria-label="Volver al mapa"
-            (click)="volverAlMapa()"
-          >
+  <main class="detail-page" [class.detail-page--smn]="esSMN">
+    <ng-container *ngIf="alerta; else detalleEstado">
+      <article class="detail-card" [ngClass]="['detail-card--' + (alerta.fuente || 'general').toLowerCase(), 'detail-card--estado-' + colorEstadoVisual, esINA ? 'detail-card--ina-' + colorClasificacionINA : '']">
+        <header class="detail-header">
+          <button class="back-button" type="button" aria-label="Volver al mapa" (click)="volverAlMapa()">
             <ion-icon name="arrow-back-outline"></ion-icon>
           </button>
+          <div class="header-content">
+            <div class="header-tags">
+              <span class="source-tag">{{ alerta.fuente || (alerta.origen === 'oficial' ? 'Fuente oficial' : 'Fuente vecinal') }}</span>
+              <span class="classification-tag" [ngClass]="'classification-tag--' + colorEstadoVisual">
+                {{ etiquetaPresentacion }}
+              </span>
+            </div>
+            <h1>{{ alerta.titulo }}</h1>
+            <p class="header-context">{{ contextoTipo }}</p>
+          </div>
+          <span class="header-icon" aria-hidden="true"><ion-icon [name]="iconoPorTipo()"></ion-icon></span>
+        </header>
 
-          <span class="tipo-alerta">Detalle de alerta</span>
+        <div class="detail-content">
+          <section *ngIf="esINA" class="source-panel ina-panel" aria-labelledby="ina-heading">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">Observación hidrológica</span>
+                <h2 id="ina-heading">Medición INA</h2>
+              </div>
+              <span class="measurement-date" *ngIf="medicionINA as medicion">
+                {{ formatearFecha(medicion.fecha) }}
+              </span>
+            </div>
+
+            <ng-container *ngIf="medicionINA as medicion">
+              <div class="measurement-hero" *ngIf="medicion.valor !== null">
+              <span class="measurement-label">Altura registrada</span>
+              <strong>{{ formatearMetrica(medicion.valor) }} <small>{{ medicion.unidad || 'm' }}</small></strong>
+              <span class="measurement-context">Lectura correspondiente a la fecha indicada</span>
+              </div>
+            </ng-container>
+
+            <p class="classification-context" *ngIf="alerta.nivel !== 'informativo' && alerta.nivel !== 'desconocido'">
+              Clasificación {{ etiquetaPresentacion | lowercase }} basada en esta medición del
+              <strong>{{ formatearFecha(medicionINA?.fecha) }}</strong>.
+            </p>
+
+            <div class="metric-grid" *ngIf="medicionINA as medicion">
+              <div class="metric-tile" *ngIf="medicion.valorPrecedente !== null">
+                <span>Lectura precedente</span>
+                <strong>{{ formatearMetrica(medicion.valorPrecedente) }} {{ medicion.unidad || 'm' }}</strong>
+              </div>
+              <div class="metric-tile" *ngIf="medicion.tendencia">
+                <span>Tendencia informada</span>
+                <strong>{{ textoTendencia(medicion.tendencia) }}</strong>
+              </div>
+            </div>
+
+            <div class="station-line" *ngIf="estacionINA">
+              <span class="data-label">Estación</span>
+              <strong>{{ estacionINA }}</strong>
+            </div>
+            <div class="thresholds" *ngIf="umbralesINA.length">
+              <h3>Referencias publicadas</h3>
+              <div class="threshold-list">
+                <div class="threshold-item" *ngFor="let umbral of umbralesINA">
+                  <span>{{ umbral.etiqueta }}</span><strong>{{ formatearMetrica(umbral.valor) }} {{ umbral.unidad }}</strong>
+                </div>
+              </div>
+              <p class="quiet-note">Los umbrales de alerta y evacuación son definidos por las autoridades locales.</p>
+            </div>
+            <div class="description-block" *ngIf="descripcionVisible">
+              <h3>Observación</h3><p>{{ descripcionVisible }}</p>
+            </div>
+          </section>
+
+          <section *ngIf="esINPRES" class="source-panel earthquake-panel" aria-labelledby="quake-heading">
+            <div class="section-heading">
+              <div><span class="eyebrow">Evento sísmico · registro histórico</span><h2 id="quake-heading">Datos del sismo</h2></div>
+              <span class="event-date" *ngIf="fechaOcurrencia">{{ formatearFecha(fechaOcurrencia) }}</span>
+            </div>
+            <div class="metric-grid quake-metrics">
+              <div class="metric-tile metric-tile--large" *ngIf="magnitudSismo !== null">
+                <span>Magnitud</span><strong>{{ formatearMetrica(magnitudSismo) }}</strong>
+              </div>
+              <div class="metric-tile metric-tile--large" *ngIf="profundidadSismo !== null">
+                <span>Profundidad</span><strong>{{ formatearMetrica(profundidadSismo) }} <small>km</small></strong>
+              </div>
+            </div>
+            <div class="data-row" *ngIf="provinciaINPRES"><span>Provincia</span><strong>{{ provinciaINPRES }}</strong></div>
+            <div class="data-row" *ngIf="alerta.ubicacion"><span>Coordenadas</span><strong>{{ formatearUbicacion(alerta.ubicacion) }}</strong></div>
+            <p class="quiet-note historical-note">La fecha corresponde a la ocurrencia del sismo. Este registro informativo no representa una alerta vigente.</p>
+            <a *ngIf="urlFuenteINPRES" class="source-link" [href]="urlFuenteINPRES" target="_blank" rel="noopener noreferrer">Ver registro en INPRES <ion-icon name="open-outline"></ion-icon></a>
+          </section>
+
+          <section *ngIf="esSMN" class="smn-content" aria-labelledby="smn-heading">
+            <div class="smn-section-heading">
+              <div>
+                <span class="eyebrow">Aviso meteorológico oficial</span>
+                <h2 id="smn-heading">Vigencia</h2>
+              </div>
+              <span class="cap-status" *ngIf="estadoSMN">{{ estadoSMN }}</span>
+            </div>
+
+            <div class="smn-validity" aria-label="Vigencia informada por el SMN">
+              <div class="smn-validity-item">
+                <span>Inicio informado</span>
+                <strong>{{ formatearFecha(alerta.fechaInicio) }}</strong>
+              </div>
+              <span class="smn-validity-divider" aria-hidden="true"></span>
+              <div class="smn-validity-item">
+                <span>Válido hasta</span>
+                <strong>{{ formatearFecha(alerta.fechaFin) }}</strong>
+              </div>
+            </div>
+
+            <div class="smn-copy-grid" [class.smn-copy-grid--single]="!descripcionVisible || !instruccionSMN">
+              <section class="smn-copy-block" *ngIf="descripcionVisible">
+                <h3>Descripción oficial</h3>
+                <p>{{ descripcionVisible }}</p>
+              </section>
+              <section class="smn-copy-block smn-instructions" *ngIf="instruccionSMN">
+                <h3>Instrucciones</h3>
+                <p>{{ instruccionSMN }}</p>
+              </section>
+            </div>
+
+            <section class="smn-areas" *ngIf="areasSMN.length" aria-labelledby="smn-areas-heading">
+              <h3 id="smn-areas-heading">Zonas incluidas</h3>
+              <ul [class.smn-areas__list--single]="areasSMN.length === 1"><li *ngFor="let area of areasSMN">{{ area }}</li></ul>
+            </section>
+
+            <p class="smn-message-type" *ngIf="tipoMensajeSMN">
+              <span>Mensaje CAP</span><strong>{{ tipoMensajeSMN }}</strong>
+            </p>
+          </section>
+
+          <section *ngIf="!esINA && !esINPRES && !esSMN" class="source-panel generic-panel">
+            <div class="classification-summary"><span class="eyebrow">Clasificación</span><strong>{{ etiquetaPresentacion }}</strong></div>
+            <div class="description-block" *ngIf="descripcionVisible"><h2>Descripción</h2><p>{{ descripcionVisible }}</p></div>
+            <div class="data-row" *ngIf="alerta.fechaInicio"><span>Inicio informado</span><strong>{{ formatearFecha(alerta.fechaInicio) }}</strong></div>
+            <div class="data-row" *ngIf="alerta.fechaFin"><span>Fin informado</span><strong>{{ formatearFecha(alerta.fechaFin) }}</strong></div>
+            <div class="data-row" *ngIf="alerta.ubicacion"><span>Ubicación</span><strong>{{ formatearUbicacion(alerta.ubicacion) }}</strong></div>
+          </section>
+
+          <footer class="detail-footer">
+            <span *ngIf="alerta.ubicacion && !esINPRES">Ubicación representativa</span>
+            <span *ngIf="alerta.ubicacion && !esINPRES">{{ formatearUbicacion(alerta.ubicacion) }}</span>
+            <button type="button" class="recommendations-button" (click)="verRecomendaciones()">Ver recomendaciones</button>
+          </footer>
         </div>
+      </article>
+    </ng-container>
 
-        <div class="header-main">
-          <div class="header-info">
-            <span class="header-eyebrow">ALERTA</span>
-            <h1>{{ alerta?.titulo }}</h1>
-
-            <span class="fuente">
-              <ng-container
-                *ngIf="alerta?.origen === 'oficial'; else fuenteVecinal"
-              >
-                <ion-icon name="checkmark-circle"></ion-icon>
-                {{ alerta?.fuente }}
-              </ng-container>
-
-              <ng-template #fuenteVecinal>
-                Fuente vecinal
-              </ng-template>
-            </span>
-          </div>
-
-          <div class="header-icon">
-            <ion-icon [name]="iconoPorTipo()"></ion-icon>
-          </div>
-        </div>
-      </div>
-
-      <div class="detalle-body">
-
-        <div
-          class="nivel-alerta"
-          [class.emergencia]="alerta?.nivel === 'emergencia'"
-          [class.advertencia]="alerta?.nivel === 'advertencia'"
-          [class.precaucion]="alerta?.nivel === 'precaucion'"
-        >
-          <span>Nivel:</span>
-          <strong>{{ alerta?.nivel }}</strong>
-        </div>
-
-        <div class="info-item">
-          <div class="info-icon">
-            <ion-icon name="time-outline"></ion-icon>
-          </div>
-          <div>
-            <span class="info-titulo">Inicio</span>
-            <span class="info-valor">
-              {{ formatearFecha(alerta?.fechaInicio) }}
-            </span>
-          </div>
-        </div>
-
-        <div class="info-item">
-          <div class="info-icon">
-            <ion-icon name="time-outline"></ion-icon>
-          </div>
-          <div>
-            <span class="info-titulo">Fin estimado</span>
-            <span class="info-valor">
-              {{ formatearFecha(alerta?.fechaFin) }}
-            </span>
-          </div>
-        </div>
-
-        <div class="info-item">
-          <div class="info-icon">
-            <ion-icon name="location-outline"></ion-icon>
-          </div>
-          <div>
-            <span class="info-titulo">Zona afectada</span>
-            <span class="info-valor">
-              {{ alerta?.ubicacion?.latitud }},
-              {{ alerta?.ubicacion?.longitud }}
-            </span>
-          </div>
-        </div>
-
-        <div class="info-item info-description">
-          <div class="info-icon">
-            <ion-icon name="document-text-outline"></ion-icon>
-          </div>
-          <div>
-            <span class="info-titulo">Descripción</span>
-            <span class="info-valor">
-              {{ alerta?.descripcion }}
-            </span>
-          </div>
-        </div>
-
-        <button
-          class="recommendations-button"
-          type="button"
-        >
-          Ver recomendaciones
-        </button>
-
-        <div class="updated">
-          Actualizado: ahora
-        </div>
-
-      </div>
-    </div>
-  </div>
+    <ng-template #detalleEstado>
+      <section class="state-card" aria-live="polite">
+        <span class="state-mark" aria-hidden="true"><ion-icon [name]="cargando ? 'time-outline' : 'information-circle-outline'"></ion-icon></span>
+        <p *ngIf="cargando">Cargando alerta…</p>
+        <p *ngIf="errorCarga">No se pudo cargar la alerta. Revisá tu conexión e intentá nuevamente.</p>
+        <p *ngIf="!cargando && !errorCarga">No se encontró la alerta solicitada.</p>
+      </section>
+    </ng-template>
+  </main>
 </ion-content>

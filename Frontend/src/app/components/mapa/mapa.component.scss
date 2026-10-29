@@ -34,6 +34,37 @@
   height: 100%;
 }
 
+.alertas-status {
+  position: absolute;
+  z-index: 5;
+  top: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  padding: 10px 14px;
+  border: 1px solid var(--alertar-border);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 96%);
+  color: var(--alertar-text);
+  box-shadow: var(--alertar-shadow);
+  text-align: center;
+}
+
+.alertas-status p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.alertas-status button {
+  margin-top: 8px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--alertar-primary);
+  color: white;
+  font: inherit;
+}
+
 .map-header {
   position: absolute;
   top: 12px;
@@ -69,6 +100,37 @@
   font-weight: 750;
   letter-spacing: -0.55px;
   text-align: center;
+}
+
+.coverage-back-button {
+  position: absolute;
+  z-index: 25;
+  top: 84px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: calc(100% - 24px);
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid rgb(255 255 255 / 85%);
+  border-radius: 13px;
+  background: rgb(255 255 255 / 96%);
+  color: var(--alertar-text);
+  box-shadow: var(--alertar-shadow);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.coverage-back-button span {
+  color: var(--alertar-primary);
+  font-size: 19px;
+  line-height: 1;
 }
 
 .header-button {
@@ -426,10 +488,12 @@
 }
 
 .maplibregl-popup-content {
+  max-height: min(60vh, 420px);
   padding: 0 !important;
   border: 1px solid rgb(23 43 58 / 7%);
   border-radius: 18px !important;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   box-shadow:
     0 16px 44px rgb(15 35 50 / 18%),
@@ -489,26 +553,6 @@
   font-weight: 750;
 }
 
-.alerta-popup .nivel {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-
-  margin-bottom: 12px;
-  padding: 6px 9px;
-
-  border: 1px solid rgb(214 69 69 / 12%);
-  border-radius: 8px;
-
-  background: #fff0f0;
-  color: #bd3434;
-
-  font-size: 10px;
-  font-weight: 750;
-  letter-spacing: 0.65px;
-  text-transform: uppercase;
-}
-
 .alerta-popup p {
   margin: 0 0 12px;
 
@@ -516,6 +560,13 @@
   font-size: 13px;
   line-height: 1.65;
   overflow-wrap: anywhere;
+}
+
+.alerta-popup .resumen {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .alerta-popup .fuente {
@@ -566,6 +617,10 @@
 
 .alerta-popup__button:active {
   transform: scale(0.98);
+}
+
+.alerta-popup__coverage-button + .alerta-popup__detail-button {
+  margin-top: 8px;
 }
 
 .alerta-marker {
@@ -682,6 +737,12 @@
 
   .map-header h1 {
     font-size: 17px;
+  }
+
+  .coverage-back-button {
+    top: 78px;
+    min-height: 42px;
+    padding: 9px 13px;
   }
 
   .map-style-selector {
