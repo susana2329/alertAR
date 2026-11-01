@@ -15,10 +15,10 @@ const client = new S3Client({
 
 exports.getimagenS3 = async (key) => {
     try {
-        console.log(client.credentials)
         const command = new GetObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key })
-        return await getSignedUrl(client, command, { expiresIn: 3600 })
-
+        const resulturl =  await getSignedUrl(client, command, { expiresIn: 3600 })
+        console.log(resulturl)
+        return resulturl
     } catch (caught) {
         console.log("che no funco : ", caught)
     }

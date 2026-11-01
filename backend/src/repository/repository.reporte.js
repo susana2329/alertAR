@@ -27,7 +27,7 @@ exports.getReportesRepositoy = async ()=>{
 
 exports.getSegunIdRepository = async (id) => { 
    try{ 
-      const reporteid = await reportes.findOne({idUser: id})
+      const reporteid = await reportes.find({idUser: id})
       if(!reporteid){
          console.log("no se pudo encontrar el reporte por el id")
       }
