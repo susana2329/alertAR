@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { NavController, IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, location } from 'ionicons/icons';
+import { SesionService } from '../../../services/sesion.service';
 
 addIcons({ arrowBackOutline, location });
 
@@ -16,38 +17,26 @@ export class PermisosUbicacionPage {
 
   mensaje = signal('');
 
-  constructor(private navCtrl: NavController) { }
+  constructor(private navCtrl: NavController, private sesion: SesionService) { }
 
   volver() {
     this.navCtrl.navigateBack('/acceso');
   }
 
-  permitirUbicacion() {
+  async permitirUbicacion() {
     this.mensaje.set('');
 
-    if (!navigator.geolocation) {
-      this.mensaje.set('Tu dispositivo no permite usar la ubicación');
-      return;
+    const permitida = await this.sesion.pedirUbicacion();
+
+    if (permitida) {
+      this.navCtrl.navigateRoot('/inicio');
+    } else {
+      this.mensaje.set('No pudimos acceder a tu ubicación. Podés seguir con "Ahora no" y activarla más tarde.');
     }
-
-    navigator.geolocation.getCurrentPosition(
-      () => {
-
-        this.navCtrl.navigateRoot('/inicio');
-      },
-      (error) => {
-        if (error.code === error.PERMISSION_DENIED) {
-          this.mensaje.set('No pudimos acceder a tu ubicación. Podés seguir con "Ahora no" y activarla más tarde.');
-        } else {
-      
-          this.navCtrl.navigateRoot('/inicio');
-        }
-      },
-      { timeout: 10000 }
-    );
   }
 
   ahoraNo() {
+    this.sesion.guardarUbicacion(false);
     this.navCtrl.navigateRoot('/inicio');
   }
 

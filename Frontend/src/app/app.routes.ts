@@ -1,11 +1,16 @@
+import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
+import { SesionService } from './services/sesion.service';
+import { soloConSesion } from './guards/sesion.guard';
+
+const arranque = () => (inject(SesionService).logueado() ? '/inicio' : '/acceso');
 
 export const routes: Routes = [
 
   {
     path: '',
-    redirectTo: 'acceso',
     pathMatch: 'full',
+    redirectTo: arranque,
   },
 
 {
@@ -27,6 +32,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/inicio/inicio.page').then((m) => m.InicioPage),
   },
   {
+    
     path: 'inicio/recomendaciones',
     loadComponent: () => import('./pages/inicio/recomendaciones/recomendaciones.page').then((m) => m.RecomendacionesPage),
   },
@@ -34,37 +40,47 @@ export const routes: Routes = [
     path: 'inicio/recomendaciones/:id',
     loadComponent: () => import('./pages/inicio/recomendaciones/detalle/detalle-recomendacion.page').then((m) => m.DetalleRecomendacionPage),
   },
+
   {
-    path: 'reportes/form',
-    loadComponent: () => import('./pages/reportes-form/reportes-form.page').then( m => m.ReportesFormPage)
-  }, {
     path: 'reportes',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para hacer un reporte' },
     loadComponent: () => import('./pages/reportes/reportes.page').then((m) => m.ReportesPage),
   },
-
-// cuando vayan subiendo las demas pages
   {
-    path: 'mapa-test',
+    path: 'reportes/form',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para hacer un reporte' },
+    loadComponent: () => import('./pages/reportes-form/reportes-form.page').then((m) => m.ReportesFormPage),
+  },
+  {
+    path: 'mapa',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para usar el mapa interactivo' },
     loadComponent: () => import('./mapa-test/mapa-test.page').then(m => m.MapaTestPage),
   },
   {
-  path: 'detalle-alerta/:id',
-  loadComponent: () =>
-    import('./detalle-alerta/detalle-alerta.page').then(
-      m => m.DetalleAlertaPage
-    )
-},
-{
+    path: 'prevencion',
+    redirectTo: 'prevencion/mochila',
+    pathMatch: 'full',
+  },
+  {
     path: 'prevencion/mochila',
-    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver tu mochila de emergencia' },
+    loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
   },
   {
     path: 'prevencion/recomendaciones',
-    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver tus recomendaciones' },
+    loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
   },
   {
     path: 'cuenta',
-    loadComponent: () => import('./pages/cuenta/cuenta').then((m) => m.CuentaPage),
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver tu cuenta' },
+    loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
   },
 
   {
@@ -87,6 +103,6 @@ export const routes: Routes = [
 
   {
     path: '**',
-    redirectTo: 'acceso',
+    redirectTo: arranque,
   },
 ];

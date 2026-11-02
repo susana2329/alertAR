@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
@@ -8,8 +8,7 @@ import {
   IonButton,
   IonIcon,
   IonTitle,
-  IonContent,
-  IonFooter
+  IonContent
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
@@ -21,12 +20,11 @@ import {
   waterOutline,
   warningOutline,
   pulseOutline,
-  home,
-  mapOutline,
-  documentTextOutline,
-  shieldCheckmarkOutline,
-  personOutline,
+  carOutline,
+  thunderstormOutline,
+  leafOutline,
 } from 'ionicons/icons';
+import { SesionService } from '../../services/sesion.service';
 
 addIcons({
   'menu-outline': menuOutline,
@@ -37,14 +35,13 @@ addIcons({
   'water-outline': waterOutline,
   'warning-outline': warningOutline,
   'pulse-outline': pulseOutline,
-  home,
-  'map-outline': mapOutline,
-  'document-text-outline': documentTextOutline,
-  'shield-checkmark-outline': shieldCheckmarkOutline,
-  'person-outline': personOutline,
+  'car-outline': carOutline,
+  'thunderstorm-outline': thunderstormOutline,
+  'leaf-outline': leafOutline,
 });
 
 interface AlertaCercana {
+  tipo: string;
   titulo: string;
   distancia: string;
   subtextoIzquierda: string;
@@ -65,7 +62,6 @@ interface AlertaCercana {
     IonIcon,
     IonTitle,
     IonContent,
-    IonFooter,
     CommonModule,
     RouterLink
   ],
@@ -78,13 +74,23 @@ export class InicioPage {
   ultimaActualizacion = '00:30';
 
   alertaPrincipal = {
+    tipo: 'lluvia',
     nivel: 'Precaución',
     titulo: 'Lluvias intensas',
     fuente: 'SMN'
   };
 
+  recomendacionPorTipo: { [tipo: string]: string } = {
+    lluvia: 'lluvias-intensas',
+    inundacion: 'inundacion',
+    hidrologica: 'inundacion',
+    tormenta: 'tormenta',
+    sismo: 'sismo'
+  };
+
   alertasCercanas: AlertaCercana[] = [
     {
+      tipo: 'inundacion',
       titulo: 'Reporte de inundación',
       distancia: '1,7km',
       subtextoIzquierda: 'Fuente: vecino',
@@ -93,6 +99,16 @@ export class InicioPage {
       iconColor: '#0E7490'
     },
     {
+      tipo: 'inundacion',
+      titulo: 'Calle anegada',
+      distancia: '2,4km',
+      subtextoIzquierda: 'Fuente: vecino',
+      subtextoDerecha: 'No verificado',
+      icon: 'car-outline',
+      iconColor: '#0E7490'
+    },
+    {
+      tipo: 'hidrologica',
       titulo: 'Situación hidrológica',
       distancia: '3,1km',
       subtextoIzquierda: 'Fuente: INA',
@@ -102,6 +118,26 @@ export class InicioPage {
       iconColor: '#0E7490'
     },
     {
+      tipo: 'tormenta',
+      titulo: 'Tormenta eléctrica',
+      distancia: '5,2km',
+      subtextoIzquierda: 'Fuente: SMN',
+      subtextoDerecha: 'Información',
+      rightHighlighted: true,
+      icon: 'thunderstorm-outline',
+      iconColor: '#0E7490'
+    },
+    {
+      tipo: 'inundacion',
+      titulo: 'Árbol caído',
+      distancia: '3,8km',
+      subtextoIzquierda: 'Fuente: vecino',
+      subtextoDerecha: 'No verificado',
+      icon: 'leaf-outline',
+      iconColor: '#0E7490'
+    },
+    {
+      tipo: 'sismo',
       titulo: 'Sismo detectado',
       distancia: '82km',
       subtextoIzquierda: 'Magnitud 2.8',
@@ -111,13 +147,32 @@ export class InicioPage {
     }
   ];
 
-  constructor(private router: Router) { }
 
-  verRecomendaciones(): void {
-    this.router.navigate(['/inicio/recomendaciones']);
+  mensajeUbicacion = signal('');
+
+
+  constructor(private router: Router, public sesion: SesionService) { }
+
+  verRecomendaciones(tipo: string): void {
+    const id = this.recomendacionPorTipo[tipo];
+
+    if (id) {
+      this.router.navigate(['/inicio/recomendaciones', id]);
+    } else {
+      this.router.navigate(['/inicio/recomendaciones']);
+    }
   }
 
   verAlerta(alerta: AlertaCercana) {
     // TODO: this.router.navigate(['/inicio/detalle-alerta']); cuando exista la página
+  }
+
+  async activarUbicacion() {
+    this.mensajeUbicacion.set('');
+    const permitida = await this.sesion.pedirUbicacion();
+
+    if (!permitida) {
+      this.mensajeUbicacion.set('No pudimos acceder a tu ubicación. Activala desde los ajustes del navegador o del celular.');
+    }
   }
 }
