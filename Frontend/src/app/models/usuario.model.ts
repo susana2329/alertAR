@@ -1,6 +1,8 @@
-export interface UserProfile{
-    name: string;
-    lastname: string;
+export interface UsuarioPerfil {
+    _id: string;
+    nombre: string;
+    apellido: string;
     email: string;
-    avartUrl: string;
+    foto: string;
+    proveedor?: 'local' | 'google';
 }

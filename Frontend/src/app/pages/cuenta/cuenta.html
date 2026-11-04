@@ -14,16 +14,20 @@
   <div class="account-container">
     <div class="profile-container">
       <ion-avatar class="profile-avatar">
-        <img src='assets/imagcuenta/mockuser.jpg' alt="Perfil de Usuario" />
+        @if (usuario?.foto) {
+         <img [src]="usuario!.foto" referrerpolicy="no-referrer" alt="Perfil de Usuario" />
+        } @else {
+        <div class="avatar-iniciales">{{ iniciales }}</div>
+        }
       </ion-avatar>
 
       <div class="profile-info">
-        <h2>{{user.name}} {{user.lastname}}</h2>
-        <p>{{user.email}}</p>
+        <h2>{{ usuario?.nombre }} {{ usuario?.apellido }}</h2>
+        <p>{{ usuario?.email }}</p>
         <div routerLink="/perfil">
           <a class="edit-profile-link">Ver y editar perfil</a>
         </div>
-        
+
       </div>
     </div>
 
@@ -93,11 +97,11 @@
     </div>
   </div>
 
-<div class="btn-cerrar-sesion">
-  <ion-button expand="block" fill="solid" class="logout-button" (click)="confirmarCerrarSesion()">
-    <ion-icon slot="start" name="log-out-outline"></ion-icon>
-    Cerrar sesión
-  </ion-button>
+  <div class="btn-cerrar-sesion">
+    <ion-button expand="block" fill="solid" class="logout-button" (click)="confirmarCerrarSesion()">
+      <ion-icon slot="start" name="log-out-outline"></ion-icon>
+      Cerrar sesión
+    </ion-button>
   </div>
 
 </ion-content>

@@ -71,6 +71,15 @@ ion-label {
     border-radius: 50%;
     object-fit: cover;
 }
+.avatar-iniciales {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ion-color-primary);
+    color: #fff;
+    font-weight: 600;
+    font-size: 2.2rem;
+}
 
 .change-photo-btn {
     --background: #0E7490;    

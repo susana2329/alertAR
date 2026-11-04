@@ -104,7 +104,7 @@ exports.getReporteDetalle = async(req,res) =>{
 
 //Aca voy a listar todas las mochilas que el usuario crea
 
-exports.getMochilasUsuario = async(req,res) =>{
+exports.getMochilasPorUsuario = async(req,res) =>{
 
     try{
         const idUsuario = req.params.id;

@@ -64,11 +64,11 @@ export const routes: Routes = [
     redirectTo: 'prevencion/mochila',
     pathMatch: 'full',
   },
-  {
-    path: 'prevencion/mochila',
+{
+    path: 'cuenta',
     canActivate: [soloConSesion],
-    data: { aviso: 'Para ver tu mochila de emergencia' },
-    loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
+    data: { aviso: 'Para ver tu cuenta' },
+    loadComponent: () => import('./pages/cuenta/cuenta').then((m) => m.CuentaPage),
   },
   {
     path: 'prevencion/recomendaciones',

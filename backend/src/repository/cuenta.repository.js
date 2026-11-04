@@ -1,6 +1,6 @@
-const Usuario = require('../models/usuario.model');
-const Reporte = require('../models/reporte.model');
-const Mochila = require('../models/mochila.model');
+const Usuario = require('./models/UserGoogle');
+//const Reporte = require('./models/reporte.model');
+//const Mochila = require('./models/mochila.model');
 
 exports.findUsuarioById = async (id) =>{
     try{
@@ -19,21 +19,19 @@ exports.updateFotoPerfil = async (id,nuevaFotoUrl) =>{
 
         return await Usuario.findByIdAndUpdate(
             id,
-            {fotoPerfil: nuevaFotoUrl},
+            {foto:nuevaFotoUrl},
             {new:true}
         ).lean();
 
     }catch (error){
-        console.error("Error en REPOSITORY updateFotoPerfil", error);
+        console.error("Error en REPOSITORY updateFotoPerfil:", error);
         throw error;
     }
 };
 
-//Aca voy a buscar todos los reportes creados pro un usuario
-
-exports.findReportesByUsuarioId = async (idUsuario) =>{
-    try{
-
+// Todos los reportes creados por un usuario
+/*exports.findReportesByUsuarioId = async (idUsuario) => {
+    try {
         console.log("REPOSITORY - findReportesByUsuarioId idUsuario:", idUsuario);
         return await Reporte.find({usuarioId:idUsuario}).lean();
     }catch (error){
@@ -42,14 +40,37 @@ exports.findReportesByUsuarioId = async (idUsuario) =>{
     }
 };
 
-//Aca se detalla el reporte del usuario de manera individual
-exports.findReporteBiId = async (reporteId)=>{
-    try{
+// Un reporte individual
+exports.findReporteById = async (reporteId) => {
+    try {
 
-        console.log("REPOSITORY -findReporteById reporteId:", reporteId);
+    
+        console.log("REPOSITORY - findReporteById reporteId:", reporteId);
         return await Reporte.findById(reporteId).lean();
-    }catch(error){
+    } catch(error){
         console.error("Error en REPOSITORY findReporteById:", error);
         throw error;
     }
 };
+
+// Todas las mochilas de un usuario
+exports.findMochilasByUsuarioId = async (idUsuario) => {
+    try {
+        console.log("REPOSITORY - findMochilasByUsuarioId idUsuario:", idUsuario);
+        return await Mochila.find({ usuarioId: idUsuario }).lean();
+    } catch (error) {
+        console.error("Error en REPOSITORY findMochilasByUsuarioId:", error);
+        throw error;
+    }
+};
+
+// Una mochila individual
+exports.findMochilaById = async (mochilaId) => {
+    try {
+        console.log("REPOSITORY - findMochilaById mochilaId:", mochilaId);
+        return await Mochila.findById(mochilaId).lean();
+    } catch (error) {
+        console.error("Error en REPOSITORY findMochilaById:", error);
+        throw error;
+    }
+};*/

@@ -1,14 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
+import { SesionService } from '../../services/sesion.service';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonAvatar, IonRouterLink, IonIcon, IonButton, IonButtons, IonTabBar, IonLabel, IonTabButton, AlertController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { chevronForwardOutline, logOutOutline,chevronBackOutline, homeOutline,mapOutline,bookmarkOutline,fileTrayFullOutline,personOutline,shieldOutline  } from 'ionicons/icons';
+import { chevronForwardOutline, logOutOutline, chevronBackOutline, homeOutline, mapOutline, bookmarkOutline, fileTrayFullOutline, personOutline, shieldOutline } from 'ionicons/icons';
+import { UsuarioPerfil } from '../../models/usuario.model';
+import { PersonalService } from '../../services/usuario.service';
 
-import { MOCK_USER } from '../../mocks/usuario.mock';
-import { UserProfile } from '../../models/usuario.model';
 
 @Component({
   selector: 'app-cuenta',
@@ -22,7 +23,7 @@ import { UserProfile } from '../../models/usuario.model';
     IonContent,
     IonHeader,
     IonToolbar,
-    IonTitle, 
+    IonTitle,
     IonAvatar,
     IonIcon,
     IonButtons,
@@ -30,13 +31,17 @@ import { UserProfile } from '../../models/usuario.model';
     IonTabBar,
     IonLabel,
     IonTabButton
-]
+  ]
 })
 export class CuentaPage implements OnInit {
-  user = MOCK_USER;
+  public usuario: UsuarioPerfil | null = null;
   constructor(
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private personalService: PersonalService,
+    private sesionService: SesionService,
+    private cdr: ChangeDetectorRef
+
   ) {
     addIcons({
       chevronForwardOutline,
@@ -51,18 +56,52 @@ export class CuentaPage implements OnInit {
     });
 
   }
+      get iniciales(): string {
+        const n = this.usuario?.nombre?.charAt(0) ?? '';
+        const a = this.usuario?.apellido?.charAt(0) ?? '';
+        return (n + a).toUpperCase();
+    }
 
 
   ngOnInit() {
     console.log('CuentaPage funcionando correctamente');
+    this.cargarDatosUsuario();
   }
 
+  cargarDatosUsuario() {
+    const sesion: any = this.sesionService.usuario();
+    const idUsuario = sesion?._id || sesion?.id;
+  if (!idUsuario) {
+    if (sesion) {
+      this.usuario = {
+        _id: '',
+        nombre: sesion.nombre ?? '',
+        apellido: sesion.apellido ?? '',
+        email: sesion.email ?? '',
+        foto: sesion.foto ?? ''
+      };
+      this.cdr.markForCheck();
+    }
+    return;
+  }
 
-  async confirmarCerrarSesion(){
+    this.personalService.obtenerDatosUsuario(idUsuario).subscribe({
+      next: (data: UsuarioPerfil) => {
+        this.usuario = data;
+        this.cdr.markForCheck();
+        console.log('Datos de cuenta cargados con éxito', data);
+      },
+      error: (error) => {
+        console.error('Error al cargar los datos de la cuenta', error);
+      }
+    });
+  }
+
+  async confirmarCerrarSesion() {
     const alert = await this.alertController.create({
       header: 'Cerrar Sesión',
       message: '¿Estás seguro de que querés cerrar sesión?',
-      buttons:[
+      buttons: [
         {
           text: 'Cancelar',
           role: 'cancel',
@@ -72,10 +111,14 @@ export class CuentaPage implements OnInit {
         },
         {
           text: 'Si, cerrar sesión',
-          role: 'cancel',
           handler: () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
             localStorage.removeItem('usuarioLogueado');
-            this.router.navigate(['/home']);
+
+            this.sesionService.cerrarSesion();
+
+            this.router.navigate(['/acceso'], { replaceUrl: true });
           }
         }
       ]
