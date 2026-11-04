@@ -1,5 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonCard, IonNote, IonCardContent, IonButton, IonIcon } from '@ionic/angular';
 import { Router } from '@angular/router';
@@ -15,12 +16,16 @@ export class ReportesPage implements OnInit {
   public tiporeportes: string = ""
 
 
-  constructor(private router: Router) {
+  constructor(private router: Router,
+    private location: Location
+  ) {
     addIcons({
       'arrow-back-outline': arrowBackOutline
     })
   }
-
+  volverAtras() {
+    this.location.back();
+  }
   ngOnInit() {
   }
   creandoReporte(event: Event) {

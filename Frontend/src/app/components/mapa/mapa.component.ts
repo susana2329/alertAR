@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import type { FeatureCollection, Point, LineString, Polygon, MultiPolygon } from 'geojson';
 import { Capacitor } from '@capacitor/core';
@@ -129,38 +130,39 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     EstiloMapa,
     string | StyleSpecification
   > = {
-    voyager: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-    light: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-    dark: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-    lightNoLabels:
-      'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
-    darkNoLabels:
-      'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',
-    satellite: {
-      version: 8,
-      sources: {
-        imagery: {
-          type: 'raster',
-          tiles: [
-            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-          ],
-          tileSize: 256,
-          attribution: 'Imagery © Esri, Maxar, Earthstar Geographics'
-        }
-      },
-      layers: [
-        {
-          id: 'satellite-imagery',
-          type: 'raster',
-          source: 'imagery'
-        }
-      ]
-    }
-  };
+      voyager: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      light: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+      dark: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      lightNoLabels:
+        'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
+      darkNoLabels:
+        'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',
+      satellite: {
+        version: 8,
+        sources: {
+          imagery: {
+            type: 'raster',
+            tiles: [
+              'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+            ],
+            tileSize: 256,
+            attribution: 'Imagery © Esri, Maxar, Earthstar Geographics'
+          }
+        },
+        layers: [
+          {
+            id: 'satellite-imagery',
+            type: 'raster',
+            source: 'imagery'
+          }
+        ]
+      }
+    };
 
   constructor(
     private router: Router,
-    private alertaService: AlertaService
+    private alertaService: AlertaService,
+    private location: Location
   ) {
     addIcons({
       'locate-outline': locateOutline,
@@ -169,7 +171,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       'pulse-outline': pulseOutline
     });
   }
-
+  volverAtras() {
+    this.location.back();
+  }
   ngAfterViewInit(): void {
     setWorkerUrl(workerUrl);
     this.cargarAlertas();
@@ -1126,4 +1130,5 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     this.marcadorUsuario?.remove();
     this.map?.remove();
   }
+
 }

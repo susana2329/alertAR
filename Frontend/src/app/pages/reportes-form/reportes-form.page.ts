@@ -25,8 +25,9 @@ import { ModalPhotosComponent } from '../../components/modal-photos/modal-photos
 import { ModalConfirmacionComponent } from '../../components/modal-confirmacion/modal-confirmacion.component'
 import { ReportesPage } from '../reportes/reportes.page'
 import { Location } from '@angular/common';
-import { arrowBackOutline } from 'ionicons/icons';
+import { arrowBackOutline, checkmarkCircle } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
+
 @Component({
   selector: 'app-reportes-form',
   templateUrl: './reportes-form.page.html',
@@ -63,9 +64,12 @@ export class ReportesFormPage implements OnInit {
   component = ReportesPage
   public contador = 0
 
+  public reporteEnviado: boolean = false; 
+
   constructor(private router: ActivatedRoute, private modal: ModalController, private location: Location, private toastcontrol: ToastController) {
     addIcons({
-      'arrow-back-outline': arrowBackOutline
+      'arrow-back-outline': arrowBackOutline,
+      'checkmark-circle': checkmarkCircle // Importación añadida para el ícono de éxito del botón
     })
   }
   ngOnInit() {
@@ -78,10 +82,8 @@ export class ReportesFormPage implements OnInit {
       this.bandera = true
       this.reporte.tipo = this.tipo
     }
-    console.log(this.fecha)
+    console.log(this.reporte.fecha)
   }
-
-
 
   ingresartipo(event: Event) {
     if (this.bandera == false) {
@@ -146,15 +148,20 @@ export class ReportesFormPage implements OnInit {
     })
     await modalcomfirmar.present()
   }
+
   async confirmarreport() {
     if (this.reporte.descripcion) {
-      await this.crearModal()
+      this.reporteEnviado = true;
+
+      setTimeout(async () => {
+        await this.crearModal();
+      }, 600); 
     }
     else {
       await this.toast()
     }
-
   }
+
   siguientefoto() {
     this.contador = this.contador + 1
 
@@ -162,6 +169,7 @@ export class ReportesFormPage implements OnInit {
       this.contador = 0
     }
   }
+
   async toast() {
     const toast = await this.toastcontrol.create({
       message: '¡Error! Tenés que completar la descripción.',
@@ -171,6 +179,7 @@ export class ReportesFormPage implements OnInit {
     })
     await toast.present()
   }
+
   atrasfoto() {
     this.contador = this.contador - 1
     if (this.contador < 0) {
@@ -181,5 +190,5 @@ export class ReportesFormPage implements OnInit {
   volver() {
     this.location.back()
   }
-
+ 
 }
