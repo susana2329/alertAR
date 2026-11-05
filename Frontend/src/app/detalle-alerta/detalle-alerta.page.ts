@@ -205,7 +205,7 @@ export class DetalleAlertaPage implements OnInit {
     });
   }
 
-  volverAlMapa(): void { void this.router.navigate(['/mapa-test']); }
+  volverAlMapa(): void { void this.router.navigate(['/mapa']); }
   verRecomendaciones(): void { void this.router.navigate(['/inicio/recomendaciones']); }
 
   iconoPorTipo(): string {

@@ -45,6 +45,19 @@ ion-label{
     flex-shrink: 0;
 }
 
+.avatar-iniciales {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ion-color-primary);
+    color: #fff;
+    font-weight: 600;
+    font-size: 2.2rem;
+}
+
 .profile-info{
     h2{
         font-size: 1.15rem;

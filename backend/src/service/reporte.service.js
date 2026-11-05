@@ -1,31 +1,69 @@
 const { postReporteRepository } = require('../repository/repository.reporte')
 const { getReportesRepositoy } = require('../repository/repository.reporte')
 const { getSegunIdRepository } = require('../repository/repository.reporte')
-const { postimagenS3, getimagenS3 } = require('./s3aws.service')
-exports.subirReporteService = async (body, files, iduser) => {
+const { randomUUID } = require('node:crypto')
+const { postimagenS3, getimagenS3, deleteimagenS3 } = require('./s3aws.service')
+
+async function eliminarFotosSubidas(keys, eliminar = deleteimagenS3) {
+    const resultados = await Promise.allSettled(keys.map(key => eliminar(key)))
+    for (const resultado of resultados) {
+        if (resultado.status === 'rejected') {
+            console.error('No se pudo limpiar una imagen luego de fallar el reporte:', resultado.reason)
+        }
+    }
+}
+
+async function crearReporteConDependencias(body, files, iduser, dependencias = {}) {
+    const subirImagen = dependencias.subirImagen || postimagenS3
+    const eliminarImagen = dependencias.eliminarImagen || deleteimagenS3
+    const guardarReporte = dependencias.guardarReporte || postReporteRepository
+    const archivos = Array.isArray(files) ? files : []
+    const fotos = []
+    const clavesIntentadas = []
+
     try {
-        const fotos = await valoress3(files, iduser)
+        const resultados = await Promise.allSettled(archivos.map(async archivo => {
+            const key = `${iduser}/${randomUUID()}-${archivo.originalname}`
+            clavesIntentadas.push(key)
+            await subirImagen(key, archivo.buffer, archivo.mimetype)
+            return {
+                fieldname: archivo.fieldname,
+                originalname: archivo.originalname,
+                encoding: archivo.encoding,
+                mimetype: archivo.mimetype,
+                size: archivo.size,
+                key
+            }
+        }))
+
+        resultados.forEach((resultado, indice) => {
+            if (resultado.status === 'fulfilled') {
+                fotos[indice] = resultado.value
+            }
+        })
+        const falloSubida = resultados.find(resultado => resultado.status === 'rejected')
+        if (falloSubida) throw falloSubida.reason
+
         const report = {
             tipo: body.tipo,
             descripcion: body.descripcion,
             ubicacion: body.ubicacion,
             fecha: body.fecha,
-            fotos: fotos,
+            fotos,
             estado: body.estado,
             idUser: iduser
         }
-        console.log(report)
-        const result = await postReporteRepository(report)
-        console.log(result)
-        if (!result) {
-            console.log("Hubo un error al recibir la confirmacion de mongo")
-        }
-        return result
+        const resultado = await guardarReporte(report)
+        if (!resultado) throw new Error('MongoDB no confirmó el guardado del reporte')
+        return resultado
+    } catch (error) {
+        await eliminarFotosSubidas(clavesIntentadas, eliminarImagen)
+        throw error
     }
-    catch (error) {
-        console.log("error en servise", error)
-        throw new error("No se pudo guardar el reporte")
-    }
+}
+
+exports.subirReporteService = async (body, files, iduser) => {
+    return crearReporteConDependencias(body, files, iduser)
 }
 exports.getReporteService = async () => {
     try {
@@ -61,21 +99,7 @@ exports.getSegunIdService = async (id) => {
     }
 }
 
-const valoress3 = async (array, id) => {
-    try {
-        const results3 = await Promise.all(array.map(async (element) => {
-            const key = `${id}/${Date.now()}${element.originalname}`
-            await postimagenS3(key, element.buffer, element.mimetype)
-            element.buffer = null
-            element.key = key
-            return element
-        }))
-        return results3
-    }
-    catch (error) {
-        console.log("ERROR AL SUBIR LAS FOTOS: ", error)
-    }
-}
+exports._crearReporteConDependencias = crearReporteConDependencias
 const getresponses3 = async (array) => {
     try {
         let arrayurlimg = await  Promise.all(array.map(async (e) => {

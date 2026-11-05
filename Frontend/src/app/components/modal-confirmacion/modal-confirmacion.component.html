@@ -90,9 +90,15 @@
     </div>
 </ion-content>
 <ion-footer>
+    @if (errorEnvio) {
+        <p role="alert" class="error-envio">{{ errorEnvio }}</p>
+    }
     <div class="buttonconfirma" >
-        <ion-button  (click)="enviar()">
-            Confirmar
+        <ion-button fill="clear" [disabled]="enviando" (click)="cancelar()">
+            Volver
+        </ion-button>
+        <ion-button [disabled]="enviando" (click)="enviar()">
+            {{ enviando ? 'Enviando…' : 'Confirmar' }}
         </ion-button>
     </div>
 

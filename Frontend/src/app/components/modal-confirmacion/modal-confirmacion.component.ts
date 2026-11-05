@@ -1,8 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { IonButton, IonContent, IonDatetime, IonDatetimeButton, IonFooter, IonHeader, IonInput, IonLabel, IonTextarea, IonTitle, IonToolbar } from '@ionic/angular';
 import { Report } from '../../models/reporte';
 import { CommonModule } from '@angular/common';
 import { IonModal } from '@ionic/angular/common';
+import { ModalController } from '@ionic/angular';
 import { ReporteService } from '../../services/reporte.service';
 
 @Component({
@@ -17,7 +19,10 @@ export class ModalConfirmacionComponent implements OnInit {
   public contador: number = 0
   public fotos: string[] = []
   public fechaiso: string = ""
-  constructor(private httpReport: ReporteService) { }
+  enviando = false
+  errorEnvio = ''
+
+  constructor(private httpReport: ReporteService, private modalController: ModalController) { }
 
   ngOnInit() {
     this.fotos = this.reporte.imagen.map(imagen => URL.createObjectURL(imagen))
@@ -45,20 +50,21 @@ export class ModalConfirmacionComponent implements OnInit {
       formdata.append('fotos', this.reporte.imagen[i])
     }
     formdata.append('estado', this.reporte.estado)
-    const result = await this.post(formdata, '6aeb9998b4b1a9fa66040179')
-  
+    this.enviando = true
+    this.errorEnvio = ''
+    try {
+      await firstValueFrom(this.httpReport.postreporte(formdata, '6aeb9998b4b1a9fa66040179'))
+      await this.modalController.dismiss({ enviado: true })
+    } catch (error) {
+      console.error('No se pudo enviar el reporte:', error)
+      this.errorEnvio = 'No pudimos enviar el reporte. Revisá tu conexión e intentá nuevamente.'
+    } finally {
+      this.enviando = false
+    }
   }
-  async post(form: FormData, id: string) {
-    const respuesta = await this.httpReport.postreporte(form, id).subscribe({
-      next: (data: any) => {
-        console.log(data)
-        return data
-      },
-      error: (error) => {
-        return error
-      }
-    })
-    return respuesta
+
+  cancelar() {
+    return this.modalController.dismiss({ enviado: false })
   }
 
 }

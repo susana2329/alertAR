@@ -1,8 +1,6 @@
-
 require('dotenv').config();
-
-
 const express = require('express');
+const cors = require('cors');
 const { getMongoDBConnection } = require('./src/database/conexion');
 const alertaRouter = require('./src/routes/alerta.router');
 const ejecutarIngesta = require('./src/ingestion/ingesta.service');
@@ -10,16 +8,17 @@ const crearProgramadorIngesta = require('./src/ingestion/ingesta.scheduler');
 const logger = require('./src/logging/logger');
 const errorHandler = require('./src/middleware/error-handler');
 const routerReporte = require('./src/routes/reporte.router');
+const cuentaRouter = require('./src/routes/cuenta.router');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const cors = require('cors');
-
 app.use(cors({
-  origin: 'http://localhost:4200'
+  origin: ['http://localhost:8100', 'http://localhost:4200'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
 app.use(express.json());
+
 app.use((req, res, next) => {
   const inicio = Date.now();
   res.on('finish', () => logger.info('http_request', {
@@ -28,6 +27,9 @@ app.use((req, res, next) => {
   next();
 });
 app.use('/api/alertas', alertaRouter);
+app.use('/api/auth', require('./src/routes/auth.router'));
+app.use('/api/cuenta', cuentaRouter);
+app.use('/reportes', routerReporte);
 app.use(errorHandler);
 
 
@@ -78,10 +80,4 @@ async function iniciarServidor() {
 if (require.main === module) iniciarServidor();
 
 module.exports = { iniciarServidor, crearCierreOrdenado, app };
-
-app.use('/reportes', routerReporte)
-
-app.listen(PORT, () => {
-    console.log(`Servidor escuchando en el puerto ${PORT}`);
-});
 

@@ -1,8 +1,7 @@
 const env = require('dotenv')
-const { S3Client, GetObjectCommand,PutObjectCommand } = require('@aws-sdk/client-s3')
+const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3')
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 env.config()
-console.log(process.env.SESSIONTOKEN)
 const client = new S3Client({
     
     region: process.env.AWS_REGION, 
@@ -14,28 +13,20 @@ const client = new S3Client({
 });
 
 exports.getimagenS3 = async (key) => {
-    try {
-        const command = new GetObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key })
-        const resulturl =  await getSignedUrl(client, command, { expiresIn: 3600 })
-        console.log(resulturl)
-        return resulturl
-    } catch (caught) {
-        console.log("che no funco : ", caught)
-    }
+    const command = new GetObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key })
+    return getSignedUrl(client, command, { expiresIn: 3600 })
 }
 exports.postimagenS3 = async (key,imagen,tipo) => {
-    try {
-        const command = new PutObjectCommand({
-            Bucket: process.env.S3_BUCKET,
-            Key: key,
-            Body:imagen,
-            ContentType: tipo
-        });
-        const response = await client.send(command)
-        console.log(command)
-        return response
-    }
-    catch(error) {
-        console.log("el error es este: ", error)
-    }
+    const command = new PutObjectCommand({
+        Bucket: process.env.S3_BUCKET,
+        Key: key,
+        Body: imagen,
+        ContentType: tipo
+    });
+    return client.send(command)
+}
+
+exports.deleteimagenS3 = async (key) => {
+    const command = new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key })
+    return client.send(command)
 }

@@ -1,17 +1,7 @@
 const reportes = require('./model/modelos')
 
 exports.postReporteRepository = async (report) => {
-   try {
-      const resultmongo = await reportes.create(report)
-      if(!resultmongo){ 
-         console.log("no se logro subir el reporte desde repository")
-      }
-      console.log(resultmongo)
-      return resultmongo
-   }
-   catch (error) {
-      console.log(error)
-   }
+   return reportes.create(report)
 }
 exports.getReportesRepositoy = async ()=>{ 
    try{ 

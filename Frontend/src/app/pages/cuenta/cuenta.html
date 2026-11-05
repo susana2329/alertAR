@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="custom-toolbar">
     <ion-buttons slot="start">
-      <ion-button routerLink="/home">
+      <ion-button routerLink="/inicio">
         <ion-icon name="chevron-back-outline" class="arrow-icon-title"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -14,21 +14,26 @@
   <div class="account-container">
     <div class="profile-container">
       <ion-avatar class="profile-avatar">
-        <img src='assets/imagcuenta/mockuser.jpg' alt="Perfil de Usuario" />
+        @if (usuario?.foto) {
+         <img [src]="usuario!.foto" referrerpolicy="no-referrer" alt="Perfil de Usuario" />
+        } @else {
+        <div class="avatar-iniciales">{{ iniciales }}</div>
+        }
       </ion-avatar>
 
       <div class="profile-info">
-        <h2>{{user.name}} {{user.lastname}}</h2>
-        <p>{{user.email}}</p>
+        <h2>{{ usuario?.nombre }} {{ usuario?.apellido }}</h2>
+        <p>{{ usuario?.email }}</p>
         <div routerLink="/perfil">
           <a class="edit-profile-link">Ver y editar perfil</a>
         </div>
-        
+
       </div>
     </div>
 
 
-    <div class="menu-card" routerLink="/reportes">
+    <!--Tarjeta para manejar los REPORTES DEL USUARIO-->
+    <div class="menu-card" routerLink="/usuario-reportes">
       <div class="card-icon-box">
         <img src='assets/icon/icon-reportes.png' alt="Icono reportes">
       </div>
@@ -40,7 +45,7 @@
     </div>
 
 
-    <div class="menu-card" routerLink="/mochila">
+    <div class="menu-card" routerLink="/prevencion/mochila">
       <div class="card-icon-box">
         <img src='assets/icon/icon-mochila.png' alt="Icono mochila">
       </div>
@@ -88,11 +93,11 @@
     </div>
   </div>
 
-<div class="btn-cerrar-sesion">
-  <ion-button expand="block" fill="solid" class="logout-button" (click)="confirmarCerrarSesion()">
-    <ion-icon slot="start" name="log-out-outline"></ion-icon>
-    Cerrar sesión
-  </ion-button>
+  <div class="btn-cerrar-sesion">
+    <ion-button expand="block" fill="solid" class="logout-button" (click)="confirmarCerrarSesion()">
+      <ion-icon slot="start" name="log-out-outline"></ion-icon>
+      Cerrar sesión
+    </ion-button>
   </div>
 
 </ion-content>

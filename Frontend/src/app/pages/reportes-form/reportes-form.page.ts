@@ -17,7 +17,7 @@ import {
   IonNote,
 } from '@ionic/angular';
 import { Report } from '../../models/reporte';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonModal } from '@ionic/angular/common';
 import { ToastController } from '@ionic/angular';
 import { ModalController } from '@ionic/angular';
@@ -67,14 +67,14 @@ export class ReportesFormPage implements OnInit {
 
   public reporteEnviado: boolean = false; 
 
-  constructor(private router: ActivatedRoute, private modal: ModalController, private location: Location, private toastcontrol: ToastController) {
+  constructor(private route: ActivatedRoute, private router: Router, private modal: ModalController, private location: Location, private toastcontrol: ToastController) {
     addIcons({
       'arrow-back-outline': arrowBackOutline,
       'checkmark-circle': checkmarkCircle // Importación añadida para el ícono de éxito del botón
     })
   }
   ngOnInit() {
-    this.tipo = this.router.snapshot.queryParams['tipoReporte']
+    this.tipo = this.route.snapshot.queryParams['tipoReporte'] ?? 'otro'
     this.tipo = this.tipo.replaceAll("-", " ")
     if (this.tipo == "otro") {
       this.bandera = false
@@ -101,7 +101,7 @@ export class ReportesFormPage implements OnInit {
   async abrirmodalphotos() {
     const modalbuttons = await this.modal.create({
       component: ModalPhotosComponent,
-      initialBreakpoint: 0.3,
+      initialBreakpoint: 0.25,
       breakpoints: [0.25, 0.5, 0.75, 1]
     })
     const dismissal = modalbuttons.onDidDismiss<Blob[]>()
@@ -147,16 +147,22 @@ export class ReportesFormPage implements OnInit {
         reporte: this.reporte
       }
     })
+    const dismissal = modalcomfirmar.onDidDismiss<{ enviado?: boolean }>()
     await modalcomfirmar.present()
+    const { data } = await dismissal
+    if (data?.enviado) {
+      await this.router.navigate(['/reportes'])
+      await this.toast('¡Reporte enviado correctamente!', 'success')
+    } else {
+      this.reporteEnviado = false
+    }
   }
 
   async confirmarreport() {
     if (this.reporte.descripcion) {
       this.reporteEnviado = true;
 
-      setTimeout(async () => {
-        await this.crearModal();
-      }, 600); 
+      await this.crearModal()
     }
     else {
       await this.toast()
@@ -171,12 +177,12 @@ export class ReportesFormPage implements OnInit {
     }
   }
 
-  async toast() {
+  async toast(message = '¡Error! Tenés que completar la descripción.', color: 'danger' | 'success' = 'danger') {
     const toast = await this.toastcontrol.create({
-      message: '¡Error! Tenés que completar la descripción.',
+      message,
       duration: 3000,
       position: 'top',
-      color: 'danger'
+      color
     })
     await toast.present()
   }
