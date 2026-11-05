@@ -1,0 +1,153 @@
+ion-content {
+  --background: #f8f9fa;
+}
+
+.custom-toolbar {
+  --background: #f8f9fa;
+  --color: #1a1a1a;
+}
+
+ion-toolbar ion-title {
+  position: absolute !important;
+  left: 0;
+  right: 0;
+  text-align: center;
+  width: 100%;
+  pointer-events: none;
+}
+
+.icono-cerrar {
+  font-size: 24px;
+  color: #333333;
+}
+
+/* Encabezado con color según estado */
+.hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #fff8ec;
+  border: 1px solid #f6e2b8;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 22px;
+
+  &.revisado {
+    background: #eef8f1;
+    border-color: #cfe8d7;
+  }
+}
+
+.hero-icono {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 26px;
+    color: #d98e04;
+  }
+}
+
+.hero.revisado .hero-icono ion-icon {
+  color: #2e7d32;
+}
+
+.hero-texto {
+  h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 8px 0 4px;
+  }
+
+  p {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #6b7280;
+    margin: 0;
+  }
+}
+
+.estado-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b7791f;
+  background: #ffffff;
+  padding: 4px 10px;
+  border-radius: 20px;
+
+  &.revisado {
+    color: #2e7d32;
+  }
+}
+
+.seccion-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #6b7280;
+  margin: 0 4px 8px;
+}
+
+.detalle-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0px 0px 20px #bdb6b6;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.descripcion-texto {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #444444;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.dato {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.dato-icono {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #f4f5f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  ion-icon {
+    font-size: 22px;
+    color: #0E7490;
+  }
+}
+
+.dato-etiqueta {
+  font-size: 0.75rem;
+  color: #777777;
+}
+
+.dato-texto p {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 2px 0 0;
+}
+
+.divisor {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 12px 0;
+}

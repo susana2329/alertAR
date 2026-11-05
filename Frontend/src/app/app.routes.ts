@@ -76,12 +76,6 @@ export const routes: Routes = [
     data: { aviso: 'Para ver tus recomendaciones' },
     loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
   },
-  {
-    path: 'cuenta',
-    canActivate: [soloConSesion],
-    data: { aviso: 'Para ver tu cuenta' },
-    loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
-  },
 
   {
     path: 'fuentes',
@@ -99,6 +93,10 @@ export const routes: Routes = [
 {
   path: 'perfil',
   loadComponent: () => import('./pages/cuenta/perfil/perfil').then(m => m.PerfilPage)
+},
+{
+  path: 'usuario-reportes',
+  loadComponent: () => import('./pages/cuenta/usuario-reportes/usuario-reportes').then(m => m.UsuarioReportesPage)
 },
 
   {

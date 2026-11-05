@@ -1,5 +1,5 @@
 const Usuario = require('./models/UserGoogle');
-//const Reporte = require('./models/reporte.model');
+const Reporte = require('./model/modelos');
 //const Mochila = require('./models/mochila.model');
 
 exports.findUsuarioById = async (id) =>{
@@ -30,12 +30,12 @@ exports.updateFotoPerfil = async (id,nuevaFotoUrl) =>{
 };
 
 // Todos los reportes creados por un usuario
-/*exports.findReportesByUsuarioId = async (idUsuario) => {
+exports.findReportesByUsuarioId = async (idUsuario) => {
     try {
         console.log("REPOSITORY - findReportesByUsuarioId idUsuario:", idUsuario);
-        return await Reporte.find({usuarioId:idUsuario}).lean();
-    }catch (error){
-        console.log("Error en REPOSITORY findReportesByUsuarioId:",error);
+        return await Reporte.find({ idUser: idUsuario }).select('-fotos').sort({ fecha: -1 }).lean();
+    } catch (error) {
+        console.error("Error en REPOSITORY findReportesByUsuarioId:", error);
         throw error;
     }
 };
@@ -43,16 +43,15 @@ exports.updateFotoPerfil = async (id,nuevaFotoUrl) =>{
 // Un reporte individual
 exports.findReporteById = async (reporteId) => {
     try {
-
-    
         console.log("REPOSITORY - findReporteById reporteId:", reporteId);
-        return await Reporte.findById(reporteId).lean();
-    } catch(error){
+        return await Reporte.findById(reporteId).select('-fotos').lean();
+    } catch (error) {
         console.error("Error en REPOSITORY findReporteById:", error);
         throw error;
     }
 };
 
+/*
 // Todas las mochilas de un usuario
 exports.findMochilasByUsuarioId = async (idUsuario) => {
     try {

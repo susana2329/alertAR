@@ -1,0 +1,181 @@
+ion-content {
+  --background: #f8f9fa;
+}
+
+.custom-toolbar {
+  --background: #f8f9fa;
+  --color: #1a1a1a;
+}
+
+ion-toolbar ion-title {
+  position: absolute !important;
+  left: 0;
+  right: 0;
+  text-align: center;
+  width: 100%;
+  pointer-events: none;
+}
+
+.arrow-icon-title {
+  font-size: 22px;
+  color: #333333;
+}
+
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 100px;
+  padding: 0 28px;
+}
+
+.icono-circulo {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #eceff1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+
+  ion-icon {
+    font-size: 44px;
+    color: #b0b7bf;
+  }
+}
+
+.estado-vacio h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 8px;
+}
+
+.descripcion {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #7b8290;
+  margin: 0;
+  max-width: 280px;
+}
+
+.separador {
+  width: 40px;
+  height: 2px;
+  border-radius: 2px;
+  background: #e0e4e8;
+  margin: 28px 0 20px;
+}
+
+.nota {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #8b929c;
+  margin: 0;
+  max-width: 260px;
+}
+
+.intro {
+  margin: 4px 4px 18px;
+
+  h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 4px;
+  }
+
+  p {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: #777777;
+    margin: 0;
+  }
+}
+
+.lista-reportes {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 24px;
+}
+
+.reporte-card {
+  background: #ffffff;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid #d1d5db;
+  border-left: 4px solid #f5b74a;
+  box-shadow: 0px 0px 20px #bdb6b6;
+  cursor: pointer;
+
+  &.revisado {
+    border-left-color: #5fb37a;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 10px 0 4px;
+  }
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.estado-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #b7791f;
+  background: #fff4e0;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+
+  &.revisado {
+    color: #2e7d32;
+    background: #e6f4ea;
+  }
+}
+
+.ver-detalles {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #0E7490;
+
+  ion-icon {
+    font-size: 14px;
+  }
+}
+
+.card-descripcion {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: #666666;
+  margin: 0 0 10px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-fecha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #8b929c;
+
+  ion-icon {
+    font-size: 15px;
+    color: #9aa3ad;
+  }
+}

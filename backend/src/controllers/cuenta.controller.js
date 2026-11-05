@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const cuentaService = require('../service/cuenta.service');
 
 exports.getPerfilUsuario = async (req, res) =>{
@@ -55,23 +56,20 @@ exports.actualizarFotoPerfil = async (req,res) =>{
 
 //Aca se enlistan todos los reportes hechos por el usuario
 
-exports.getReportesPorUsuario= async(req,res) =>{
-    try{    
-
+exports.getReportesPorUsuario = async (req, res) => {
+    try{
         const idUsuario = req.params.id;
-        console.log("CONTROLLER - getReportesPorUsuario idUsuario: ", idUsuario);
+        console.log("CONTROLLER - getReportesPorUsuario idUsuario:", idUsuario);
+
+        if (!mongoose.isValidObjectId(idUsuario)) {
+            return res.status(400).json({ code: 400, message: "El id del usuario no es válido" });
+        }
 
         const reportes = await cuentaService.obtenerReportesPorUsuario(idUsuario);
-
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).send(JSON.stringify(reportes));
-
-    }catch (error){
-        console.log("Error en CONTROLLER getReportesPorUsuario", error);
-        res.status(500).send({
-            code:500,
-            message:"Error al obtener los reportes del usuario"
-        });
+        res.status(200).json(reportes);
+    } catch (error) {
+        console.error("Error en CONTROLLER getReportesPorUsuario:", error);
+        res.status(500).json({ code: 500, message: "Error al obtener los reportes del usuario" });
     }
 };
 
@@ -101,7 +99,7 @@ exports.getReporteDetalle = async(req,res) =>{
         });
     }
 };
-
+/*
 //Aca voy a listar todas las mochilas que el usuario crea
 
 exports.getMochilasPorUsuario = async(req,res) =>{
@@ -150,5 +148,5 @@ exports.getMochilaDetalle = async(req,res) =>{
             message:"Error al obtener el detalle de la mochila"
         });
     }
-};
+};*/
 
