@@ -57,6 +57,7 @@ export class ReportesFormPage implements OnInit {
     ubicacion: "Lugano, Buenos Aires (ubicacion automatica)",
     fecha: new Date(),
     imagen: [],
+    fotos:[], 
     estado: "En revicion"
   }
   public previewimg: string[] = []

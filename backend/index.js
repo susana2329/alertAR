@@ -9,7 +9,7 @@ const ejecutarIngesta = require('./src/ingestion/ingesta.service');
 const crearProgramadorIngesta = require('./src/ingestion/ingesta.scheduler');
 const logger = require('./src/logging/logger');
 const errorHandler = require('./src/middleware/error-handler');
-
+const routerReporte = require('./src/routes/reporte.router');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -29,6 +29,7 @@ app.use((req, res, next) => {
 });
 app.use('/api/alertas', alertaRouter);
 app.use(errorHandler);
+
 
 function crearCierreOrdenado({ server, programador }) {
     let cierreEnCurso;
@@ -77,3 +78,10 @@ async function iniciarServidor() {
 if (require.main === module) iniciarServidor();
 
 module.exports = { iniciarServidor, crearCierreOrdenado, app };
+
+app.use('/reportes', routerReporte)
+
+app.listen(PORT, () => {
+    console.log(`Servidor escuchando en el puerto ${PORT}`);
+});
+

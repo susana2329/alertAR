@@ -21,7 +21,10 @@
     "express": "^5.2.1",
     "fast-xml-parser": "^5.11.2",
     "he": "^2.0.0",
-    "mongoose": "^9.11.2"
+    "@aws-sdk/client-s3": "^3.1156.0",
+    "@aws-sdk/s3-request-presigner": "^3.1158.0",
+    "mongoose": "^9.11.2",
+    "multer": "^2.4.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
