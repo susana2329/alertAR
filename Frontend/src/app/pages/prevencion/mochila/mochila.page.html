@@ -1,0 +1,40 @@
+<ion-header class="ion-no-border">
+  <div class="report-header">
+    <button class="back-button" (click)="volver()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </button>
+    <div class="logo-container">
+      <img src="assets/image/ALERT.png" alt="Alert" class="logo-img">
+      <img src="assets/image/AR.png" alt="AR" class="logo-img">
+    </div>
+  </div>
+</ion-header>
+
+<ion-content>
+  <div class="contenedor">
+    
+    <div class="titulos">
+      <h1>Personaliza tu mochila</h1>
+      <p>Selecciona una categoria para empezar</p>
+    </div>
+
+   <div class="tarjetita">
+  <div class="tarjeta" *ngFor="let categoria of categorias" (click)="irACategoria(categoria)">
+    <div class="icono-contenedor">
+      <img [src]="categoria.icono" [alt]="categoria.nombre">
+      <div class="circulo-color" [style.background-color]="categoria.color"></div>
+    </div>
+    <h2>{{ categoria.nombre }}</h2>
+    <p>{{ categoria.descripcion }}</p>
+  </div>
+</div>
+
+    <div class="aviso">
+      <div class="aviso-icono">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+      </div>
+      <p>Información oficial para estar preparado ante una emergencia</p>
+    </div>
+
+  </div>
+</ion-content>

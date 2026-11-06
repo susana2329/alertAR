@@ -6,15 +6,13 @@ import { soloConSesion } from './guards/sesion.guard';
 const arranque = () => (inject(SesionService).logueado() ? '/inicio' : '/acceso');
 
 export const routes: Routes = [
-
   {
     path: '',
     pathMatch: 'full',
     redirectTo: arranque,
   },
-
-{
-
+  
+  {
     path: 'acceso',
     loadComponent: () => import('./pages/acceso/antes-login/antes-login').then(m => m.AntesLoginPage),
   },
@@ -32,13 +30,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/inicio/inicio.page').then((m) => m.InicioPage),
   },
   {
-    
     path: 'inicio/recomendaciones',
     loadComponent: () => import('./pages/inicio/recomendaciones/recomendaciones.page').then((m) => m.RecomendacionesPage),
   },
   {
     path: 'inicio/recomendaciones/:id',
     loadComponent: () => import('./pages/inicio/recomendaciones/detalle/detalle-recomendacion.page').then((m) => m.DetalleRecomendacionPage),
+  },
+  {
+    path: 'detalle-alerta/:id',
+    loadComponent: () => import('./detalle-alerta/detalle-alerta.page').then(m => m.DetalleAlertaPage),
   },
 
   {
@@ -53,66 +54,76 @@ export const routes: Routes = [
     data: { aviso: 'Para hacer un reporte' },
     loadComponent: () => import('./pages/reportes-form/reportes-form.page').then((m) => m.ReportesFormPage),
   },
+
   {
     path: 'mapa',
     canActivate: [soloConSesion],
     data: { aviso: 'Para usar el mapa interactivo' },
     loadComponent: () => import('./mapa-test/mapa-test.page').then(m => m.MapaTestPage),
   },
-  {
-    path: 'detalle-alerta/:id',
-    loadComponent: () => import('./detalle-alerta/detalle-alerta.page').then(m => m.DetalleAlertaPage),
-  },
+
   {
     path: 'prevencion',
     redirectTo: 'prevencion/mochila',
     pathMatch: 'full',
   },
-{
+  {
+    path: 'prevencion/mochila',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver tu mochila de emergencia' },
+    loadComponent: () => import('./pages/prevencion/mochila/mochila.page').then(m => m.MochilaPage),
+  },
+  {
+    path: 'prevencion/mochila-individual', 
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver tu mochila de emergencia' },
+    loadComponent: () => import('./pages/prevencion/mochila-individual/mochila-individual.page').then(m => m.MochilaIndividualPage),
+  },
+  {
+    path: 'prevencion/mochila-mascotas',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver la mochila de tus mascotas' },
+    loadComponent: () => import('./pages/prevencion/mochila-mascotas/mochila-mascotas.page').then(m => m.MochilaMascotasPage),
+  },
+  {
+    path: 'prevencion/recomendaciones',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver tus recomendaciones' },
+    loadComponent: () => import('./pages/prevencion/recomendaciones/recomendaciones.page').then(m => m.RecomendacionesPage),
+  },
+
+  {
     path: 'cuenta',
     canActivate: [soloConSesion],
     data: { aviso: 'Para ver tu cuenta' },
     loadComponent: () => import('./pages/cuenta/cuenta').then((m) => m.CuentaPage),
   },
   {
-    path: 'prevencion/mochila',
-    canActivate: [soloConSesion],
-    data: { aviso: 'Para ver tu mochila de emergencia' },
-    loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
-  },
-  {
-    path: 'prevencion/recomendaciones',
-    canActivate: [soloConSesion],
-    data: { aviso: 'Para ver tus recomendaciones' },
-    loadComponent: () => import('./pages/proximamente/proximamente.page').then(m => m.ProximamentePage),
-  },
-
-  {
     path: 'fuentes',
     loadComponent: () => import('./pages/cuenta/fuentes/fuentes').then(m => m.FuentesPage)
   },
-
-{
-  path: 'configuracion',
-  loadComponent: () => import('./pages/cuenta/configuracion/configuracion').then(m => m.ConfiguracionPage)
-},
-{
-  path: 'informacion',
-  loadComponent: () => import('./pages/cuenta/informacion/informacion').then(m => m.InformacionPage)
-},
-{
-  path: 'perfil',
-  canActivate: [soloConSesion],
-  loadComponent: () => import('./pages/cuenta/perfil/perfil').then(m => m.PerfilPage)
-},
-{
-  path: 'usuario-reportes',
-  canActivate: [soloConSesion],
-  loadComponent: () => import('./pages/cuenta/usuario-reportes/usuario-reportes').then(m => m.UsuarioReportesPage)
-},
+  {
+    path: 'configuracion',
+    loadComponent: () => import('./pages/cuenta/configuracion/configuracion').then(m => m.ConfiguracionPage)
+  },
+  {
+    path: 'informacion',
+    loadComponent: () => import('./pages/cuenta/informacion/informacion').then(m => m.InformacionPage)
+  },
+  {
+    path: 'perfil',
+    canActivate: [soloConSesion],
+    loadComponent: () => import('./pages/cuenta/perfil/perfil').then(m => m.PerfilPage)
+  },
+  {
+    path: 'usuario-reportes',
+    canActivate: [soloConSesion],
+    loadComponent: () => import('./pages/cuenta/usuario-reportes/usuario-reportes').then(m => m.UsuarioReportesPage)
+  },
 
   {
     path: '**',
     redirectTo: arranque,
   },
+
 ];
