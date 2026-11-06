@@ -41,6 +41,13 @@ ion-toolbar {
     color: #03294F;
     opacity: 0.6;
   }
+
+  .location-attribution {
+    margin: 2px 0 0;
+    font-size: 10px;
+    color: #03294F;
+    opacity: .55;
+  }
 }
 
 .weather-alert-card {
@@ -76,6 +83,12 @@ ion-toolbar {
     opacity: 0.65;
   }
 
+  .alert-description {
+    margin: 12px 0 6px;
+    color: #03294F;
+    line-height: 1.4;
+  }
+
   .weather-icon {
     font-size: 56px;
     color: rgba(3, 41, 79, 0.55);
@@ -88,6 +101,39 @@ ion-toolbar {
     font-weight: 600;
     text-transform: none;
   }
+}
+
+.weather-alert-card.no-alerta {
+  background: #E2F0E8;
+}
+
+.preventive-info {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, .65);
+  border-radius: 10px;
+  color: #03294F;
+
+  p { margin: 4px 0 0; line-height: 1.4; }
+}
+
+.estado-inicio, .empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 72px;
+  color: #03294F;
+  text-align: center;
+}
+
+.empty-state, .location-notice {
+  padding: 14px;
+  margin: 0 0 12px;
+  border-radius: 12px;
+  background: #EEF3F7;
+  color: #03294F;
+  line-height: 1.4;
 }
 
 .section-header {
@@ -135,6 +181,12 @@ ion-toolbar {
     flex: 1;
   }
 
+  border: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+
   .alert-row {
     display: flex;
     justify-content: space-between;
@@ -167,6 +219,18 @@ ion-toolbar {
       }
     }
   }
+}
+
+.alert-item-description, .preventive-snippet {
+  margin: 8px 0 0;
+  color: #03294F;
+  opacity: .8;
+  line-height: 1.35;
+}
+
+.preventive-snippet {
+  padding-top: 7px;
+  border-top: 1px solid rgba(3, 41, 79, .12);
 }
 
 ion-footer {

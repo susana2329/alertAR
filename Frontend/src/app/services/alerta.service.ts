@@ -18,13 +18,16 @@ export class AlertaService {
     );
   }
 
+  listarParaMapa(): Observable<Alerta[]> {
+    return this.http.get<Alerta[]>(`${this.endpoint}/mapa`);
+  }
+
   obtenerPorId(id: string): Observable<Alerta | undefined> {
     if (this.alertasCache) {
       return of(this.alertasCache.find((alerta) => alerta.id === id));
     }
-
-    return this.listar().pipe(
-      map((alertas) => alertas.find((alerta) => alerta.id === id))
+    return this.http.get<Alerta>(`${this.endpoint}/${encodeURIComponent(id)}`).pipe(
+      map(alerta => alerta.id === id ? alerta : undefined)
     );
   }
 }

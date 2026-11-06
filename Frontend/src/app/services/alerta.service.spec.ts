@@ -63,4 +63,21 @@ describe('AlertaService', () => {
     service.listar().subscribe((alertas) => expect(alertas[0]).toEqual(alerta));
     http.expectOne(endpoint).flush([alerta]);
   });
+
+  it('carga los resúmenes mediante el endpoint dedicado del mapa', () => {
+    service.listarParaMapa().subscribe(alertas => expect(alertas).toEqual([]));
+    http.expectOne(`${endpoint}/mapa`).flush([]);
+  });
+
+  it('recupera el documento completo por id si solo se consultó el resumen del mapa', () => {
+    service.listarParaMapa().subscribe();
+    http.expectOne(`${endpoint}/mapa`).flush([]);
+    const alerta: Alerta = {
+      id: 'ina-1', titulo: 'Estación', tipo: 'crecida', nivel: 'informativo', origen: 'oficial',
+      fuente: 'INA', descripcion: 'Detalle', fechaInicio: null, fechaFin: null,
+      ubicacion: null, geometria: null, detalle: { serieTemporal: [1, 2, 3] }
+    };
+    service.obtenerPorId(alerta.id).subscribe(resultado => expect(resultado).toEqual(alerta));
+    http.expectOne(`${endpoint}/${alerta.id}`).flush(alerta);
+  });
 });

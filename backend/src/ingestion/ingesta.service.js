@@ -6,9 +6,10 @@ const { normalizarINA } = require('./normalizers/ina.normalizer');
 const { obtenerSismosINPRES } = require('./sources/inpres.source');
 const { normalizarINPRES } = require('./normalizers/inpres.normalizer');
 const { guardarOficiales } = require('../repository/alerta.repository');
+const inaRepository = require('../repository/ina.repository');
 
 function resumenInicial() {
-    return { estado: 'pendiente', cantidadRecibida: null, cantidadNormalizada: 0, cantidadGuardada: 0, cantidadActualizada: 0, cantidadEliminada: 0, cantidadOmitida: 0, cantidadFallida: 0, inicio: null, fin: null, duracionMs: null, persistencia: null, resultadosPersistencia: null, erroresDocumentos: [], erroresPersistencia: [], erroresRegistros: [], error: null };
+    return { estado: 'pendiente', cantidadRecibida: null, cantidadNormalizada: 0, cantidadGuardada: 0, cantidadActualizada: 0, cantidadArchivada: 0, cantidadEliminada: 0, cantidadOmitida: 0, cantidadRevision: 0, cantidadFallida: 0, inicio: null, fin: null, duracionMs: null, persistencia: null, resultadosPersistencia: null, erroresDocumentos: [], erroresPersistencia: [], erroresRegistros: [], error: null };
 }
 
 function clasificarResultadoPersistencia(resultado) {
@@ -47,7 +48,7 @@ async function procesarFuente(nombre, obtener, transformar, guardar, resumen) {
     }
 
     try {
-        const guardadosPrevios = resumen.cantidadGuardada + resumen.cantidadActualizada;
+        const guardadosPrevios = resumen.cantidadGuardada + resumen.cantidadActualizada + resumen.cantidadArchivada;
         resumen.persistencia = await guardar(registros);
         const resultados = Array.isArray(resumen.persistencia)
             ? resumen.persistencia
@@ -78,10 +79,32 @@ async function guardarRegistrosAislados(registros, deps, resumen) {
             const guardados = await deps.guardarOficiales([registro], { onResultado(accion) {
                 if (accion === 'guardada') resumen.cantidadGuardada++;
                 if (accion === 'actualizada') resumen.cantidadActualizada++;
+                if (accion === 'archivada') resumen.cantidadArchivada++;
             } });
             resultados.push(...(Array.isArray(guardados) ? guardados : [guardados]));
         } catch (error) {
             resumen.erroresPersistencia.push({ indice, identificador: registro.identificadorFuente, mensaje: error.message });
+        }
+    }
+    return resultados;
+}
+
+async function guardarObservacionesINA(registros, deps, resumen) {
+    const resultados = [];
+    for (let indice = 0; indice < registros.length; indice++) {
+        try {
+            const guardados = await deps.guardarObservacionesINA([registros[indice]], { onResultado(accion, detalle) {
+                if (accion === 'guardada') resumen.cantidadGuardada++;
+                if (accion === 'actualizada') resumen.cantidadActualizada++;
+                if (accion === 'omitida') resumen.cantidadOmitida++;
+                if (accion === 'revision') {
+                    resumen.cantidadRevision++;
+                    resumen.erroresPersistencia.push({ indice, ...detalle });
+                }
+            } });
+            resultados.push(...(Array.isArray(guardados) ? guardados : [guardados]));
+        } catch (error) {
+            resumen.erroresPersistencia.push({ indice, identificador: registros[indice].identificadorFuente, mensaje: error.message });
         }
     }
     return resultados;
@@ -137,6 +160,7 @@ async function procesarSMN(deps, resumen) {
                 conteoObservado++;
                 if (accion === 'guardada') resumen.cantidadGuardada++;
                 if (accion === 'actualizada') resumen.cantidadActualizada++;
+                if (accion === 'archivada') resumen.cantidadArchivada++;
                 if (accion === 'cancelada') resumen.cantidadEliminada++;
             } });
             const items = Array.isArray(guardados) ? guardados : [guardados];
@@ -176,6 +200,7 @@ async function ejecutarIngesta(dependencias = {}) {
     const deps = {
         obtenerDocumentoSMN, obtenerTexto, extraerEnlacesCAP, parsearCAP, normalizarSMN,
         obtenerObservacionesINA, normalizarINA,
+        guardarObservacionesINA: inaRepository.guardarObservaciones,
         obtenerSismosINPRES, normalizarINPRES,
         guardarOficiales,
         ...dependencias
@@ -188,7 +213,7 @@ async function ejecutarIngesta(dependencias = {}) {
             const alertas = deps.normalizarINA(documento, error => estado.erroresRegistros.push(error));
             estado.cantidadRecibida = documento.features.length;
             return alertas;
-        }, alertas => guardarRegistrosAislados(alertas, deps, resumen.INA), resumen.INA),
+        }, alertas => guardarObservacionesINA(alertas, deps, resumen.INA), resumen.INA),
         procesarFuente('INPRES', () => deps.obtenerSismosINPRES(), (xml, estado) => {
             const alertas = deps.normalizarINPRES(xml, error => estado.erroresRegistros.push(error));
             estado.cantidadRecibida = alertas.length + estado.erroresRegistros.length;

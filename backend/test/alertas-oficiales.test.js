@@ -15,10 +15,12 @@ const poligono = (x) => ({
 });
 
 function alertaCAP({ identifier = 'cap-new', msgType = 'Update', references = 'smn@smn.gob.ar,cap-old,2026-10-20T00:00:00Z', x = -60 } = {}) {
+    const inicio = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const fin = new Date(Date.now() + 60 * 60 * 1000).toISOString();
     return normalizarSMN({
-        identifier, sender: 'smn@smn.gob.ar', sent: '2026-10-21T00:00:00Z',
+        identifier, sender: 'smn@smn.gob.ar', sent: inicio,
         status: 'Actual', msgType, scope: 'Public', references,
-        info: [{ event: 'Tormenta', headline: 'Alerta', severity: 'Severe', onset: '2026-10-21T00:00:00Z', expires: '2026-10-22T00:00:00Z' }],
+        info: [{ event: 'Tormenta', headline: 'Alerta', severity: 'Severe', onset: inicio, expires: fin }],
         areas: [{ descripcion: null, poligonos: [poligono(x).coordinates[0]] }]
     });
 }
@@ -51,6 +53,7 @@ test('normalizadores producen una estructura oficial común y conservan datos de
             geometry: { type: 'Point', coordinates: [-60, -35] },
             properties: {
                 unid: 1,
+                series_id: 101,
                 fecha: '2026-10-21T00:00:00Z',
                 nombre: 'Estación de prueba',
                 valor: 2.5,
@@ -190,23 +193,14 @@ test('CAP regionales mantienen Update y referencias ambiguas sin mutaciones', as
 });
 
 
-test('repositorio hace upsert idempotente para la misma alerta', async () => {
-    const original = Alerta.findOneAndUpdate;
-    let writes = 0;
-    Alerta.findOneAndUpdate = async (_filter, update, options) => {
-        writes++;
-        assert.equal(options.upsert, true);
-        return update.$set;
-    };
-    try {
-        const item = normalizarINA({ type: 'FeatureCollection', features: [{
-            id: 'station.1', geometry: { type: 'Point', coordinates: [-60, -35] },
-            properties: { unid: 1, fecha: '2026-10-21T00:00:00Z', nombre: 'Estación', timeseries: '[]' }
-        }] })[0];
-        await repositorio.guardarOficiales([item]);
-        await repositorio.guardarOficiales([item]);
-        assert.equal(writes, 2);
-    } finally { Alerta.findOneAndUpdate = original; }
+test('normalizador INA genera identidad operativa estable por unid y conserva la clave temporal original', () => {
+    const item = normalizarINA({ type: 'FeatureCollection', features: [{
+        id: 'station.1', geometry: { type: 'Point', coordinates: [-60, -35] },
+        properties: { unid: 1, series_id: 101, fecha: '2026-10-21T00:00:00Z', nombre: 'Estación', timeseries: '[]' }
+    }] })[0];
+    assert.equal(item.claveOperativaINA, 'INA:ESTACION:1');
+    assert.equal(item.datosFuente.estacion.seriesId, 101);
+    assert.match(item.claveIdempotencia, /^INA:1:/);
 });
 
 test('Update resuelve una referencia única y cambia la geometría en el mismo registro', async () => {

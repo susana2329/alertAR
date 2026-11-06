@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, convertToParamMap, ParamMap, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { DetalleAlertaPage } from './detalle-alerta.page';
@@ -11,16 +12,19 @@ describe('DetalleAlertaPage', () => {
   let ruta$: Subject<ParamMap>;
   let respuesta$: Subject<Alerta | undefined>;
   let respuestaError$: Subject<Alerta | undefined>;
+  let respuestaNoEncontrada$: Subject<Alerta | undefined>;
 
   beforeEach(() => {
     ruta$ = new Subject<ParamMap>();
     respuesta$ = new Subject<Alerta | undefined>();
     respuestaError$ = new Subject<Alerta | undefined>();
+    respuestaNoEncontrada$ = new Subject<Alerta | undefined>();
     TestBed.configureTestingModule({ providers: [
       { provide: ActivatedRoute, useValue: { paramMap: ruta$.asObservable() } },
       { provide: Router, useValue: { navigate: () => Promise.resolve(true) } },
       { provide: AlertaService, useValue: {
-        obtenerPorId: (id: string) => (id === 'error' ? respuestaError$ : respuesta$).asObservable()
+        obtenerPorId: (id: string) => (id === 'error' ? respuestaError$
+          : id === 'inexistente' ? respuestaNoEncontrada$ : respuesta$).asObservable()
       } }
     ] });
     fixture = TestBed.createComponent(DetalleAlertaPage);
@@ -36,9 +40,52 @@ describe('DetalleAlertaPage', () => {
     } as Alerta;
   }
 
-  it('crea la página y muestra el estado de carga mientras espera la respuesta', () => {
+  it('mantiene visible el estado de carga mientras espera la respuesta HTTP', () => {
     expect(component).toBeTruthy();
     expect(component.cargando).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('Cargando alerta');
+  });
+
+  it('sale de carga y renderiza el detalle recibido por la API', () => {
+    const marcaDeteccion = vi.spyOn((component as any).changeDetector, 'markForCheck');
+    ruta$.next(convertToParamMap({ id: 'alerta-1' }));
+    expect(component.cargando).toBe(true);
+    respuesta$.next({
+      id: 'alerta-1', titulo: 'Tormenta severa', tipo: 'tormenta', nivel: 'advertencia',
+      origen: 'oficial', fuente: 'SMN', descripcion: 'Descripción oficial',
+      descripcionCompleta: 'Descripción oficial', fechaInicio: '2026-11-05T10:00:00.000Z',
+      fechaFin: '2026-11-05T12:00:00.000Z', ubicacion: null, geometria: null,
+      detalle: { estadoFuente: 'Actual', tipoMensaje: 'Alert', datosFuente: { informaciones: [{ instruccion: 'Seguir los avisos.' }] } }
+    });
+    fixture.detectChanges();
+
+    expect(component.cargando).toBe(false);
+    expect(component.errorCarga).toBe(false);
+    expect(fixture.nativeElement.textContent).toContain('Tormenta severa');
+    expect(fixture.nativeElement.textContent).toContain('Seguir los avisos.');
+    expect(fixture.nativeElement.textContent).not.toContain('Cargando alerta');
+    expect(marcaDeteccion).toHaveBeenCalled();
+  });
+
+  it('sale de carga y muestra el estado de error ante una falla HTTP', () => {
+    ruta$.next(convertToParamMap({ id: 'error' }));
+    respuestaError$.error(new HttpErrorResponse({ status: 0, statusText: 'Network error' }));
+    fixture.detectChanges();
+
+    expect(component.cargando).toBe(false);
+    expect(component.errorCarga).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('No se pudo cargar la alerta');
+  });
+
+  it('trata el HTTP 404 como alerta inexistente y no como error de conexión', () => {
+    ruta$.next(convertToParamMap({ id: 'inexistente' }));
+    respuestaNoEncontrada$.error(new HttpErrorResponse({ status: 404, statusText: 'Not Found' }));
+    fixture.detectChanges();
+
+    expect(component.cargando).toBe(false);
+    expect(component.errorCarga).toBe(false);
+    expect(component.alerta).toBeUndefined();
+    expect(fixture.nativeElement.textContent).toContain('No se encontró la alerta solicitada');
   });
 
   it('presenta lectura INA con fecha y separa la fecha de medición del inicio del evento', () => {
@@ -145,16 +192,4 @@ describe('DetalleAlertaPage', () => {
     expect(component.urlFuenteINPRES).toBeNull();
   });
 
-  it('distingue una alerta inexistente de un error al consultar la API', () => {
-    ruta$.next(convertToParamMap({ id: 'test' }));
-    respuesta$.next(undefined);
-    expect(component.cargando).toBe(false);
-    expect(component.alerta).toBeUndefined();
-    expect(component.errorCarga).toBe(false);
-
-    ruta$.next(convertToParamMap({ id: 'error' }));
-    respuestaError$.error(new Error('sin conexión'));
-    expect(component.errorCarga).toBe(true);
-    expect(component.cargando).toBe(false);
-  });
 });

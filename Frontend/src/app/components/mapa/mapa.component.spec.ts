@@ -8,7 +8,7 @@ describe('MapaComponent', () => {
   let fixture: ComponentFixture<MapaComponent>;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [{ provide: AlertaService, useValue: { listar: () => ({ subscribe: () => undefined }) } }] });
+    TestBed.configureTestingModule({ providers: [{ provide: AlertaService, useValue: { listarParaMapa: () => ({ subscribe: () => undefined }) } }] });
     fixture = TestBed.createComponent(MapaComponent);
     component = fixture.componentInstance;
   });

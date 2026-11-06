@@ -24,8 +24,9 @@
     <ion-icon name="location-outline"></ion-icon>
     <div>
       @if (sesion.ubicacionPermitida()) {
-        <p class="location-name">{{ ubicacion }}</p>
-        <p class="location-updated">Actualizado: {{ ultimaActualizacion }}</p>
+        <p class="location-name">{{ ubicacion ?? 'Ubicación no disponible' }}</p>
+        <p class="location-updated">{{ respuesta ? 'Datos consultados: ' + fecha(respuesta.actualizadoEn) : 'Actualizando información' }}</p>
+        @if (ubicacionAtribucion) { <a class="location-attribution" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">{{ ubicacionAtribucion }}</a> }
       } @else {
         <p class="location-name">Ubicación desactivada</p>
         <p class="location-updated">Mostrando solo alertas importantes</p>
@@ -33,52 +34,75 @@
     </div>
   </div>
 
-  <div class="weather-alert-card">
+  <div class="weather-alert-card" [class.no-alerta]="!destacada">
+    @if (cargando) {
+      <div class="estado-inicio"><ion-spinner name="crescent"></ion-spinner><span>Buscando información oficial…</span></div>
+    } @else if (errorCarga) {
+      <div class="weather-text-row"><div class="weather-text"><p class="alert-label">No se pudo actualizar</p><h2 class="alert-title">No pudimos cargar las alertas</h2><p class="alert-source">{{ errorCarga }}</p></div></div>
+      <ion-button expand="block" class="recommendations-btn" (click)="cargarInicio()">Reintentar</ion-button>
+    } @else if (destacada) {
     <div class="weather-text-row">
       <div class="weather-text">
-        <p class="alert-label">{{ alertaPrincipal.nivel }}</p>
-        <h2 class="alert-title">{{ alertaPrincipal.titulo }}</h2>
-        <p class="alert-source">Fuente: {{ alertaPrincipal.fuente }}</p>
+        <p class="alert-label">{{ nivel(destacada.nivel) }}</p>
+        <h2 class="alert-title">{{ destacada.titulo }}</h2>
+        <p class="alert-source">Fuente: {{ destacada.fuente }} · {{ distancia(destacada) }}</p>
       </div>
-      <ion-icon name="rainy" class="weather-icon"></ion-icon>
+      <ion-icon [name]="icono(destacada)" class="weather-icon"></ion-icon>
     </div>
-    <ion-button expand="block" class="recommendations-btn" (click)="verRecomendaciones(alertaPrincipal.tipo)">
-      Ver recomendaciones
-    </ion-button>
+    <p class="alert-description">{{ destacada.descripcionCompleta || destacada.descripcion }}</p>
+    <p class="alert-source">Actualizado: {{ fecha(destacada.fechaActualizacion) }}</p>
+    @if (destacada.informacionPreventiva) {
+      <div class="preventive-info"><strong>Información preventiva oficial</strong><p>{{ destacada.informacionPreventiva }}</p></div>
+    }
+    } @else {
+      <div class="weather-text-row">
+        <div class="weather-text"><p class="alert-label">Información preventiva</p><h2 class="alert-title">{{ ubicacion ? 'No se detectan situaciones importantes en la zona' : 'No hay alertas oficiales vigentes' }}</h2><p class="alert-source">{{ respuesta?.mensaje }}</p></div>
+        <ion-icon name="checkmark-circle-outline" class="weather-icon"></ion-icon>
+      </div>
+    }
   </div>
 
   <div class="section-header">
-    <h3>Alertas cerca tuyo</h3>
+    <h3>{{ ubicacion ? 'Alertas cerca tuyo' : 'Alertas oficiales recientes' }}</h3>
     <a class="see-map-link" routerLink="/mapa">Ver mapa</a>
   </div>
 
-  @if (sesion.ubicacionPermitida()) {
+  @if (mensajeSinUbicacion && !errorCarga) {
+    <p class="location-notice">{{ mensajeSinUbicacion }}</p>
+  }
+
+  @if (cargando) {
+    <div class="empty-state">Consultando eventos oficiales…</div>
+  } @else if (errorCarga) {
+    <div class="empty-state">{{ errorCarga }}</div>
+  } @else if (alertasCercanas.length) {
     <div class="alerts-list">
-      <div class="alert-item" *ngFor="let alerta of alertasCercanas" (click)="verAlerta(alerta)">
-        <ion-icon [name]="alerta.icon" [style.color]="alerta.iconColor" class="alert-icon"></ion-icon>
+      <button type="button" class="alert-item" *ngFor="let alerta of alertasCercanas" (click)="verAlerta(alerta)">
+        <ion-icon [name]="icono(alerta)" [style.color]="alerta.color === 'rojo' ? '#EE4129' : '#0E7490'" class="alert-icon"></ion-icon>
         <div class="alert-info">
           <div class="alert-row">
             <h4>{{ alerta.titulo }}</h4>
-            <span class="distance">{{ alerta.distancia }}</span>
+            <span class="distance">{{ distancia(alerta) }}</span>
           </div>
           <div class="alert-row">
-            <p class="subtext">{{ alerta.subtextoIzquierda }}</p>
-            <span class="subtext" [class.highlighted]="alerta.rightHighlighted">{{ alerta.subtextoDerecha }}</span>
+            <p class="subtext">{{ alerta.fuente }} · {{ nivel(alerta.nivel) }}</p>
+            <span class="subtext">{{ fecha(alerta.fechaActualizacion) }}</span>
           </div>
+          <p class="alert-item-description">{{ alerta.descripcion }}</p>
+          @if (alerta.informacionPreventiva) { <p class="preventive-snippet">{{ alerta.informacionPreventiva }}</p> }
         </div>
-      </div>
+      </button>
     </div>
   } @else {
-
+    <div class="empty-state">{{ respuesta?.mensaje || 'No hay eventos oficiales vigentes para mostrar con la información disponible.' }}</div>
+  }
+  @if (!ubicacion && !cargando) {
     <div class="sin-ubicacion">
       <ion-icon name="location-outline" class="sin-ubicacion-icono"></ion-icon>
-      <p class="sin-ubicacion-titulo">Activá tu ubicación</p>
-      <p class="sin-ubicacion-texto">Para ver las alertas que hay cerca tuyo necesitamos saber dónde estás.</p>
+      <p class="sin-ubicacion-titulo">Personalizá las alertas por ubicación</p>
+      <p class="sin-ubicacion-texto">Tu ubicación permite estimar distancia y detectar si un área oficial de alerta te incluye.</p>
       <ion-button size="small" class="sin-ubicacion-boton" (click)="activarUbicacion()">Activar ubicación</ion-button>
-
-      @if (mensajeUbicacion()) {
-        <p class="sin-ubicacion-error">{{ mensajeUbicacion() }}</p>
-      }
+      @if (mensajeUbicacion()) { <p class="sin-ubicacion-error">{{ mensajeUbicacion() }}</p> }
     </div>
   }
 </ion-content>

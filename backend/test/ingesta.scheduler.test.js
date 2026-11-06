@@ -44,7 +44,7 @@ test('inicia una ronda sincrónicamente y programa el intervalo configurado', as
     assert.equal(logger.infos[0][0], 'ingesta_completada');
     assert.deepEqual(logger.infos[0][1].fuentes.SMN, {
         estado: 'completada', inicio: null, fin: null, duracionMs: null, recibidos: null,
-        normalizados: 0, guardados: 0, actualizados: 0, eliminados: 0, omitidos: 0, fallidos: 0,
+        normalizados: 0, guardados: 0, actualizados: 0, archivados: 0, revision: 0, eliminados: 0, omitidos: 0, fallidos: 0,
         error: null, erroresDocumentos: [], erroresPersistencia: [], erroresRegistros: []
     });
     programador.detener();

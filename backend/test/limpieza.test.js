@@ -2,27 +2,28 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { ejecutar } = require('../scripts/limpiar-smn-vencidas');
 
-test('limpieza simula candidatos, informa ids/motivo y nunca llama deleteMany', async () => {
-    const ahora = new Date('2026-10-22T00:00:00Z');
-    let filtroRecibido;
-    let borrado = false;
-    const modelo = {
-        find(filtro) {
-            filtroRecibido = filtro;
-            return { select() { return this; }, sort() { return this; }, async lean() {
-                return [{ _id: 'smn-1', fuente: 'SMN', tipoMensaje: 'Alert', estadoFuente: 'Actual', fechaFin: new Date('2026-10-21T00:00:00Z'), titulo: 'Fin de alerta' }];
-            } };
-        },
-        async deleteMany() { borrado = true; throw new Error('no debe borrar en simulación'); }
-    };
+test('el comando de limpieza en modo simulación solo informa y no archiva ni elimina', async () => {
+    let opciones;
     let linea;
-    const resultado = await ejecutar({ modelo, ahora, salida: valor => { linea = valor; } });
-    const reporte = JSON.parse(linea);
-    assert.equal(resultado.cantidadCandidata, 1);
-    assert.equal(resultado.cantidadEliminada, 0);
-    assert.equal(reporte.candidatos[0].id, 'smn-1');
-    assert.match(reporte.candidatos[0].motivo, /vencida/);
-    assert.equal(filtroRecibido.fuente, 'SMN');
-    assert.equal(filtroRecibido.origen, 'oficial');
-    assert.equal(borrado, false);
+    const resultado = await ejecutar({
+        ahora: new Date('2026-10-22T00:00:00Z'),
+        archivador: async args => { opciones = args; return { modo: args.modo, candidatos: 2, migrados: 0, eliminados: 0 }; },
+        salida: valor => { linea = valor; }
+    });
+    assert.equal(opciones.modo, 'dry-run');
+    assert.deepEqual(opciones.fuentes, ['SMN']);
+    assert.equal(resultado.eliminados, 0);
+    assert.equal(JSON.parse(linea).candidatos, 2);
+});
+
+test('el comando legado con ejecución archiva y verifica antes de retirar alertas SMN de operativas', async () => {
+    let opciones;
+    const resultado = await ejecutar({
+        execute: true,
+        archivador: async args => { opciones = args; return { modo: args.modo, migrados: 1, verificados: 1, eliminados: 1 }; },
+        salida: () => undefined
+    });
+    assert.equal(opciones.modo, 'archive');
+    assert.equal(resultado.migrados, 1);
+    assert.equal(resultado.eliminados, 1);
 });

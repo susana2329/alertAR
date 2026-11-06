@@ -19,9 +19,11 @@ test('procesa SMN, INA e INPRES respetando los documentos que devuelve cada fuen
         normalizarSMN: cap => { assert.deepEqual(cap, { cap: true }); return alerta('SMN'); },
         obtenerObservacionesINA: async () => documentoINA,
         normalizarINA: documento => { assert.equal(documento, documentoINA); return [alerta('INA')]; },
+        guardarObservacionesINA: async registros => { llamadas.push(registros); return registros.map(x => ({ guardado: x.fuente })); },
         obtenerSismosINPRES: async () => xmlINPRES,
         normalizarINPRES: xml => { assert.equal(xml, xmlINPRES); return [alerta('INPRES')]; },
-        guardarOficiales: async registros => { llamadas.push(registros); return registros.map(x => ({ guardado: x.fuente })); }
+        guardarOficiales: async registros => { llamadas.push(registros); return registros.map(x => ({ guardado: x.fuente })); },
+        guardarObservacionesINA: async registros => { llamadas.push(registros); return registros.map(x => ({ guardado: x.fuente })); }
     });
 
     assert.deepEqual(llamadas.map(x => x[0].fuente).sort(), ['INA', 'INPRES', 'SMN']);
@@ -59,6 +61,7 @@ test('registra errores y resultados de persistencia por separado para cada fuent
         obtenerTexto: async () => '<cap/>', parsearCAP: () => ({}), normalizarSMN: () => alerta('SMN'),
         obtenerObservacionesINA: async () => ({ type: 'FeatureCollection', features: [] }),
         normalizarINA: () => [alerta('INA')],
+        guardarObservacionesINA: async () => ({ guardados: 1 }),
         obtenerSismosINPRES: async () => '<inpres/>', normalizarINPRES: () => [],
         guardarOficiales: async items => {
             if (items[0]?.fuente === 'SMN') throw new Error('validación rechazada');
@@ -264,14 +267,14 @@ test('incorpora rechazos por registro INPRES al resumen y persiste los ítems v�
 test('un fallo de persistencia INA por estación no bloquea las demás mediciones', async () => {
     const intentados = [];
     const documento = { type: 'FeatureCollection', features: [
-        { id: 'a', geometry: { type: 'Point', coordinates: [-60, -35] }, properties: { unid: 1, fecha: '2026-10-21T00:00:00Z' } },
-        { id: 'b', geometry: { type: 'Point', coordinates: [-61, -36] }, properties: { unid: 2, fecha: '2026-10-21T00:00:00Z' } }
+        { id: 'a', geometry: { type: 'Point', coordinates: [-60, -35] }, properties: { unid: 1, series_id: 101, fecha: '2026-10-21T00:00:00Z' } },
+        { id: 'b', geometry: { type: 'Point', coordinates: [-61, -36] }, properties: { unid: 2, series_id: 102, fecha: '2026-10-21T00:00:00Z' } }
     ] };
     const resumen = await ejecutarIngesta({
         obtenerDocumentoSMN: async () => '<rss><channel/></rss>', extraerEnlacesCAP,
         obtenerObservacionesINA: async () => documento,
         obtenerSismosINPRES: async () => '<lista/>', normalizarINPRES: () => [],
-        guardarOficiales: async ([registro]) => {
+        guardarObservacionesINA: async ([registro]) => {
             intentados.push(registro.identificadorFuente);
             if (registro.identificadorFuente === '1') throw new Error('estación rechazada');
             return [registro];

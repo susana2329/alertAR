@@ -204,7 +204,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     this.estadoAlertas = 'cargando';
     this.mensajeError = '';
 
-    this.alertaService.listar().subscribe({
+    this.alertaService.listarParaMapa().subscribe({
       next: (alertas) => {
         this.alertas = alertas;
         this.alertasPorId.clear();

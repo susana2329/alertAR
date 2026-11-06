@@ -1,6 +1,19 @@
 const alertaRepository = require('../repository/alerta.repository');
+const alertaHistoricaRepository = require('../repository/alerta-historica.repository');
 const { obtenerPuntoRepresentativo } = require('../geo/punto-representativo');
 const { presentarClasificacion } = require('./clasificacion-presentacion');
+const logger = require('../logging/logger');
+const DURACION_CACHE_MAPA_MS = 5 * 60 * 1000;
+let cacheMapa;
+let cargaMapaEnCurso;
+
+function contarPorFuente(docs) {
+    return docs.reduce((conteo, doc) => {
+        const fuente = doc.fuente || 'sin-fuente';
+        conteo[fuente] = (conteo[fuente] || 0) + 1;
+        return conteo;
+    }, {});
+}
 
 function fechaISOValida(fecha) {
     return fecha instanceof Date && Number.isFinite(fecha.getTime()) ? fecha.toISOString() : null;
@@ -79,6 +92,12 @@ function mapearAlerta(doc, ahora = new Date()) {
         ...presentarClasificacion(nivel, naturaleza),
         descripcion: textoPreview(completa), descripcionPreview: textoPreview(completa), descripcionCompleta: completa,
         fechaInicio: fechaISOValida(doc.fechaInicio), fechaFin: fechaISOValida(doc.fechaFin),
+        actualizadoEn: fechaISOValida(doc.updatedAt) || fechaISOValida(doc.createdAt),
+        fechaUltimaMedicion: fechaISOValida(doc.fechaUltimaMedicion) || (doc.fuente === 'INA' ? fechaISOValida(doc.fechaInicio) : null),
+        estadoActualizacion: doc.fuente === 'INA'
+            ? ((doc.fechaUltimaMedicion ?? doc.fechaInicio) instanceof Date && Date.now() - (doc.fechaUltimaMedicion ?? doc.fechaInicio).getTime() > 24 * 60 * 60 * 1000 ? 'desactualizada' : 'actualizada')
+            : (doc.estadoActualizacion ?? null),
+        ...(doc.identificadorFuente ? { identificadorFuente: doc.identificadorFuente } : {}),
         estadoFuente: doc.estadoFuente ?? null,
         ubicacion, geometria: doc.geometria ?? null,
         detalle: construirDetalle(doc),
@@ -87,8 +106,56 @@ function mapearAlerta(doc, ahora = new Date()) {
 }
 
 exports.listarAlertas = async () => {
+    const inicio = process.hrtime.bigint();
     const docs = await alertaRepository.obtenerTodas();
-    return docs.map(doc => mapearAlerta(doc)).filter(Boolean);
+    const consultaMs = Number(process.hrtime.bigint() - inicio) / 1e6;
+    const presentacion = process.hrtime.bigint();
+    const alertas = docs.map(doc => mapearAlerta(doc)).filter(Boolean);
+    logger.info('alertas_listadas', { documentosRecuperados: docs.length, documentosPresentados: alertas.length,
+        documentosPorFuente: contarPorFuente(docs),
+        consultaMs: Math.round(consultaMs * 10) / 10, presentacionMs: Math.round(Number(process.hrtime.bigint() - presentacion) / 1e5) / 10 });
+    return alertas;
+};
+
+exports.listarAlertasMapa = async () => {
+    if (cacheMapa && cacheMapa.expiraEn > Date.now()) {
+        logger.info('alertas_mapa_cache', { cache: 'hit', documentosPresentados: cacheMapa.alertas.length });
+        return cacheMapa.alertas;
+    }
+    if (cargaMapaEnCurso) return cargaMapaEnCurso;
+    cargaMapaEnCurso = (async () => {
+        const inicio = process.hrtime.bigint();
+        const docs = await alertaRepository.obtenerParaMapa();
+        const consultaMs = Number(process.hrtime.bigint() - inicio) / 1e6;
+        const presentacion = process.hrtime.bigint();
+        const alertas = docs.map(doc => mapearAlerta(doc)).filter(Boolean);
+        logger.info('alertas_mapa_listadas', { documentosRecuperados: docs.length, documentosPresentados: alertas.length,
+            documentosPorFuente: contarPorFuente(docs),
+            consultaMs: Math.round(consultaMs * 10) / 10, presentacionMs: Math.round(Number(process.hrtime.bigint() - presentacion) / 1e5) / 10 });
+        cacheMapa = { alertas, expiraEn: Date.now() + DURACION_CACHE_MAPA_MS };
+        return alertas;
+    })();
+    try { return await cargaMapaEnCurso; }
+    finally { cargaMapaEnCurso = undefined; }
+};
+
+exports.invalidarCacheMapa = () => { cacheMapa = undefined; };
+
+exports.listarCandidatasInicio = async ahora => {
+    const inicio = process.hrtime.bigint();
+    const docs = await alertaRepository.obtenerCandidatasInicio(ahora);
+    const consultaMs = Number(process.hrtime.bigint() - inicio) / 1e6;
+    const presentacion = process.hrtime.bigint();
+    const alertas = docs.map(doc => mapearAlerta(doc, ahora)).filter(Boolean);
+    logger.info('alertas_inicio_listadas', { documentosRecuperados: docs.length, documentosPresentados: alertas.length,
+        documentosPorFuente: contarPorFuente(docs),
+        consultaMs: Math.round(consultaMs * 10) / 10, presentacionMs: Math.round(Number(process.hrtime.bigint() - presentacion) / 1e5) / 10 });
+    return alertas;
+};
+
+exports.obtenerAlerta = async id => {
+    const doc = await alertaRepository.obtenerPorId(id) || await alertaHistoricaRepository.obtenerPorId(id);
+    return doc ? mapearAlerta(doc) : null;
 };
 exports._mapearAlerta = mapearAlerta;
 exports._textoPreview = textoPreview;

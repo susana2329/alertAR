@@ -55,6 +55,7 @@ export interface Alerta {
   descripcion: string;
   fechaInicio: string | null;
   fechaFin: string | null;
+  actualizadoEn?: string | null;
   ubicacion: UbicacionAlerta | null;
   geometria: GeometriaPunto | GeometriaPoligono | GeometriaMultiPoligono | null;
   fuente?: string;

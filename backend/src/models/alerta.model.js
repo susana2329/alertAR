@@ -26,6 +26,9 @@ const alertaSchema = new mongoose.Schema({
     },
 
     claveIdempotencia: { type: String },
+    claveOperativaINA: { type: String },
+    fechaUltimaMedicion: { type: Date },
+    estadoActualizacion: { type: String, enum: ['actualizada', 'desactualizada', 'revision'] },
     identificadorFuente: { type: String },
     emisor: { type: String },
     estadoFuente: { type: mongoose.Schema.Types.Mixed },
@@ -40,8 +43,17 @@ alertaSchema.index(
     { unique: true, partialFilterExpression: { claveIdempotencia: { $type: 'string' } } }
 );
 alertaSchema.index({ fechaInicio: -1 });
+alertaSchema.index({ origen: 1, fuente: 1, fechaInicio: -1 });
+alertaSchema.index({ origen: 1, fuente: 1, fechaFin: 1 });
+// Partial: legacy INA snapshots do not have this key. Duplicate legacy data
+// therefore does not prevent the index from being created before migration.
+alertaSchema.index({ claveOperativaINA: 1 }, {
+    unique: true,
+    partialFilterExpression: { claveOperativaINA: { $type: 'string' } }
+});
+alertaSchema.index({ fuente: 1, origen: 1, fechaUltimaMedicion: 1 });
 
-module.exports = mongoose.model('Alerta', alertaSchema);
+module.exports = mongoose.model('Alerta', alertaSchema, 'alertas');
 module.exports.TIPOS = TIPOS;
 module.exports.NIVELES = NIVELES;
 module.exports.NATURALEZAS = NATURALEZAS;
