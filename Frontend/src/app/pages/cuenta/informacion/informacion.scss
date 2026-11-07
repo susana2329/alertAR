@@ -34,6 +34,13 @@ ion-toolbar ion-title {
     font-size: 1.15rem;
     font-weight: 500;
     color: #1e293b;
+    top: 0; 
+    bottom: 0; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    width: 100%;
+    pointer-events: none; 
 }
 
 ion-toolbar ion-buttons {
@@ -61,14 +68,15 @@ ion-label {
     align-items: center;
     text-align: center;
     padding: 10px 16px;
+    margin-bottom: 16px;
 
     .shield-box {
-        width: 90px;
-        height: 90px;
+        width: 130px;
+        height: 130px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
 
         img {
             width: 100%;
@@ -89,7 +97,7 @@ ion-label {
         font-size: 0.85rem;
         color: #64748b;
         margin: 0;
-        max-width: 280px;
+        max-width: 320px; 
     }
 }
 

@@ -22,11 +22,15 @@ ion-toolbar {
 
 ion-toolbar ion-title {
     position: absolute !important;
+    top: 0; 
+    bottom: 0; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
     left: 0;
     right: 0;
-    text-align: center;
     width: 100%;
-    pointer-events: none;
+    pointer-events: none; 
 }
 
 ion-toolbar ion-buttons {
@@ -41,6 +45,13 @@ ion-label {
 ion-toggle {
     --width: 30px;   
     --height: 10px;  
+    --track-background: #e2e8f0 !important;     
+    --background-checked: #0E7490 !important;
+    --track-background-checked: #0E7490 !important;
+    &.toggle-checked::part(track),
+    &.ion-checked::part(track) {
+        background: #0E7490 !important;
+    }
 }
 
 .custom-toolbar {
@@ -137,6 +148,6 @@ ion-toggle {
 .custom-tab-bar {
     --background: #ffffff;
     --color: #777777;
-    --color-selected: #0E7490;
+    --color-selected: #0E7491;
     border-top: 1px solid #f0f0f0;
 }
