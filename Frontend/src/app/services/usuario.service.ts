@@ -14,4 +14,8 @@ export class PersonalService {
   obtenerDatosUsuario(id: string): Observable<UsuarioPerfil> {
     return this._httpClient.get<UsuarioPerfil>(`${this.API_URL}/${id}`);
   }
+
+  actualizarFotoPerfil(id: string, data: { fotoPerfil: string }): Observable<any> {
+  return this._httpClient.patch(`http://localhost:3000/api/cuenta/perfil/${id}/avatar`, data);
+}
 }
