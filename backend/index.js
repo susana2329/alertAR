@@ -41,6 +41,7 @@ app.use('/api/inicio', require('./src/routes/inicio.router'));
 app.use('/api/geocodificacion', require('./src/routes/geocodificacion.router'));
 app.use('/api/auth', require('./src/routes/auth.router'));
 app.use('/api/cuenta', cuentaRouter);
+app.use('/api', require('./src/routes/mochila.router'));
 app.use('/reportes', routerReporte);
 app.use(errorHandler);
 

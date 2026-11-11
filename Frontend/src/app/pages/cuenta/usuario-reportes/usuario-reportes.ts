@@ -51,6 +51,9 @@ export class UsuarioReportesPage implements OnInit {
 
         this.reportesService.listarPorUsuario(idUsuario).subscribe({
             next: (data) => {
+                this.reportes = data.sort((a: any, b: any) => {
+                return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+                });
                 this.reportes = data;
                 this.cargando = false;
                 this.cdr.markForCheck();
