@@ -73,6 +73,16 @@ describe('InicioPage', () => {
     expect(fixture.componentInstance.mensajeSinUbicacion).toContain('Activá tu ubicación');
   });
 
+  it('consulta alertas globales si la ubicación falla durante la captura', async () => {
+    await crearPage(true, of({ ...respuesta(null, []), ubicacion: null }));
+    sesion.obtenerCoordenadas.mockRejectedValue(new Error('Location request timed out'));
+    await fixture.componentInstance.cargarInicio();
+    expect(fixture.componentInstance.cargando).toBe(false);
+    expect(fixture.componentInstance.errorCarga).toBeNull();
+    expect(service.obtener).toHaveBeenLastCalledWith(undefined);
+    expect(fixture.componentInstance.mensajeSinUbicacion).toContain('No pudimos obtener tu ubicación');
+  });
+
   it('termina y muestra error diferenciado si falla la API de inicio', async () => {
     await crearPage(true, throwError(() => new HttpErrorResponse({ status: 0 })));
     expect(fixture.componentInstance.cargando).toBe(false);

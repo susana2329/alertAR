@@ -48,14 +48,6 @@ addIcons({
   'checkmark-circle-outline': checkmarkCircleOutline,
 });
 
-function conLimite<T>(operacion: Promise<T>, milisegundos: number): Promise<T | null> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  return Promise.race([
-    operacion,
-    new Promise<null>(resolve => { timer = setTimeout(() => resolve(null), milisegundos); })
-  ]).finally(() => { if (timer) clearTimeout(timer); });
-}
-
 @Component({
   selector: 'app-inicio',
   standalone: true,
@@ -102,6 +94,7 @@ export class InicioPage implements OnInit {
     this.cargando = true;
     this.errorCarga = null;
     this.mensajeSinUbicacion = '';
+    this.ubicacion = null;
     this.ubicacionAtribucion = null;
     this.respuesta = null;
     this.destacada = null;
@@ -109,11 +102,7 @@ export class InicioPage implements OnInit {
     let coordenadas: CoordenadasUsuario | null = null;
     try {
       if (this.sesion.ubicacionPermitida()) {
-        // Protege además contra WebViews que no resuelvan getCurrentPosition aun con timeout.
-        coordenadas = await conLimite(
-          Promise.resolve().then(() => this.sesion.obtenerCoordenadas()).catch(() => null),
-          5000
-        );
+        coordenadas = await this.sesion.obtenerCoordenadas().catch(() => null);
         if (!coordenadas) this.mensajeSinUbicacion = 'No pudimos obtener tu ubicación. Mostramos alertas oficiales sin personalizar.';
       } else {
         this.mensajeSinUbicacion = 'Activá tu ubicación para ver qué situaciones pueden afectarte.';

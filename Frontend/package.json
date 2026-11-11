@@ -7,6 +7,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:android:emulator": "ng build --configuration development-android-emulator",
+    "build:android:device": "ng build --configuration development-android-device",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"

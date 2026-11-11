@@ -19,7 +19,14 @@ export class AlertaService {
   }
 
   listarParaMapa(): Observable<Alerta[]> {
-    return this.http.get<Alerta[]>(`${this.endpoint}/mapa`);
+    return this.http.get<unknown>(`${this.endpoint}/mapa`).pipe(
+      map((respuesta): Alerta[] => {
+        if (!Array.isArray(respuesta)) {
+          throw new TypeError('La respuesta de alertas/mapa debe ser un arreglo.');
+        }
+        return respuesta as Alerta[];
+      })
+    );
   }
 
   obtenerPorId(id: string): Observable<Alerta | undefined> {

@@ -63,6 +63,37 @@ test('reutiliza el listado compacto del mapa hasta que se invalida la caché', a
     assert.equal(consultas, 2);
 });
 
+test('filtra INA por situacionMapa y mantiene sin cambios las fuentes SMN e INPRES', async () => {
+    const ahora = new Date();
+    alertaRepository.obtenerParaMapa = async () => [
+        { _id: { toString: () => 'ina-riesgo' }, fuente: 'INA', naturaleza: 'observacion', nivel: 'informativo',
+            fechaInicio: ahora, fechaUltimaMedicion: ahora, origen: 'oficial',
+            datosFuente: { medicion: { valor: 4.8, valorPrecedente: 4.6, tendencia: 'crece' },
+                estadoFuente: { estado: 'normal' }, umbrales: { alerta: 5, evacuacion: 6 } } },
+        { _id: { toString: () => 'ina-normal' }, fuente: 'INA', naturaleza: 'observacion', nivel: 'informativo',
+            fechaInicio: ahora, fechaUltimaMedicion: ahora, origen: 'oficial',
+            datosFuente: { medicion: { valor: 2, valorPrecedente: 1.9, tendencia: 'crece' },
+                estadoFuente: { estado: 'normal' }, umbrales: { alerta: 5, evacuacion: 6 } } },
+        { _id: { toString: () => 'ina-vencida' }, fuente: 'INA', naturaleza: 'alerta', nivel: 'emergencia',
+            fechaInicio: new Date(ahora.getTime() - 25 * 60 * 60 * 1000),
+            fechaUltimaMedicion: new Date(ahora.getTime() - 25 * 60 * 60 * 1000), origen: 'oficial',
+            datosFuente: { medicion: { valor: 7, valorPrecedente: 6, tendencia: 'crece' },
+                estadoFuente: { estado: 'evacuación' }, umbrales: { alerta: 5, evacuacion: 6 } } },
+        { _id: { toString: () => 'smn-1' }, fuente: 'SMN', tipo: 'meteorologica', nivel: 'advertencia',
+            naturaleza: 'alerta', origen: 'oficial', titulo: 'SMN vigente', fechaInicio: ahora, fechaFin: null },
+        { _id: { toString: () => 'inpres-1' }, fuente: 'INPRES', tipo: 'sismo', nivel: 'informativo',
+            naturaleza: 'observacion', origen: 'oficial', titulo: 'Sismo vigente', fechaInicio: ahora }
+    ];
+
+    const alertas = await alertaService.listarAlertasMapa();
+    assert.deepEqual(alertas.map(alerta => alerta.id), ['ina-riesgo', 'smn-1', 'inpres-1']);
+    assert.equal(alertas[0].situacionMapa, 'riesgo_potencial');
+    assert.equal(alertas[0].nivel, 'informativo');
+    assert.equal(alertas[0].naturaleza, 'observacion');
+    assert.equal(alertas[1].situacionMapa, undefined);
+    assert.equal(alertas[2].situacionMapa, undefined);
+});
+
 test('mapea un Point conservando sus coordenadas', async () => {
     alertaRepository.obtenerTodas = async () => [{
         _id: { toString: () => 'point-1' },

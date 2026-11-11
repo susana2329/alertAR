@@ -2,6 +2,7 @@ const alertaRepository = require('../repository/alerta.repository');
 const alertaHistoricaRepository = require('../repository/alerta-historica.repository');
 const { obtenerPuntoRepresentativo } = require('../geo/punto-representativo');
 const { presentarClasificacion } = require('./clasificacion-presentacion');
+const { clasificarSituacionMapaINA } = require('./ina-situacion-mapa');
 const logger = require('../logging/logger');
 const DURACION_CACHE_MAPA_MS = 5 * 60 * 1000;
 let cacheMapa;
@@ -67,7 +68,7 @@ function construirDetalle(doc) {
     return {};
 }
 
-function mapearAlerta(doc, ahora = new Date()) {
+function mapearAlerta(doc, ahora = new Date(), situacionMapa) {
     if (doc.fuente === 'SMN' && doc.fechaFin instanceof Date && doc.fechaFin < ahora) return null;
     let ubicacion = null;
     if (doc.geometria) {
@@ -101,6 +102,7 @@ function mapearAlerta(doc, ahora = new Date()) {
         estadoFuente: doc.estadoFuente ?? null,
         ubicacion, geometria: doc.geometria ?? null,
         detalle: construirDetalle(doc),
+        ...(situacionMapa ? { situacionMapa } : {}),
         ...(doc.fuente ? { fuente: doc.fuente } : {})
     };
 }
@@ -128,8 +130,40 @@ exports.listarAlertasMapa = async () => {
         const docs = await alertaRepository.obtenerParaMapa();
         const consultaMs = Number(process.hrtime.bigint() - inicio) / 1e6;
         const presentacion = process.hrtime.bigint();
-        const alertas = docs.map(doc => mapearAlerta(doc)).filter(Boolean);
+        const ahora = new Date();
+        let documentosINAExcluidos = 0;
+        const alertas = docs.flatMap(doc => {
+            if (doc.fuente !== 'INA') {
+                const alerta = mapearAlerta(doc, ahora);
+                return alerta ? [alerta] : [];
+            }
+            const datos = doc.datosFuente ?? {};
+            const clasificacionMapa = clasificarSituacionMapaINA({
+                valor: datos.medicion?.valor,
+                valorPrecedente: datos.medicion?.valorPrecedente,
+                tendencia: datos.medicion?.tendencia,
+                estado: datos.estadoFuente?.estado ?? doc.estadoFuente?.estado,
+                umbrales: datos.umbrales,
+                fechaMedicion: doc.fechaUltimaMedicion ?? datos.medicion?.fecha ?? doc.fechaInicio,
+                ahora
+            });
+            if (clasificacionMapa.discrepancias.length) {
+                logger.warn('ina_discrepancia_clasificacion_mapa', {
+                    id: String(doc._id), identificadorFuente: doc.identificadorFuente ?? null,
+                    estadoExplicito: datos.estadoFuente?.estado ?? doc.estadoFuente?.estado ?? null,
+                    valor: datos.medicion?.valor ?? null, umbrales: datos.umbrales ?? null,
+                    discrepancias: clasificacionMapa.discrepancias
+                });
+            }
+            if (!clasificacionMapa.situacionMapa) {
+                documentosINAExcluidos++;
+                return [];
+            }
+            const alerta = mapearAlerta(doc, ahora, clasificacionMapa.situacionMapa);
+            return alerta ? [alerta] : [];
+        });
         logger.info('alertas_mapa_listadas', { documentosRecuperados: docs.length, documentosPresentados: alertas.length,
+            documentosINAExcluidos,
             documentosPorFuente: contarPorFuente(docs),
             consultaMs: Math.round(consultaMs * 10) / 10, presentacionMs: Math.round(Number(process.hrtime.bigint() - presentacion) / 1e5) / 10 });
         cacheMapa = { alertas, expiraEn: Date.now() + DURACION_CACHE_MAPA_MS };

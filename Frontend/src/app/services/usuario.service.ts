@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UsuarioPerfil } from '../models/usuario.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PersonalService {
-  private API_URL = 'http://localhost:3000/api/cuenta/perfil';
+  private readonly API_URL = `${environment.apiUrl.replace(/\/$/, '')}/cuenta/perfil`;
 
   constructor(private _httpClient: HttpClient) {}
 

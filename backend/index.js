@@ -14,10 +14,14 @@ const errorHandler = require('./src/middleware/error-handler');
 const routerReporte = require('./src/routes/reporte.router');
 const cuentaRouter = require('./src/routes/cuenta.router');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
+const origenesDesarrollo = ['http://localhost:8100', 'http://localhost:4200', 'http://localhost', 'capacitor://localhost'];
+const origenesConfigurados = (process.env.CORS_ORIGINS || (process.env.NODE_ENV === 'development' ? origenesDesarrollo.join(',') : '')).split(',').map(origen => origen.trim()).filter(Boolean);
+const origenesPermitidos = new Set(origenesConfigurados);
 
 app.use(cors({
-  origin: ['http://localhost:8100', 'http://localhost:4200'],
+  origin: (origin, callback) => callback(null, !origin || origenesPermitidos.has(origin)),
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -59,8 +63,8 @@ async function iniciarServidor() {
     try {
         await getMongoDBConnection();
 
-        const server = app.listen(PORT, () => {
-            logger.info('servidor_iniciado', { puerto: PORT });
+        const server = app.listen(PORT, HOST, () => {
+            logger.info('servidor_iniciado', { host: HOST, puerto: PORT });
             const intervaloConfigurado = Number(process.env.INGESTA_INTERVALO_MS);
             const intervaloMs = Number.isFinite(intervaloConfigurado) && intervaloConfigurado > 0
                 ? intervaloConfigurado

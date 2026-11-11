@@ -69,6 +69,13 @@ describe('AlertaService', () => {
     http.expectOne(`${endpoint}/mapa`).flush([]);
   });
 
+  it('rechaza una respuesta de mapa que no cumple el contrato de arreglo', () => {
+    let error: unknown;
+    service.listarParaMapa().subscribe({ error: value => error = value });
+    http.expectOne(`${endpoint}/mapa`).flush({ alertas: [] });
+    expect(error).toBeInstanceOf(TypeError);
+  });
+
   it('recupera el documento completo por id si solo se consultó el resumen del mapa', () => {
     service.listarParaMapa().subscribe();
     http.expectOne(`${endpoint}/mapa`).flush([]);

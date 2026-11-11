@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, AfterViewInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
@@ -11,7 +11,6 @@ import {
   Marker,
   Popup,
   GeoJSONSource,
-  setWorkerUrl,
   type ExpressionSpecification,
   type LayerSpecification,
   type StyleSpecification
@@ -26,7 +25,10 @@ import { addIcons } from 'ionicons';
 import { IonIcon } from '@ionic/angular';
 import { Alerta, colorPresentacionAlerta, etiquetaNivelAlerta } from '../../models/alerta.model';
 import { AlertaService } from '../../services/alerta.service';
-import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+import { configurarWorkerMapLibre } from './maplibre-worker';
+import { diagnosticarError } from '../../utils/diagnostico-error';
+import { environment } from '../../../environments/environment';
+import { Subscription, timeout } from 'rxjs';
 
 type EstiloMapa =
   | 'voyager'
@@ -59,8 +61,22 @@ const SPIDER_BACKGROUND_LAYER = 'alertas-spiderfy-background';
 const SPIDER_MARKER_LAYER = 'alertas-spiderfy-markers';
 const SPIDER_CLOSE_BACKGROUND_LAYER = 'alertas-spiderfy-close-background';
 const SPIDER_CLOSE_LAYER = 'alertas-spiderfy-close';
+const CAPAS_ALERTAS = [
+  POLYGON_FILL_LAYER_ID,
+  POLYGON_OUTLINE_LAYER_ID,
+  POINT_HALO_LAYER,
+  POINT_BACKGROUND_LAYER,
+  POINT_LAYER,
+  SPIDER_LEGS_LAYER,
+  SPIDER_HALO_LAYER,
+  SPIDER_BACKGROUND_LAYER,
+  SPIDER_MARKER_LAYER,
+  SPIDER_CLOSE_BACKGROUND_LAYER,
+  SPIDER_CLOSE_LAYER
+];
 const SPIDER_SEARCH_RADIUS = 72;
 const OVERLAP_RADIUS = 52;
+const TIMEOUT_ALERTAS_MS = 20000;
 
 const ICON_EMERGENCIA = 'alerta-icon-emergencia';
 const ICON_ADVERTENCIA = 'alerta-icon-advertencia';
@@ -117,6 +133,10 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   }
   private handlersRegistrados = false;
   private configurandoAlertas = false;
+  private solicitudAlertas?: Subscription;
+  private generacionFuenteAlertas = 0;
+  private revisionDatosFuenteAlertas = 0;
+  private readonly urlAlertasMapa = `${environment.apiUrl.replace(/\/$/, '')}/alertas/mapa`;
   private readonly alertasPorId = new Map<string, Alerta>();
   private readonly spiderfiedIds = new Set<string>();
   private popupSpiderfy = false;
@@ -162,7 +182,8 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   constructor(
     private router: Router,
     private alertaService: AlertaService,
-    private location: Location
+    private location: Location,
+    private changeDetector: ChangeDetectorRef
   ) {
     addIcons({
       'locate-outline': locateOutline,
@@ -175,7 +196,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     this.location.back();
   }
   ngAfterViewInit(): void {
-    setWorkerUrl(workerUrl);
+    configurarWorkerMapLibre(document.baseURI);
     this.cargarAlertas();
 
     this.map = new MapLibreMap({
@@ -185,13 +206,36 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       zoom: 12
     });
 
-    this.map.on('load', () => {
-      void this.configurarAlertas();
+    this.map.on('style.load', () => {
+      void this.inicializarEstiloAlertas();
     });
 
-    this.map.on('style.load', () => {
-      void this.configurarAlertas();
+    this.map.on('error', event => {
+      const eventoMapLibre = event as typeof event & {
+        sourceId?: string;
+        sourceDataType?: string;
+        tile?: { uid?: number; state?: string; tileID?: { toString: () => string } };
+      };
+      const datosEvento = Object.fromEntries(
+        Object.entries(event).filter(([clave]) => clave !== 'target')
+      );
+      console.error('[MapLibre] Error de mapa o recurso ' + JSON.stringify({
+        estilo: this.estiloMapaActual,
+        sourceId: eventoMapLibre.sourceId,
+        sourceDataType: eventoMapLibre.sourceDataType,
+        tile: eventoMapLibre.tile ? {
+          uid: eventoMapLibre.tile.uid,
+          state: eventoMapLibre.tile.state,
+          id: eventoMapLibre.tile.tileID?.toString()
+        } : undefined,
+        error: diagnosticarError(event.error),
+        evento: diagnosticarError(datosEvento)
+      }));
     });
+
+    this.map.on('sourcedataloading', event => this.registrarEventoFuenteAlertas('sourcedataloading', event));
+    this.map.on('sourcedata', event => this.registrarEventoFuenteAlertas('sourcedata', event));
+    this.map.on('sourcedataabort', event => this.registrarEventoFuenteAlertas('sourcedataabort', event));
 
     this.map.on('movestart', () => this.manejarCambioDeVista());
     this.map.on('zoomstart', () => this.manejarCambioDeVista());
@@ -201,29 +245,61 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   }
 
   cargarAlertas(): void {
+    if (this.estadoAlertas === 'cargando' && this.solicitudAlertas) return;
     this.estadoAlertas = 'cargando';
     this.mensajeError = '';
+    this.changeDetector.markForCheck();
 
-    this.alertaService.listarParaMapa().subscribe({
+    console.info('[Mapa] Solicitando alertas ' + JSON.stringify({ url: this.urlAlertasMapa }));
+    this.solicitudAlertas = this.alertaService.listarParaMapa().pipe(
+      timeout({ first: TIMEOUT_ALERTAS_MS })
+    ).subscribe({
       next: (alertas) => {
-        this.alertas = alertas;
-        this.alertasPorId.clear();
-        for (const alerta of alertas) this.alertasPorId.set(alerta.id, alerta);
-        this.estadoAlertas = 'cargado';
-        if (this.alertaSeleccionada) {
-          this.alertaSeleccionada = this.alertasPorId.get(this.alertaSeleccionada.id);
+        try {
+          this.alertas = alertas;
+          this.alertasPorId.clear();
+          for (const alerta of alertas) this.alertasPorId.set(alerta.id, alerta);
+          if (this.alertaSeleccionada) {
+            this.alertaSeleccionada = this.alertasPorId.get(this.alertaSeleccionada.id);
+          }
+          this.cerrarPopupActivo();
+          this.sincronizarCoberturaConAlertas();
+          this.cerrarSpiderfy(false);
+          this.actualizarFuenteAlertas();
+          this.estadoAlertas = 'cargado';
+          this.changeDetector.markForCheck();
+          const geojson = this.crearFeatureCollection();
+          console.info('[Mapa] Alertas recibidas ' + JSON.stringify({
+            cantidad: alertas.length,
+            conUbicacionValida: alertas.filter(alerta => this.ubicacionValida(alerta?.ubicacion)).length,
+            featuresGeoJSON: geojson.features.length
+          }));
+        } catch (error) {
+          this.mensajeError = 'No se pudieron procesar las alertas recibidas.';
+          this.estadoAlertas = 'error';
+          this.changeDetector.markForCheck();
+          console.error('[Mapa] Error procesando respuesta de alertas ' + JSON.stringify(diagnosticarError(error, this.urlAlertasMapa)));
         }
-        this.cerrarPopupActivo();
-        this.sincronizarCoberturaConAlertas();
-        this.cerrarSpiderfy(false);
-        this.actualizarFuenteAlertas();
       },
       error: (error: unknown) => {
-        console.error('No se pudieron cargar las alertas:', error);
         this.estadoAlertas = 'error';
         this.mensajeError = 'No se pudieron cargar las alertas. Revisá la conexión e intentá nuevamente.';
+        this.changeDetector.markForCheck();
+        console.error('[Mapa] Falló la solicitud de alertas ' + JSON.stringify(diagnosticarError(error, this.urlAlertasMapa)));
+        this.solicitudAlertas = undefined;
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.solicitudAlertas?.unsubscribe();
+    this.modoCobertura = false;
+    this.alertaPoligonoSeleccionada = undefined;
+    this.camaraPreviaCobertura = undefined;
+    this.cerrarSpiderfy();
+    this.cerrarPopupActivo();
+    this.marcadorUsuario?.remove();
+    this.map?.remove();
   }
 
   cambiarEstiloMapa(estilo: EstiloMapa): void {
@@ -233,7 +309,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
 
     this.cerrarSpiderfy();
     this.estiloMapaActual = estilo;
-    this.map.setStyle(this.estilosMapa[estilo]);
+    this.map.setStyle(this.estilosMapa[estilo], { diff: false });
   }
 
   private crearFeatureCollection(): FeatureCollection<Point> {
@@ -357,7 +433,10 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
 
   private async configurarAlertas(): Promise<void> {
     if (!this.map || this.configurandoAlertas) return;
-    if (this.map.getSource(SOURCE_ID)) return;
+    if (this.map.getSource(SOURCE_ID)) {
+      this.actualizarFuenteAlertas();
+      return;
+    }
 
     this.configurandoAlertas = true;
     const map = this.map;
@@ -393,9 +472,14 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
         }
       });
 
-      map.addSource(SOURCE_ID, {
-        ...this.opcionesFuenteAlertas()
-      });
+      const opcionesFuenteAlertas = this.opcionesFuenteAlertas();
+      const generacion = ++this.generacionFuenteAlertas;
+      console.info('[MapLibre] Creando fuente GeoJSON ' + JSON.stringify({
+        estilo: this.estiloMapaActual,
+        generacion,
+        ...this.resumirGeoJSON(opcionesFuenteAlertas.data)
+      }));
+      map.addSource(SOURCE_ID, opcionesFuenteAlertas);
 
       map.addSource(SPIDER_SOURCE_ID, {
         type: 'geojson',
@@ -412,11 +496,141 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
 
       this.registrarEventosCapas();
       this.establecerVisibilidadCapasAlertas(!this.modoCobertura);
+      await this.registrarEstadoFuenteAlertas('fuente creada en style.load');
     } catch (error) {
-      console.error('Error al configurar las alertas del mapa:', error);
+      console.error('[MapLibre] Error al configurar las alertas del mapa ' + JSON.stringify({
+        estilo: this.estiloMapaActual,
+        error: diagnosticarError(error)
+      }));
     } finally {
       this.configurandoAlertas = false;
     }
+  }
+
+  private async inicializarEstiloAlertas(): Promise<void> {
+    console.info('[MapLibre] style.load ' + JSON.stringify({
+      estilo: this.estiloMapaActual,
+      generacionFuenteAlertas: this.generacionFuenteAlertas,
+      fuenteExisteAntesDeConfigurar: !!this.map?.getSource(SOURCE_ID)
+    }));
+    await this.configurarAlertas();
+    await this.registrarEstadoFuenteAlertas('comprobación posterior a style.load');
+  }
+
+  private async registrarEstadoFuenteAlertas(etapa: string): Promise<void> {
+    const map = this.map;
+    if (!map) return;
+
+    const fuente = map.getSource(SOURCE_ID);
+    const capas = CAPAS_ALERTAS.map(id => ({ id, existe: !!map.getLayer(id) }));
+    let cantidadFeaturesFuente: number | null = null;
+    let errorFuente: unknown;
+    if (fuente instanceof GeoJSONSource) {
+      try {
+        const data = await fuente.getData();
+        cantidadFeaturesFuente = data.type === 'FeatureCollection' ? data.features.length : 1;
+      } catch (error) {
+        errorFuente = diagnosticarError(error);
+      }
+    }
+
+    console.info('[MapLibre] Estado de fuente y capas ' + JSON.stringify({
+      etapa,
+      estilo: this.estiloMapaActual,
+      generacion: this.generacionFuenteAlertas,
+      fuenteExiste: !!fuente,
+      fuenteGeoJSON: fuente instanceof GeoJSONSource,
+      cantidadFeaturesFuente,
+      capas,
+      errorFuente
+    }));
+  }
+
+  private registrarEventoFuenteAlertas(tipo: string, evento: {
+    sourceId?: string;
+    sourceDataType?: string;
+    isSourceLoaded?: boolean;
+    coord?: { overscaledZ?: number; wrap?: number; canonical?: { z: number; x: number; y: number } };
+    tile?: { uid?: number; state?: string; tileID?: { toString: () => string } };
+  }): void {
+    if (evento.sourceId !== SOURCE_ID) return;
+    console.info('[MapLibre] Evento de fuente GeoJSON ' + JSON.stringify({
+      tipo,
+      estilo: this.estiloMapaActual,
+      generacion: this.generacionFuenteAlertas,
+      sourceDataType: evento.sourceDataType,
+      isSourceLoaded: evento.isSourceLoaded,
+      coord: evento.coord ? {
+        z: evento.coord.canonical?.z,
+        x: evento.coord.canonical?.x,
+        y: evento.coord.canonical?.y,
+        overscaledZ: evento.coord.overscaledZ,
+        wrap: evento.coord.wrap
+      } : undefined,
+      tile: evento.tile ? {
+        uid: evento.tile.uid,
+        state: evento.tile.state,
+        id: evento.tile.tileID?.toString()
+      } : undefined
+    }));
+  }
+
+  private resumirGeoJSON(data: FeatureCollection<Point>): Record<string, unknown> {
+    const features = data.features;
+    const geometrias: Record<string, number> = {};
+    const tiposPropiedades: Record<string, Record<string, number>> = {};
+    const coordenadas: { minLongitud: number; maxLongitud: number; minLatitud: number; maxLatitud: number } = {
+      minLongitud: Infinity,
+      maxLongitud: -Infinity,
+      minLatitud: Infinity,
+      maxLatitud: -Infinity
+    };
+    let coordenadasValidas = 0;
+    let bytesSerializadosAprox = 0;
+    let maxCadenaPropiedad = 0;
+
+    for (const feature of features) {
+      geometrias[feature.geometry.type] = (geometrias[feature.geometry.type] ?? 0) + 1;
+      if (feature.geometry.type === 'Point') {
+        const [longitud, latitud] = feature.geometry.coordinates;
+        if (Number.isFinite(longitud) && Number.isFinite(latitud)) {
+          coordenadasValidas++;
+          coordenadas.minLongitud = Math.min(coordenadas.minLongitud, longitud);
+          coordenadas.maxLongitud = Math.max(coordenadas.maxLongitud, longitud);
+          coordenadas.minLatitud = Math.min(coordenadas.minLatitud, latitud);
+          coordenadas.maxLatitud = Math.max(coordenadas.maxLatitud, latitud);
+        }
+      }
+
+      const propiedades = feature.properties ?? {};
+      bytesSerializadosAprox += JSON.stringify(feature).length;
+      for (const [clave, valor] of Object.entries(propiedades)) {
+        const tipo = valor === null ? 'null' : Array.isArray(valor) ? 'array' : typeof valor;
+        const resumen = tiposPropiedades[clave] ??= {};
+        resumen[tipo] = (resumen[tipo] ?? 0) + 1;
+        if (typeof valor === 'string') maxCadenaPropiedad = Math.max(maxCadenaPropiedad, valor.length);
+      }
+    }
+
+    const muestra = features[0];
+    const propiedadesMuestra = muestra?.properties ?? {};
+    return {
+      features: features.length,
+      geometrias,
+      coordenadasPuntoValidas: coordenadasValidas,
+      rangoCoordenadas: coordenadasValidas ? coordenadas : null,
+      propiedadesPorTipo: tiposPropiedades,
+      bytesSerializadosAprox,
+      maxCadenaPropiedad,
+      muestra: muestra ? {
+        coordenadas: muestra.geometry.type === 'Point' ? muestra.geometry.coordinates : undefined,
+        id: propiedadesMuestra['id'],
+        tipo: propiedadesMuestra['tipo'],
+        nivel: propiedadesMuestra['nivel'],
+        color: propiedadesMuestra['color'],
+        origen: propiedadesMuestra['origen']
+      } : null
+    };
   }
 
   private agregarCapasSpiderfy(map: MapLibreMap): void {
@@ -773,7 +987,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     popup.getElement().querySelector<HTMLButtonElement>('.alerta-popup__detail-button')?.addEventListener('click', (clickEvent) => {
       clickEvent.preventDefault();
       clickEvent.stopPropagation();
-      void this.router.navigate(['/detalle-alerta', alerta.id]);
+      void this.router.navigate(['/detalle-alerta', alerta.id]).catch(error => {
+        console.error('[Navegación] No se pudo abrir el detalle de la alerta ' + JSON.stringify(diagnosticarError(error)));
+      });
     });
   }
 
@@ -892,7 +1108,30 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     const source = this.map?.getSource(SOURCE_ID);
     if (!(source instanceof GeoJSONSource)) return;
 
-    source.setData(this.crearFeatureCollection());
+    const data = this.crearFeatureCollection();
+    const revisionDatos = ++this.revisionDatosFuenteAlertas;
+    console.info('[MapLibre] Actualizando fuente de alertas ' + JSON.stringify({
+      generacion: this.generacionFuenteAlertas,
+      revisionDatos,
+      featuresGeoJSON: data.features.length,
+      ...this.resumirGeoJSON(data)
+    }));
+    void source.setData(data)
+      .then(() => {
+        console.info('[MapLibre] Promesa setData resuelta ' + JSON.stringify({
+          generacion: this.generacionFuenteAlertas,
+          revisionDatos,
+          nota: 'La resolución no confirma por sí sola que los tiles estén cargados; revisar eventos sourcedata y error.'
+        }));
+        return this.registrarEstadoFuenteAlertas('promesa setData resuelta');
+      })
+      .catch(error => {
+      console.error('[MapLibre] Error al incorporar GeoJSON a la fuente ' + JSON.stringify({
+        estilo: this.estiloMapaActual,
+        featuresGeoJSON: data.features.length,
+        error: diagnosticarError(error)
+      }));
+      });
   }
 
   private crearFeatureCollectionPoligono(): FeatureCollection<Polygon | MultiPolygon> {
@@ -1119,16 +1358,6 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       ],
       zoom: 15
     });
-  }
-
-  ngOnDestroy(): void {
-    this.modoCobertura = false;
-    this.alertaPoligonoSeleccionada = undefined;
-    this.camaraPreviaCobertura = undefined;
-    this.cerrarSpiderfy();
-    this.cerrarPopupActivo();
-    this.marcadorUsuario?.remove();
-    this.map?.remove();
   }
 
 }

@@ -15,13 +15,17 @@ export interface CoordenadasUsuario {
   longitud: number;
 }
 
+export type EstadoUbicacion = 'disponible' | 'permiso-denegado' | 'servicio-desactivado' | 'timeout' | 'error' | null;
+
 @Injectable({ providedIn: 'root' })
 export class SesionService {
 
   usuario = signal<UsuarioSesion | null>(this.leerUsuario());
   ubicacionPermitida = signal(localStorage.getItem('alertar_ubicacion') === 'permitida');
   coordenadas = signal<CoordenadasUsuario | null>(null);
+  estadoUbicacion = signal<EstadoUbicacion>(null);
   private coordenadasCapturadasEn = 0;
+  private solicitudEnCurso: Promise<CoordenadasUsuario | null> | null = null;
 
   logueado = computed(() => this.usuario() !== null);
 
@@ -45,16 +49,12 @@ export class SesionService {
   async pedirUbicacion(): Promise<boolean> {
     try {
       const coordenadas = await this.consultarPosicion(true);
-      if (!coordenadas) {
-        this.guardarUbicacion(false);
-        return false;
-      }
+      if (!coordenadas) return false;
       this.coordenadas.set(coordenadas);
       this.coordenadasCapturadasEn = Date.now();
       this.guardarUbicacion(true);
       return true;
     } catch {
-      this.guardarUbicacion(false);
       return false;
     }
   }
@@ -72,18 +72,30 @@ export class SesionService {
     }).catch(() => null);
   }
 
-  private async consultarPosicion(solicitarPermiso: boolean): Promise<CoordenadasUsuario | null> {
-    const posicion = Capacitor.isNativePlatform()
-      ? this.consultarPosicionNativa(solicitarPermiso)
-      : this.consultarPosicionWeb();
-    // Algunos WebViews/proveedores de ubicación no llaman los callbacks al vencer timeout.
-    // El watchdog garantiza que Inicio continúe consultando alertas aun sin coordenadas.
+  private consultarPosicion(solicitarPermiso: boolean): Promise<CoordenadasUsuario | null> {
+    if (this.solicitudEnCurso) return this.solicitudEnCurso;
+    this.solicitudEnCurso = this.consultarPosicionUnica(solicitarPermiso).finally(() => {
+      this.solicitudEnCurso = null;
+    });
+    return this.solicitudEnCurso;
+  }
+
+  private async consultarPosicionUnica(solicitarPermiso: boolean): Promise<CoordenadasUsuario | null> {
     let timer: ReturnType<typeof setTimeout> | undefined;
     try {
+      const posicion = Capacitor.isNativePlatform()
+        ? this.consultarPosicionNativa(solicitarPermiso)
+        : this.consultarPosicionWeb();
       return await Promise.race([
         posicion,
-        new Promise<null>(resolve => { timer = setTimeout(() => resolve(null), 8000); })
+        new Promise<null>(resolve => { timer = setTimeout(() => {
+          this.estadoUbicacion.set('timeout');
+          resolve(null);
+        }, Capacitor.isNativePlatform() ? 23000 : 12000); })
       ]);
+    } catch (error) {
+      this.estadoUbicacion.set(this.esTimeout(error) ? 'timeout' : this.esServicioDesactivado(error) ? 'servicio-desactivado' : 'error');
+      return null;
     } finally {
       if (timer) clearTimeout(timer);
     }
@@ -94,18 +106,64 @@ export class SesionService {
     if (permisos.location !== 'granted' && solicitarPermiso) {
       permisos = await Geolocation.requestPermissions();
     }
-    if (permisos.location !== 'granted') return null;
-    const posicion = await Geolocation.getCurrentPosition({ enableHighAccuracy: false, maximumAge: 60000, timeout: 7000 });
-    return { latitud: posicion.coords.latitude, longitud: posicion.coords.longitude };
+    if (permisos.location !== 'granted') {
+      this.estadoUbicacion.set('permiso-denegado');
+      this.guardarUbicacion(false);
+      return null;
+    }
+    // Precisión alta ayuda al GPS simulado y al primer fix en Android. No reutilizar
+    // una posición antigua aquí: una coordenada vieja puede personalizar alertas mal.
+    const posicion = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+    this.estadoUbicacion.set('disponible');
+    return this.validarCoordenadas(posicion.coords.latitude, posicion.coords.longitude);
   }
 
   private consultarPosicionWeb(): Promise<CoordenadasUsuario | null> {
-    if (!navigator.geolocation) return Promise.resolve(null);
+    if (!navigator.geolocation) {
+      this.estadoUbicacion.set('error');
+      return Promise.resolve(null);
+    }
     return new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(
-      posicion => resolve({ latitud: posicion.coords.latitude, longitud: posicion.coords.longitude }),
-      error => error.code === error.PERMISSION_DENIED ? resolve(null) : reject(error),
-      { enableHighAccuracy: false, maximumAge: 60000, timeout: 7000 }
+      posicion => {
+        this.estadoUbicacion.set('disponible');
+        resolve(this.validarCoordenadas(posicion.coords.latitude, posicion.coords.longitude));
+      },
+      error => {
+        if (error.code === error.PERMISSION_DENIED) {
+          this.estadoUbicacion.set('permiso-denegado');
+          this.guardarUbicacion(false);
+          resolve(null);
+        } else {
+          this.estadoUbicacion.set(error.code === error.TIMEOUT ? 'timeout' : 'error');
+          reject(error);
+        }
+      },
+      { enableHighAccuracy: false, maximumAge: 0, timeout: 10000 }
     ));
+  }
+
+  private validarCoordenadas(latitud: number, longitud: number): CoordenadasUsuario | null {
+    if (!Number.isFinite(latitud) || !Number.isFinite(longitud) || Math.abs(latitud) > 90 || Math.abs(longitud) > 180) {
+      this.estadoUbicacion.set('error');
+      return null;
+    }
+    return { latitud, longitud };
+  }
+
+  private esServicioDesactivado(error: unknown): boolean {
+    const mensaje = this.mensajeError(error);
+    return /location.*(disabled|turned off)|location services/i.test(mensaje);
+  }
+
+  private esTimeout(error: unknown): boolean {
+    const mensaje = this.mensajeError(error);
+    return /timeout|timed out|OS-PLUG-GLOC-0010/i.test(mensaje);
+  }
+
+  private mensajeError(error: unknown): string {
+    if (error instanceof Error) return error.message;
+    if (error && typeof error === 'object' && 'message' in error) return String(error.message);
+    return String(error);
   }
 
   private leerUsuario(): UsuarioSesion | null {

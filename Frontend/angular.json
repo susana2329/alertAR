@@ -31,6 +31,16 @@
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
+              },
+              {
+                "glob": "maplibre-gl-worker.mjs",
+                "input": "node_modules/maplibre-gl/dist",
+                "output": "assets/maplibre"
+              },
+              {
+                "glob": "maplibre-gl-shared.mjs",
+                "input": "node_modules/maplibre-gl/dist",
+                "output": "assets/maplibre"
               }
             ],
             "styles": [
@@ -68,6 +78,24 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "development-android-emulator": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                { "replace": "src/environments/environment.ts", "with": "src/environments/environment.android-emulator.ts" }
+              ]
+            },
+            "development-android-device": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                { "replace": "src/environments/environment.ts", "with": "src/environments/environment.android-device.ts" }
+              ]
             },
             "ci": {
               "progress": false
