@@ -7,10 +7,10 @@ const mochilaSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    individual: { type: [Number], default: [] },
-    familiar: { type: [Number], default: [] },
-    mascotas: { type: [Number], default: [] },
-    hogar: { type: [Number], default: [] }
+    individual: { type: [String], default: [] },
+    familiar: { type: [String], default:[] },
+    mascotas: { type: [String], default: [] },
+    hogar: { type: [String], default: [] }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Mochila', mochilaSchema);

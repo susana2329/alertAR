@@ -1,9 +1,8 @@
 const Mochila = require('./models/mochila');
 
-const actualizarProgresoMochila = async (userId, tipoMochila, itemsCompletados) => {
+exports.actualizarProgresoMochila = async (userId, tipoMochila, itemsCompletados) => {
     try {
         const campoUpdate = { [tipoMochila]: itemsCompletados };
-        
         const mochilaActualizada = await Mochila.findOneAndUpdate(
             { usuarioId: userId }, 
             { $set: campoUpdate },
@@ -15,4 +14,14 @@ const actualizarProgresoMochila = async (userId, tipoMochila, itemsCompletados) 
     }
 };
 
-module.exports = { actualizarProgresoMochila };
+exports.mochilagetRepository = async (userId)=>{
+    try{ 
+        console.log(userId)
+        const result = await Mochila.find({usuarioId:userId})
+        console.log( result)
+        return result
+    }
+    catch(error){ 
+        throw new Error('No hay una mochila con ese id')
+    }
+}
