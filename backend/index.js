@@ -10,6 +10,7 @@ const errorHandler = require('./src/middleware/error-handler');
 const routerReporte = require('./src/routes/reporte.router');
 const cuentaRouter = require('./src/routes/cuenta.router');
 const app = express();
+const router = require('./src/routes/mochila.router')
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
@@ -17,7 +18,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
+
 
 app.use((req, res, next) => {
   const inicio = Date.now();
@@ -26,10 +27,12 @@ app.use((req, res, next) => {
   }));
   next();
 });
+app.use(express.json());
 app.use('/api/alertas', alertaRouter);
 app.use('/api/auth', require('./src/routes/auth.router'));
 app.use('/api/cuenta', cuentaRouter);
 app.use('/reportes', routerReporte);
+app.use('/api', router)
 app.use(errorHandler);
 
 
