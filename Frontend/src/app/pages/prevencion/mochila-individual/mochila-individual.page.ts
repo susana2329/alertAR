@@ -50,13 +50,13 @@ async guardarProgreso() {
     const idsCompletados = this.checklist.filter(item => item.completado).map(item => item.id);
     const porcentajeActual = this.porcentaje;
 
-    this.mochilaService.guardarProgreso('mascotas', idsCompletados).subscribe({
-      next: (res) => console.log('Guardado de mascotas exitoso', res),
-      error: (err) => console.error('Error al guardar mascotas', err)
+    this.mochilaService.guardarProgreso('individual', idsCompletados).subscribe({
+      next: (res) => console.log('Guardado de mochila exitoso', res),
+      error: (err) => console.error('Error al guardar la mochila individual', err)
     });
 
     const toast = await this.toastController.create({
-      message: `El kit de tu mascota se ha guardado (${porcentajeActual}% completado).`,
+      message: `Tu mochila individual se guardó (${porcentajeActual}% completado).`,
       duration: 3500,
       position: 'bottom',
       color: 'dark'

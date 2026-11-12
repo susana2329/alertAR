@@ -19,7 +19,7 @@ export class MochilaHogarPage implements OnInit {
   public checklist: ItemMochila[] = [];
 
   constructor(
-    private location: Location, 
+    private location: Location,
     private mochilaService: MochilaService,
     private toastController: ToastController
   ) {
@@ -59,19 +59,27 @@ export class MochilaHogarPage implements OnInit {
     const idsCompletados = this.checklist.filter(item => item.completado).map(item => item.id);
     const porcentajeActual = this.porcentaje;
 
-    this.mochilaService.guardarProgreso('hogar', idsCompletados).subscribe({
-      next: (res) => console.log('Progreso de hogar guardado', res),
-      error: (err) => console.error('Error al guardar hogar', err)
+    this.mochilaService.guardarProgreso('hogar.items', idsCompletados).subscribe({
+      next: async () => {
+        const toast = await this.toastController.create({
+          message: `Tu kit de emergencia del hogar se ha guardado (${porcentajeActual}% completado).`,
+          duration: 3500,
+          position: 'bottom',
+          color: 'dark'
+        });
+        await toast.present();
+        this.location.back();
+      },
+      error: async (err) => {
+        console.error('Error al guardar hogar', err);
+        const toast = await this.toastController.create({
+          message: 'No pudimos guardar tu progreso. Intentá de nuevo.',
+          duration: 3500,
+          position: 'bottom',
+          color: 'danger'
+        });
+        await toast.present();
+      }
     });
-
-    const toast = await this.toastController.create({
-      message: `Tu kit de emergencia del hogar se ha guardado (${porcentajeActual}% completado).`,
-      duration: 3500,
-      position: 'bottom',
-      color: 'dark'
-    });
-    await toast.present();
-
-    this.location.back();
   }
 }

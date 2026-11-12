@@ -1,0 +1,90 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="custom-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back-outline" class="arrow-icon-title"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Mis Mochilas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="usuario-mochilas-container">
+
+    @if (!tieneMochilas) {
+      <div class="estado-vacio">
+        <div class="icono-circulo">
+          <ion-icon name="briefcase-outline"></ion-icon>
+        </div>
+
+        <h2>¡Hola! Todavía no tenés mochilas</h2>
+        <p class="descripcion">
+          En esta sección vas a poder gestionar y visualizar tus kits de prevención. 
+          Por el momento no creaste ninguna.
+        </p>
+
+        <div class="separador"></div>
+
+        <p class="nota">
+          Te invitamos a armar tu primera mochila para poder visualizarla, completarla y hacerle un seguimiento.
+        </p>
+
+        <ion-button expand="block" routerLink="/prevencion/mochila" class="btn-crear-primera">
+          <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+          Crear mi primera mochila
+        </ion-button>
+      </div>
+    } @else {
+      <div class="intro-section">
+        <h2>Tus kits de prevención</h2>
+        <p>Tenés mochilas registradas. ¡Te invitamos a completarlas para estar al 100% preparados!</p>
+      </div>
+
+      <div class="tarjetas-lista">
+
+        <!-- Mochila Individual -->
+        <div class="mochila-card" routerLink="/prevencion/mochila-individual">
+          <div class="card-info">
+            <h3>Mochila Individual</h3>
+            <p>Progreso: <strong>{{ porcentajeIndividual }}%</strong> completado</p>
+            <span class="mensaje-aliento" *ngIf="porcentajeIndividual < 100">¡Completala para estar al 100%!</span>
+          </div>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+
+        <!-- Kit del Hogar -->
+        <div class="mochila-card" routerLink="/prevencion/mochila-hogar">
+          <div class="card-info">
+            <h3>Kit del Hogar</h3>
+            <p>Progreso: <strong>{{ porcentajeHogar }}%</strong> completado</p>
+            <span class="mensaje-aliento" *ngIf="porcentajeHogar < 100">¡Completala para estar al 100%!</span>
+          </div>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+
+        <!-- Mochila Familiar -->
+        <div class="mochila-card" routerLink="/prevencion/mochila-familiar">
+          <div class="card-info">
+            <h3>Mochila Familiar</h3>
+            <p>Progreso: <strong>{{ porcentajeFamiliar }}%</strong> completado</p>
+            <span class="mensaje-aliento" *ngIf="porcentajeFamiliar < 100">¡Completala para estar al 100%!</span>
+          </div>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+
+        <!-- Mochila de Mascotas -->
+        <div class="mochila-card" routerLink="/prevencion/mochila-mascotas">
+          <div class="card-info">
+            <h3>Mochila de Mascotas</h3>
+            <p>Progreso: <strong>{{ porcentajeMascotas }}%</strong> completado</p>
+            <span class="mensaje-aliento" *ngIf="porcentajeMascotas < 100">¡Completala para estar al 100%!</span>
+          </div>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+
+      </div>
+    }
+
+  </div>
+</ion-content>

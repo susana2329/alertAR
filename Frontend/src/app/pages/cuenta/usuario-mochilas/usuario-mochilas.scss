@@ -1,0 +1,183 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+* {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+ion-content {
+  --background: #f8f9fa;
+}
+
+.custom-toolbar {
+  --background: #f8f9fa;
+  --color: #1a1a1a;
+}
+
+ion-toolbar ion-title {
+  position: absolute !important;
+  left: 0;
+  right: 0;
+  text-align: center;
+  width: 100%;
+  pointer-events: none;
+}
+
+.arrow-icon-title {
+  font-size: 22px;
+  color: #333333;
+}
+
+.usuario-mochilas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 10px 4px 30px 4px;
+}
+
+/* ---------- Con mochilas ---------- */
+.intro-section {
+  margin: 4px 4px 6px;
+
+  h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 4px;
+  }
+
+  p {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: #777777;
+    margin: 0;
+  }
+}
+
+.tarjetas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mochila-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0px 0px 20px #bdb6b6;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin: 0;
+    }
+
+    p {
+      font-size: 0.85rem;
+      color: #777777;
+      margin: 0;
+
+      strong {
+        color: #0E7490;
+      }
+    }
+
+    .mensaje-aliento {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #b7791f;
+      margin-top: 2px;
+    }
+  }
+
+  ion-icon {
+    font-size: 18px;
+    color: #999999;
+    flex-shrink: 0;
+  }
+}
+
+/* ---------- Estado vacío ---------- */
+.estado-vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 60px 20px 0;
+}
+
+.icono-circulo {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #eceff1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+
+  ion-icon {
+    font-size: 44px;
+    color: #b0b7bf;
+  }
+}
+
+.estado-vacio h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 8px;
+}
+
+.descripcion {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #7b8290;
+  margin: 0;
+  max-width: 280px;
+}
+
+.separador {
+  width: 40px;
+  height: 2px;
+  border-radius: 2px;
+  background: #e0e4e8;
+  margin: 28px 0 20px;
+}
+
+.nota {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #8b929c;
+  margin: 0 0 24px;
+  max-width: 260px;
+}
+
+.btn-crear-primera {
+  width: 100%;
+  max-width: 280px;
+  --background: #0E7490;
+  --color: #ffffff;
+  --border-radius: 14px;
+  --box-shadow: none;
+  height: 48px;
+  font-weight: 700;
+  text-transform: none;
+}
