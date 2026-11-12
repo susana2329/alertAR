@@ -16,9 +16,7 @@ exports.actualizarProgresoMochila = async (userId, tipoMochila, itemsCompletados
 
 exports.mochilagetRepository = async (userId)=>{
     try{ 
-        console.log(userId)
         const result = await Mochila.find({usuarioId:userId})
-        console.log( result)
         return result
     }
     catch(error){ 

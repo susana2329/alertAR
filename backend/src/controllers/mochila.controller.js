@@ -2,10 +2,10 @@ const mochilaService = require('../service/mochila.service');
 const {mochilagetservice} = require('../service/mochila.service')
 const guardarMochila = async (req, res) => {
     try {
-        const userId = req.usuarioId;; 
+        const userId = req.params.id; 
         const { tipoMochila, itemsCompletados } = req.body; 
 
-        if (!userId || !tipoMochila || !Array.isArray(itemsCompletados)) {
+        if (!userId || !tipoMochila || !itemsCompletados) {
            return res.status(400).json({ mensaje: 'Faltan datos requeridos' });
         }
 
