@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonIcon, IonCheckbox, IonButton } from '@ionic/angular';
+import { IonContent, IonHeader, IonIcon, IonCheckbox, IonButton, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { ItemMochila } from '../../../models/mochila.model';
 import { arrowBackOutline, briefcaseOutline } from 'ionicons/icons';
@@ -32,7 +32,7 @@ export class MochilaIndividualPage {
   ];
 
 
-  constructor(private location: Location, private mochilaService: MochilaService) {
+  constructor(private location: Location, private mochilaService: MochilaService, private toastController: ToastController) {
     addIcons({ 'arrow-back-outline': arrowBackOutline, 'briefcase-outline': briefcaseOutline });
   }
 
@@ -46,13 +46,23 @@ export class MochilaIndividualPage {
     return Math.round((elementosCompletados / this.checklist.length) * 100);
   }
 
-  guardarProgreso() {
-    const idsCompletados = this.checklist
-      .filter(item => item.completado)
-      .map(item => item.id);
-    this.mochilaService.guardarProgreso('individual', idsCompletados).subscribe({
-      next: (res) => console.log('Guardado exitoso', res),
-      error: (err) => console.error('Error', err)
+async guardarProgreso() {
+    const idsCompletados = this.checklist.filter(item => item.completado).map(item => item.id);
+    const porcentajeActual = this.porcentaje;
+
+    this.mochilaService.guardarProgreso('mascotas', idsCompletados).subscribe({
+      next: (res) => console.log('Guardado de mascotas exitoso', res),
+      error: (err) => console.error('Error al guardar mascotas', err)
     });
+
+    const toast = await this.toastController.create({
+      message: `El kit de tu mascota se ha guardado (${porcentajeActual}% completado).`,
+      duration: 3500,
+      position: 'bottom',
+      color: 'dark'
+    });
+    await toast.present();
+
+    this.location.back();
   }
 }

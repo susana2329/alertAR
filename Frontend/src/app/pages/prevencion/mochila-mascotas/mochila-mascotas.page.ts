@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonIcon, IonCheckbox, IonButton } from '@ionic/angular';
+import { IonContent, IonHeader, IonIcon, IonCheckbox, IonButton, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import { ItemMochila } from '../../../models/mochila.model';
@@ -28,7 +28,7 @@ export class MochilaMascotasPage {
     { id: 10, titulo: 'Lugar de resguardo', subtitulo: 'Familiar, conocido o refugio previsto', completado: false }
   ];
 
-  constructor(private location: Location) {
+  constructor(private location: Location, private toastController: ToastController, private mochilaService: MochilaService ) {
     addIcons({ 'arrow-back-outline': arrowBackOutline });
   }
 
@@ -42,8 +42,23 @@ export class MochilaMascotasPage {
     return Math.round((elementosCompletados / this.checklist.length) * 100);
   }
 
-  guardarProgreso() {
-    console.log('Progreso Mascotas a guardar:', this.checklist);
-// se me pasa la alergia y sigo con la conexion axa
+async guardarProgreso() {
+    const idsCompletados = this.checklist.filter(item => item.completado).map(item => item.id);
+    const porcentajeActual = this.porcentaje;
+
+    this.mochilaService.guardarProgreso('mascotas', idsCompletados).subscribe({
+      next: (res) => console.log('Guardado de mascotas exitoso', res),
+      error: (err) => console.error('Error al guardar mascotas', err)
+    });
+
+    const toast = await this.toastController.create({
+      message: `El kit de tu mascota se ha guardado (${porcentajeActual}% completado).`,
+      duration: 2500,
+      position: 'bottom',
+      color: 'dark'
+    });
+    await toast.present();
+
+    this.location.back();
   }
 }

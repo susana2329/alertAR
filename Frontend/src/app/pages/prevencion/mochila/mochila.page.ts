@@ -25,7 +25,7 @@ export class MochilaPage {
       descripcion: 'Para tu familia',
       color: '#A8D5A8',
       icono: 'assets/icon/familiar.png',
-      ruta: '' 
+      ruta: '/prevencion/mochila-familiar' 
     },
     {
       nombre: 'Mascotas',
@@ -39,7 +39,7 @@ export class MochilaPage {
       descripcion: 'Para tu casa',
       color: '#F9A8F9',
       icono: 'assets/icon/casita.png',
-      ruta: '' 
+      ruta: '/prevencion/mochila-hogar' 
     },
   ];
 

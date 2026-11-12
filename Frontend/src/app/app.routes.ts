@@ -86,6 +86,18 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/prevencion/mochila-mascotas/mochila-mascotas.page').then(m => m.MochilaMascotasPage),
   },
   {
+    path: 'prevencion/mochila-familiar', 
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver tu mochila familiar' },
+    loadComponent: () => import('./pages/prevencion/mochila-familiar/mochila-familiar.page').then(m => m.MochilaFamiliarPage),
+  },
+  {
+    path: 'prevencion/mochila-hogar', 
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver el kit de emergencia del hogar' },
+    loadComponent: () => import('./pages/prevencion/mochila-hogar/mochila-hogar.page').then(m => m.MochilaHogarPage),
+  },
+  {
     path: 'prevencion/recomendaciones',
     canActivate: [soloConSesion],
     data: { aviso: 'Para ver tus recomendaciones' },
