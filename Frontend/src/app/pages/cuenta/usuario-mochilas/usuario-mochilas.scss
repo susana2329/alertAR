@@ -36,7 +36,6 @@ ion-toolbar ion-title {
   padding: 10px 4px 30px 4px;
 }
 
-/* ---------- Con mochilas ---------- */
 .intro-section {
   margin: 4px 4px 6px;
 
@@ -114,7 +113,6 @@ ion-toolbar ion-title {
   }
 }
 
-/* ---------- Estado vacío ---------- */
 .estado-vacio {
   display: flex;
   flex-direction: column;
@@ -180,4 +178,54 @@ ion-toolbar ion-title {
   height: 48px;
   font-weight: 700;
   text-transform: none;
+}
+
+.mochila-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border-left: 4px solid #cbd5e1;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &.completada {
+    border-left: 4px solid #10b981;
+    background: linear-gradient(to right, #f0fdf4, #ffffff);
+  }
+
+  h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #475569;
+  }
+
+  .texto-exito {
+    color: #059669;
+    font-weight: 600;
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  .mensaje-aliento {
+    display: block;
+    color: #d97706;
+    font-size: 0.8rem;
+    margin-top: 2px;
+  }
 }

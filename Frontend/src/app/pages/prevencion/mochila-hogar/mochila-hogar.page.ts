@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef  } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonIcon, IonCheckbox, IonButton, ToastController } from '@ionic/angular';
@@ -21,13 +21,24 @@ export class MochilaHogarPage implements OnInit {
   constructor(
     private location: Location,
     private mochilaService: MochilaService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private cdr: ChangeDetectorRef
   ) {
     addIcons({ 'arrow-back-outline': arrowBackOutline, 'home-outline': homeOutline });
   }
 
   ngOnInit() {
     this.cargarChecklistHogar();
+  }
+
+   ionViewWillEnter() {
+    this.mochilaService.obtenerProgreso('hogar').subscribe({
+      next: (ids) => {
+        this.checklist.forEach(item => item.completado = ids.includes(item.id));
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('No se pudo cargar el progreso', err)
+    });
   }
 
   cargarChecklistHogar() {
@@ -59,7 +70,7 @@ export class MochilaHogarPage implements OnInit {
     const idsCompletados = this.checklist.filter(item => item.completado).map(item => item.id);
     const porcentajeActual = this.porcentaje;
 
-    this.mochilaService.guardarProgreso('hogar.items', idsCompletados).subscribe({
+    this.mochilaService.guardarProgreso('hogar', idsCompletados).subscribe({
       next: async () => {
         const toast = await this.toastController.create({
           message: `Tu kit de emergencia del hogar se ha guardado (${porcentajeActual}% completado).`,

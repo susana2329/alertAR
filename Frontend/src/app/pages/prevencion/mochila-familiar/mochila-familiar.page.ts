@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonIcon, IonCheckbox, IonButton, ToastController } from '@ionic/angular';
@@ -35,7 +35,8 @@ export class MochilaFamiliarPage {
   constructor(
     private location: Location, 
     private mochilaService: MochilaService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private cdr: ChangeDetectorRef
     ) {
     addIcons({ 'arrow-back-outline': arrowBackOutline, 'people-outline': peopleOutline });
   }
@@ -164,6 +165,14 @@ export class MochilaFamiliarPage {
 
     this.checklist = nuevosItems;
     this.mostrandoConfiguracion = false;
+
+    this.mochilaService.obtenerProgreso('familiar').subscribe({
+      next: (ids) => {
+        this.checklist.forEach(item => item.completado = ids.includes(item.id));
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('No se pudo cargar el progreso', err)
+    });
   }
 
   get porcentaje(): number {
@@ -174,9 +183,29 @@ export class MochilaFamiliarPage {
 
   guardarProgreso() {
     const idsCompletados = this.checklist.filter(item => item.completado).map(item => item.id);
+    const porcentajeActual = this.porcentaje;
+
     this.mochilaService.guardarProgreso('familiar', idsCompletados).subscribe({
-      next: (res) => console.log('Guardado exitoso', res),
-      error: (err) => console.error('Error', err)
+      next: async () => {
+        const toast = await this.toastController.create({
+          message: `Tu mochila familiar se ha guardado (${porcentajeActual}% completado).`,
+          duration: 3500,
+          position: 'bottom',
+          color: 'dark'
+        });
+        await toast.present();
+        this.location.back();
+      },
+      error: async (err) => {
+        console.error('Error al guardar la mochila familiar', err);
+        const toast = await this.toastController.create({
+          message: 'No pudimos guardar tu progreso. Intentá de nuevo.',
+          duration: 3500,
+          position: 'bottom',
+          color: 'danger'
+        });
+        await toast.present();
+      }
     });
   }
 }

@@ -1,14 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { arrowBackOutline, chevronForwardOutline, briefcaseOutline, addCircleOutline } from 'ionicons/icons';
+import { MochilaService } from '../../../services/mochila.service';
+
+interface TarjetaMochila {
+    clave: string;
+    titulo: string;
+    ruta: string;
+    completados: number;
+    total: number | null;
+    porcentaje: number | null;
+}
 
 @Component({
     selector: 'app-usuario-mochilas',
     templateUrl: './usuario-mochilas.html',
-    styleUrl: './usuario-mochilas.scss', 
+    styleUrl: './usuario-mochilas.scss',
     standalone: true,
     imports: [
         CommonModule,
@@ -22,45 +32,74 @@ import { arrowBackOutline, chevronForwardOutline, briefcaseOutline, addCircleOut
         IonIcon
     ]
 })
-export class UsuarioMochilasPage implements OnInit {
+export class UsuarioMochilasPage {
 
-    // Controla si el usuario tiene al menos una mochila creada o progreso guardado
-    public tieneMochilas: boolean = false;
+    public cargando: boolean = true;
+    public mochilas: TarjetaMochila[] = [];
 
-    // Porcentajes dinámicos de cada mochila (puedes ajustarlos o leerlos del almacenamiento local si gustas)
-    public porcentajeIndividual: number = 0;
-    public porcentajeHogar: number = 0;
-    public porcentajeFamiliar: number = 0;
-    public porcentajeMascotas: number = 0;
+    private readonly definiciones = [
+        { clave: 'individual', titulo: 'Mochila Individual', ruta: '/prevencion/mochila-individual', total: 13 },
+        { clave: 'familiar', titulo: 'Mochila Familiar', ruta: '/prevencion/mochila-familiar', total: null },
+        { clave: 'hogar', titulo: 'Kit del Hogar', ruta: '/prevencion/mochila-hogar', total: 10 },
+        { clave: 'mascotas', titulo: 'Mochila de Mascotas', ruta: '/prevencion/mochila-mascotas', total: 10 }
+    ];
 
-    constructor(private location: Location) {
+    constructor(
+        private location: Location,
+        private mochilaService: MochilaService,
+        private cdr: ChangeDetectorRef
+    ) {
         addIcons({ arrowBackOutline, chevronForwardOutline, briefcaseOutline, addCircleOutline });
     }
 
-    ngOnInit() {
+    get tieneMochilas(): boolean {
+        return this.mochilas.length > 0;
+    }
+
+    ionViewWillEnter() {
         this.cargarEstadoMochilas();
     }
 
     cargarEstadoMochilas() {
-        // Verificamos si hay algún indicador o datos guardados en el localStorage
-        // (Por ejemplo, si el usuario ya guardó progreso en alguna de las mochilas)
-        const ind = localStorage.getItem('progreso_individual');
-        const hog = localStorage.getItem('progreso_hogar');
-        const fam = localStorage.getItem('progreso_familiar');
-        const mas = localStorage.getItem('progreso_mascotas');
+        this.mochilaService.obtenerMochilas().subscribe({
+            next: (data) => {
+                const doc = Array.isArray(data) ? data[0] : data;
 
-        // Si al menos una tiene datos, pasamos `tieneMochilas` a true
-        if (ind || hog || fam || mas) {
-            this.tieneMochilas = true;
-            this.porcentajeIndividual = ind ? Number(ind) : 0;
-            this.porcentajeHogar = hog ? Number(hog) : 0;
-            this.porcentajeFamiliar = fam ? Number(fam) : 0;
-            this.porcentajeMascotas = mas ? Number(mas) : 0;
-        } else {
-            // Para pruebas iniciales, si querés forzar que se vea el listado y simular porcentajes, 
-            // podés cambiar esto temporalmente a true. De lo contrario, arranca en false (estado vacío).
-            this.tieneMochilas = false;
+                this.mochilas = this.definiciones
+                    .map(d => {
+                        const completados = this.contar(doc?.[d.clave]);
+                        return {
+                            ...d,
+                            completados,
+                            porcentaje: this.calcular(completados, d.total)
+                        };
+                    })
+                    .filter(m => m.completados > 0);
+
+                this.cargando = false;
+                this.cdr.markForCheck();
+            },
+            error: (error) => {
+                console.error('Error al cargar las mochilas', error);
+                this.cargando = false;
+                this.cdr.markForCheck();
+            }
+        });
+    }
+
+    private contar(valor: any): number {
+        if (Array.isArray(valor)) return valor.length;
+        if (valor && typeof valor === 'object') {
+            return Object.values(valor).reduce(
+                (total: number, v: any) => total + (Array.isArray(v) ? v.length : 0), 0
+            );
         }
+        return 0;
+    }
+
+    private calcular(completados: number, total: number | null): number | null {
+        if (!total) return null;
+        return Math.min(100, Math.round((completados / total) * 100));
     }
 
     volver() {

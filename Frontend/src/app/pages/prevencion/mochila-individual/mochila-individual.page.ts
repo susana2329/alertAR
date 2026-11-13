@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef  } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonIcon, IonCheckbox, IonButton, ToastController } from '@ionic/angular';
@@ -32,8 +32,18 @@ export class MochilaIndividualPage {
   ];
 
 
-  constructor(private location: Location, private mochilaService: MochilaService, private toastController: ToastController) {
+  constructor(private location: Location, private mochilaService: MochilaService, private toastController: ToastController, private cdr: ChangeDetectorRef) {
     addIcons({ 'arrow-back-outline': arrowBackOutline, 'briefcase-outline': briefcaseOutline });
+  }
+
+  ionViewWillEnter() {
+    this.mochilaService.obtenerProgreso('individual').subscribe({
+      next: (ids) => {
+        this.checklist.forEach(item => item.completado = ids.includes(item.id));
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('No se pudo cargar el progreso', err)
+    });
   }
 
   volver() {
