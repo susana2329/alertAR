@@ -3,13 +3,13 @@ const {mochilagetservice} = require('../service/mochila.service')
 const guardarMochila = async (req, res) => {
     try {
         const userId = req.params.id; 
-        const { tipoMochila, itemsCompletados } = req.body; 
+        const { tipoMochila, itemsCompletados, cantidadFamilia} = req.body; 
 
         if (!userId || !tipoMochila || !itemsCompletados) {
            return res.status(400).json({ mensaje: 'Faltan datos requeridos' });
         }
 
-        const mochilaActualizada = await mochilaService.guardarMochila(userId, tipoMochila, itemsCompletados);
+        const mochilaActualizada = await mochilaService.guardarMochila(userId, tipoMochila, itemsCompletados, cantidadFamilia);
         
         res.status(200).json({ 
             mensaje: 'Progreso guardado correctamente', 

@@ -3,6 +3,7 @@ const cuentaService = require('../service/cuenta.service');
 
 exports.getPerfilUsuario = async (req, res) =>{
     try{
+        
         const id = req.params.id;
         console.log("CONTROLLER - getPerfilUsuario id:", id);
 

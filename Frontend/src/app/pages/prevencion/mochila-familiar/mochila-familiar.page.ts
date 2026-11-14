@@ -185,7 +185,7 @@ export class MochilaFamiliarPage {
     const idsCompletados = this.checklist.filter(item => item.completado).map(item => item.id);
     const porcentajeActual = this.porcentaje;
 
-    this.mochilaService.guardarProgreso('familiar', idsCompletados).subscribe({
+    this.mochilaService.guardarProgreso('familiar', idsCompletados, this.configFamiliar.cantidadIntegrantes).subscribe({
       next: async () => {
         const toast = await this.toastController.create({
           message: `Tu mochila familiar se ha guardado (${porcentajeActual}% completado).`,

@@ -1,12 +1,13 @@
 const Mochila = require('./models/mochila');
 
-exports.actualizarProgresoMochila = async (userId, tipoMochila, itemsCompletados) => {
+
+exports.actualizarProgresoMochila = async (userId, tipoMochila, itemsCompletados, cantidadFamilia) => {
     try {
-        const campoUpdate = { [tipoMochila]: itemsCompletados };
+        const campoUpdate = { [tipoMochila]: itemsCompletados, cantidadFamilia: cantidadFamilia};
         const mochilaActualizada = await Mochila.findOneAndUpdate(
             { usuarioId: userId }, 
             { $set: campoUpdate },
-            { new: true, upsert: true } 
+            { new: true, upsert: true }, 
         );
         return mochilaActualizada;
     } catch (error) {

@@ -20,12 +20,12 @@ export class MochilaService {
     return sesion?._id || sesion?.id || null;
   }
 
-  guardarProgreso(tipoMochila: string, itemsCompletados: number[]): Observable<ProgresoMochila> {
+  guardarProgreso(tipoMochila: string, itemsCompletados: number[], cantidadFamilia?: number): Observable<ProgresoMochila> {
     const userId = this.idUsuario();
     if (!userId) {
       return throwError(() => new Error('No hay un usuario con sesión iniciada'));
     }
-    const body = { tipoMochila, itemsCompletados };
+    const body = { tipoMochila, itemsCompletados, cantidadFamilia};
     return this.http.put<ProgresoMochila>(`${this.apiUrl}/mochila/${userId}`, body);
   }
 
