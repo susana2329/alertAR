@@ -246,7 +246,10 @@ ion-content {
 .boton-google:active {
   transform: scale(0.98);
 }
-
+.boton-principal:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
 .logo-google {
   width: 24px;
   height: 24px;

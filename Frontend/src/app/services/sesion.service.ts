@@ -34,6 +34,10 @@ export class SesionService {
     localStorage.setItem('alertar_usuario', JSON.stringify(usuario));
     this.usuario.set(usuario);
   }
+    
+  obtenerToken(): string | null {
+    return localStorage.getItem('alertar_token');
+  }
 
   cerrarSesion() {
     localStorage.removeItem('alertar_token');

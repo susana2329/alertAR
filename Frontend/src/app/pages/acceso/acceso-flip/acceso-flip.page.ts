@@ -5,7 +5,7 @@ import { NavController, IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { personOutline, mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { GoogleAuthService } from '../../../services/google-auth.service';
-import { SesionService } from '../../../services/sesion.service';
+import { AuthApiService } from '../../../services/auth-api.service';
 
 addIcons({ personOutline, mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline });
 
@@ -18,18 +18,17 @@ addIcons({ personOutline, mailOutline, lockClosedOutline, eyeOutline, eyeOffOutl
 })
 export class AccesoFlipPage {
 
-  volteada = false;
 
+  volteada = false;
   ciudad = [1, 2, 3, 4, 5, 6, 7, 8];
+  cargando = false;
+
+
   loginEmail = '';
   loginPassword = '';
   mostrarLoginPassword = false;
   errorLogin = '';
 
-  usuarios = [
-    { email: 'susana@gmail.com', password: '123456' },
-    { email: 'juan@gmail.com', password: 'abcdef' }
-  ];
 
   nombre = '';
   apellido = '';
@@ -42,13 +41,12 @@ export class AccesoFlipPage {
   constructor(
     private navCtrl: NavController,
     private googleAuth: GoogleAuthService,
-    private sesion: SesionService,
+    private authApi: AuthApiService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute
   ) {
     this.volteada = this.route.snapshot.queryParamMap.get('modo') === 'registro';
   }
-
   mostrarRegistro() {
     this.volteada = true;
   }
@@ -57,7 +55,7 @@ export class AccesoFlipPage {
     this.volteada = false;
   }
 
-  iniciarSesion() {
+  async iniciarSesion() {
     this.errorLogin = '';
 
     if (this.loginEmail === '' || this.loginPassword === '') {
@@ -65,22 +63,20 @@ export class AccesoFlipPage {
       return;
     }
 
-    let encontrado = false;
-    for (let usuario of this.usuarios) {
-      if (usuario.email === this.loginEmail && usuario.password === this.loginPassword) {
-        encontrado = true;
-      }
+    this.cargando = true;
+
+    try {
+      await this.authApi.iniciarSesion(this.loginEmail, this.loginPassword);
+      this.navCtrl.navigateRoot('/acceso/permisos-ubicacion');
+    } catch (error: any) {
+      this.errorLogin = error.message;
     }
 
-    if (encontrado) {
-      this.sesion.iniciar('token-de-prueba', { nombre: 'Usuario', email: this.loginEmail });
-      this.navCtrl.navigateRoot('/acceso/permisos-ubicacion');
-    } else {
-      this.errorLogin = 'Correo o contraseña incorrectos';
-    }
+    this.cargando = false;
+    this.cdr.markForCheck();
   }
 
-  crearCuenta() {
+  async crearCuenta() {
     this.errorRegistro = '';
 
     if (this.nombre === '' || this.apellido === '' || this.registroEmail === '' || this.registroPassword === '') {
@@ -103,8 +99,17 @@ export class AccesoFlipPage {
       return;
     }
 
-    this.sesion.iniciar('token-de-prueba', { nombre: this.nombre, apellido: this.apellido, email: this.registroEmail });
-    this.navCtrl.navigateRoot('/acceso/permisos-ubicacion');
+    this.cargando = true;
+
+    try {
+      await this.authApi.registrar(this.nombre, this.apellido, this.registroEmail, this.registroPassword);
+      this.navCtrl.navigateRoot('/acceso/permisos-ubicacion');
+    } catch (error: any) {
+      this.errorRegistro = error.message;
+    }
+
+    this.cargando = false;
+    this.cdr.markForCheck();
   }
 
   async entrarConGoogle() {
