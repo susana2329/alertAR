@@ -1,0 +1,69 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="custom-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back-outline" class="arrow-icon-title"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Mis Mochilas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="usuario-mochilas-container">
+
+    @if (cargando) {
+    } @else if (!tieneMochilas) {
+      <div class="estado-vacio">
+        <div class="icono-circulo">
+          <ion-icon name="briefcase-outline"></ion-icon>
+        </div>
+
+        <h2>Todavía no tenés mochilas</h2>
+        <p class="descripcion">
+          En esta sección vas a poder gestionar y visualizar tus kits de prevención.
+          Por el momento no creaste ninguna.
+        </p>
+
+        <div class="separador"></div>
+
+        <p class="nota">
+          Te invitamos a armar tu primera mochila para poder visualizarla, completarla y hacerle un seguimiento.
+        </p>
+
+        <ion-button expand="block" routerLink="/prevencion/mochila" class="btn-crear-primera">
+          <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+          Crear mi primera mochila
+        </ion-button>
+      </div>
+    } @else {
+      <div class="intro-section">
+        <h2>Tus kits de prevención</h2>
+        <p>Tenés mochilas registradas. ¡Te invitamos a completarlas para estar al 100% preparados!</p>
+      </div>
+
+      <div class="tarjetas-lista">
+        @for (m of mochilas; track m.clave) {
+          <div class="mochila-card" [routerLink]="m.ruta" [class.completada]="m.porcentaje === 100">
+            <div class="card-info">
+              <h3>{{ m.titulo }}</h3>
+
+              @if (m.porcentaje !== null) {
+                @if (m.porcentaje === 100) {
+                  <p class="texto-exito">Kit completo al 100%</p>
+                } @else {
+                  <p>Progreso: <strong>{{ m.porcentaje }}%</strong> completado</p>
+                  <span class="mensaje-aliento">Completá tu kit para estar al 100%</span>
+                }
+              } @else {
+                <p><strong>{{ m.completados }}</strong> ítems completados</p>
+              }
+            </div>
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+</ion-content>

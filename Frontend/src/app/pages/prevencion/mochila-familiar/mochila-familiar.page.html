@@ -1,0 +1,103 @@
+<ion-header class="ion-no-border">
+    <div class="header-container">
+        <button class="back-button" (click)="volver()">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+        </button>
+        <h1>Mochila Familiar</h1>
+    </div>
+</ion-header>
+
+<ion-content>
+    <div class="contenedor">
+
+        <div *ngIf="mostrandoConfiguracion">
+            <div class="subtitulo-seccion">
+                <div class="icono-mochila-circular">
+                    <ion-icon name="people-outline" class="icono-interno"></ion-icon>
+                </div>
+                <div class="texto-mochila">
+                    <h2>Configuración del Grupo Familiar</h2>
+                    <p>Personaliza la lista según las características de tu hogar</p>
+                </div>
+            </div>
+
+            <div class="form-container">
+
+                <div class="item-card card-columna">
+                    <h3>Cantidad total de integrantes en el hogar:</h3>
+                    <input type="number" [(ngModel)]="configFamiliar.cantidadIntegrantes" min="1" max="15"
+                        class="input-numero">
+                </div>
+
+                <div class="item-card card-clicable"
+                    (click)="configFamiliar.adultosMayores = !configFamiliar.adultosMayores">
+                    <ion-checkbox [(ngModel)]="configFamiliar.adultosMayores"
+                        (click)="$event.stopPropagation()"></ion-checkbox>
+                    <div class="item-textos">
+                        <h3>¿Hay adultos mayores (más de 65 años)?</h3>
+                        <p>Se incluirán ítems de medicación y soportes de marcha</p>
+                    </div>
+                </div>
+
+                <div class="item-card card-clicable"
+                    (click)="configFamiliar.discapacidad = !configFamiliar.discapacidad">
+                    <ion-checkbox [(ngModel)]="configFamiliar.discapacidad"
+                        (click)="$event.stopPropagation()"></ion-checkbox>
+                    <div class="item-textos">
+                        <h3>¿Hay personas con discapacidad en el hogar?</h3>
+                        <p>Se incluirán soportes vitales y dispositivos de asistencia</p>
+                    </div>
+                </div>
+
+                <div class="boton-guardar">
+                    <ion-button expand="block" (click)="generarChecklist()">Generar Mochila Familiar</ion-button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!mostrandoConfiguracion">
+            <div class="progreso-section">
+                <div class="progreso-info">
+                    <div class="barra-fondo">
+                        <div class="barra-relleno" [style.width]="porcentaje + '%'"></div>
+                    </div>
+                    <p>Completa los elementos esenciales</p>
+                </div>
+                <div class="grafico-circular">
+                    <div class="anillo-progreso"
+                        [style.background]="'conic-gradient(#0E7490 ' + porcentaje + '%, #E2E8F0 0)'">
+                        <div class="centro-blanco">
+                            <span class="numero">{{ porcentaje }}%</span>
+                            <span class="texto">Completado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subtitulo-seccion">
+                <div class="icono-mochila">
+                    <img src="assets/icon/mochila.png" alt="Mochila">
+                </div>
+                <div class="texto-mochila">
+                    <h2>Kit Familiar Adaptado</h2>
+                    <p>Revisa y completa los elementos claves</p>
+                </div>
+            </div>
+
+            <div class="checklist-container">
+                <div class="item-card" *ngFor="let item of checklist" (click)="item.completado = !item.completado">
+                    <ion-checkbox [(ngModel)]="item.completado" (click)="$event.stopPropagation()"></ion-checkbox>
+                    <div class="item-textos">
+                        <h3>{{ item.titulo }}</h3>
+                        <p>{{ item.subtitulo }}</p>
+                    </div>
+                </div>
+
+                <div class="boton-guardar">
+                    <ion-button expand="block" (click)="guardarProgreso()">Guardar progreso</ion-button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</ion-content>

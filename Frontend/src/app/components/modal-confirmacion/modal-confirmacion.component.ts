@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { IonModal } from '@ionic/angular/common';
 import { ModalController } from '@ionic/angular';
 import { ReporteService } from '../../services/reporte.service';
+import { SesionService } from '../../services/sesion.service';
 
 @Component({
   selector: 'app-modal-confirmacion',
@@ -22,7 +23,7 @@ export class ModalConfirmacionComponent implements OnInit {
   enviando = false
   errorEnvio = ''
 
-  constructor(private httpReport: ReporteService, private modalController: ModalController) { }
+  constructor(private httpReport: ReporteService, private modalController: ModalController, private sesionService: SesionService) { }
 
   ngOnInit() {
     this.fotos = this.reporte.imagen.map(imagen => URL.createObjectURL(imagen))
@@ -50,10 +51,17 @@ export class ModalConfirmacionComponent implements OnInit {
       formdata.append('fotos', this.reporte.imagen[i])
     }
     formdata.append('estado', this.reporte.estado)
+    const sesion: any = this.sesionService.usuario();
+    const idUsuarioActual = sesion?._id || sesion?.id;
+
+    if (!idUsuarioActual) {
+      this.errorEnvio = 'No se encontró la sesión del usuario.';
+      return;
+    }
     this.enviando = true
     this.errorEnvio = ''
     try {
-      await firstValueFrom(this.httpReport.postreporte(formdata, '6aeb9998b4b1a9fa66040179'))
+      await firstValueFrom(this.httpReport.postreporte(formdata, idUsuarioActual))
       await this.modalController.dismiss({ enviado: true })
     } catch (error) {
       console.error('No se pudo enviar el reporte:', error)

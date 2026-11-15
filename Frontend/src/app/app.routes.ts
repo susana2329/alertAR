@@ -11,7 +11,7 @@ export const routes: Routes = [
     pathMatch: 'full',
     redirectTo: arranque,
   },
-  
+
   {
     path: 'acceso',
     loadComponent: () => import('./pages/acceso/antes-login/antes-login').then(m => m.AntesLoginPage),
@@ -74,7 +74,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/prevencion/mochila/mochila.page').then(m => m.MochilaPage),
   },
   {
-    path: 'prevencion/mochila-individual', 
+    path: 'prevencion/mochila-individual',
     canActivate: [soloConSesion],
     data: { aviso: 'Para ver tu mochila de emergencia' },
     loadComponent: () => import('./pages/prevencion/mochila-individual/mochila-individual.page').then(m => m.MochilaIndividualPage),
@@ -84,6 +84,18 @@ export const routes: Routes = [
     canActivate: [soloConSesion],
     data: { aviso: 'Para ver la mochila de tus mascotas' },
     loadComponent: () => import('./pages/prevencion/mochila-mascotas/mochila-mascotas.page').then(m => m.MochilaMascotasPage),
+  },
+  {
+    path: 'prevencion/mochila-familiar',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver tu mochila familiar' },
+    loadComponent: () => import('./pages/prevencion/mochila-familiar/mochila-familiar.page').then(m => m.MochilaFamiliarPage),
+  },
+  {
+    path: 'prevencion/mochila-hogar',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para ver el kit de emergencia del hogar' },
+    loadComponent: () => import('./pages/prevencion/mochila-hogar/mochila-hogar.page').then(m => m.MochilaHogarPage),
   },
   {
     path: 'prevencion/recomendaciones',
@@ -103,6 +115,7 @@ export const routes: Routes = [
   },
   {
     path: 'configuracion',
+    canActivate: [soloConSesion],
     loadComponent: () => import('./pages/cuenta/configuracion/configuracion').then(m => m.ConfiguracionPage)
   },
   {
@@ -118,6 +131,10 @@ export const routes: Routes = [
     path: 'usuario-reportes',
     canActivate: [soloConSesion],
     loadComponent: () => import('./pages/cuenta/usuario-reportes/usuario-reportes').then(m => m.UsuarioReportesPage)
+  },
+  {
+    path: 'usuario-mochilas',
+    loadComponent: () => import('./pages/cuenta/usuario-mochilas/usuario-mochilas').then(m => m.UsuarioMochilasPage)
   },
 
   {

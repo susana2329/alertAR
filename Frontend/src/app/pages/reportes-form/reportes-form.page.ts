@@ -188,7 +188,7 @@ export class ReportesFormPage implements OnInit {
   }
 
   atrasfoto() {
-    this.contador = this.contador - 1
+    this.contador = this.contador
     if (this.contador < 0) {
       this.contador = this.reporte.imagen.length - 1
     }

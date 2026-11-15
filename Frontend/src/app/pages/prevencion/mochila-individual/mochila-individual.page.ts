@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef  } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonIcon, IonCheckbox, IonButton } from '@ionic/angular';
+import { IonContent, IonHeader, IonIcon, IonCheckbox, IonButton, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { ItemMochila } from '../../../models/mochila.model';
 import { arrowBackOutline, briefcaseOutline } from 'ionicons/icons';
@@ -32,8 +32,18 @@ export class MochilaIndividualPage {
   ];
 
 
-  constructor(private location: Location, private mochilaService: MochilaService) {
+  constructor(private location: Location, private mochilaService: MochilaService, private toastController: ToastController, private cdr: ChangeDetectorRef) {
     addIcons({ 'arrow-back-outline': arrowBackOutline, 'briefcase-outline': briefcaseOutline });
+  }
+
+  ionViewWillEnter() {
+    this.mochilaService.obtenerProgreso('individual').subscribe({
+      next: (ids) => {
+        this.checklist.forEach(item => item.completado = ids.includes(item.id));
+        this.cdr.markForCheck();
+      },
+      error: (err) => console.error('No se pudo cargar el progreso', err)
+    });
   }
 
   volver() {
@@ -46,13 +56,23 @@ export class MochilaIndividualPage {
     return Math.round((elementosCompletados / this.checklist.length) * 100);
   }
 
-  guardarProgreso() {
-    const idsCompletados = this.checklist
-      .filter(item => item.completado)
-      .map(item => item.id);
+async guardarProgreso() {
+    const idsCompletados = this.checklist.filter(item => item.completado).map(item => item.id);
+    const porcentajeActual = this.porcentaje;
+
     this.mochilaService.guardarProgreso('individual', idsCompletados).subscribe({
-      next: (res) => console.log('Guardado exitoso', res),
-      error: (err) => console.error('Error', err)
+      next: (res) => console.log('Guardado de mochila exitoso', res),
+      error: (err) => console.error('Error al guardar la mochila individual', err)
     });
+
+    const toast = await this.toastController.create({
+      message: `Tu mochila individual se guardó (${porcentajeActual}% completado).`,
+      duration: 3500,
+      position: 'bottom',
+      color: 'dark'
+    });
+    await toast.present();
+
+    this.location.back();
   }
 }

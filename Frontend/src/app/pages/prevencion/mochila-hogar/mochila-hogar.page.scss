@@ -1,0 +1,242 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+* {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+:host {
+  --ion-background-color: #ffffff;
+}
+
+ion-content {
+  --background: #ffffff;
+}
+
+ion-header {
+  background: #ffffff;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px 0 16px;
+  height: 60px;
+  position: relative;
+}
+
+.back-button {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #333333;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.header-container h1 {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #333333;
+  pointer-events: none;
+}
+
+.contenedor {
+  padding: 20px;
+}
+
+.progreso-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.progreso-info {
+  flex: 1;
+  padding-right: 10px;
+  padding-left: 15px;
+}
+
+.barra-fondo {
+  width: 100%;
+  height: 8px;
+  background-color: #E2E8F0;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.barra-relleno {
+  height: 100%;
+  background-color: #0E7490;
+  border-radius: 10px;
+  transition: width 0.3s ease-out;
+}
+
+.progreso-info p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.grafico-circular {
+  position: relative;
+  width: 96px; 
+  height: 96px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: -15px;
+}
+
+.anillo-progreso {
+  width: 80px; 
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.3s ease;
+}
+
+.centro-blanco {
+  width: 66px; 
+  height: 66px;
+  background: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.numero {
+  font-size: 18px;
+  font-weight: 800;
+  color: #03294F;
+  line-height: 1.1;
+}
+
+.texto {
+  font-size: 8px;
+  font-weight: 600;
+  color: #64748B;
+}
+
+.subtitulo-seccion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.icono-mochila {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  background-color: #03294F;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icono-mochila img {
+  width: 30px; 
+  height: 30px;
+  object-fit: contain;
+}
+
+.texto-mochila h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #03294F;
+}
+
+.texto-mochila p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.checklist-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 40px;
+}
+
+.item-card {
+  display: flex;
+  align-items: center;
+  background: #F8FAFC;
+  padding: 14px 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+  gap: 14px;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.item-card:active {
+  transform: scale(0.97);
+}
+
+ion-checkbox {
+  --size: 22px;
+  --checkbox-background: #ffffff;
+  --border-color: #64748B;
+  --border-width: 2px;
+  --border-radius: 4px;
+  --checkmark-color: #ffffff;
+  --checkbox-background-checked: #0E7490;
+  --border-color-checked: #0E7490;
+}
+
+.item-textos {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-textos h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #03294F;
+}
+
+.item-textos p {
+  margin: 2px 0 0 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748B;
+}
+
+.boton-guardar {
+  margin-top: 10px;
+}
+
+.boton-guardar ion-button {
+  --background: #0E7490 !important;
+  --color: #ffffff !important;
+  --border-radius: 12px;
+  height: 52px;
+  font-weight: 700;
+  text-transform: none;
+  font-size: 15px;
+  --box-shadow: 0 4px 10px rgba(14, 116, 144, 0.2);
+}
