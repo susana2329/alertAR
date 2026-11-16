@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { SesionService } from './sesion.service';
+import { environment } from '../../environments/environment';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = environment.apiUrl.replace(/\/$/, '');
 
 @Injectable({ providedIn: 'root' })
 export class AuthApiService {
