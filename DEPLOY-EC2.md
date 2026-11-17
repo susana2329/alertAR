@@ -7,7 +7,7 @@ Esta rama contiene únicamente el backend 1.0.0 que consume el APK. Miguel puede
 1. Apuntar el registro DNS `api.alertarapp.com.ar` a la IP pública de EC2 y permitir entrada TCP 80/443 en el security group. Mantener el puerto Node 3000 cerrado al público.
 2. Instalar Node.js 24 (versión usada para preparar y probar este paquete), npm y Nginx. Configurar TLS válido para `api.alertarapp.com.ar` antes de entregar el APK.
 3. Extraer el paquete en un directorio estable, por ejemplo `/opt/alertar/backend`, y ejecutar allí `npm ci --omit=dev`.
-4. Copiar `.env.example` a `.env`, completar las credenciales por un canal seguro y restringir sus permisos al usuario del servicio. MongoDB Atlas debe permitir la IP de salida de EC2. El bucket S3 y las credenciales AWS deben permitir `GetObject`, `PutObject` y `DeleteObject` sobre las fotos.
+4. Copiar `.env.example` a `.env`, completar las credenciales de MongoDB, JWT y Google por un canal seguro y restringir sus permisos al usuario del servicio. MongoDB Atlas debe permitir la IP de salida de EC2. Asociar a la instancia un rol IAM con permisos `s3:GetObject`, `s3:PutObject` y `s3:DeleteObject` sobre los objetos del bucket configurado. No colocar claves AWS en `.env`; el SDK obtiene las credenciales temporales del rol de EC2.
 5. Mantener `HOST=127.0.0.1`, `PORT=3000` y `TRUST_PROXY_LOOPBACK=true` si Nginx es el único proxy de la misma instancia. `CORS_ORIGINS` debe incluir `https://localhost` para el APK Android; agregar los orígenes web reales que correspondan.
 
 ## Servicio
