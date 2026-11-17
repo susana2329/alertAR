@@ -7,6 +7,7 @@ import { chevronBackOutline, chevronForwardOutline, documentTextOutline, calenda
 
 import { SesionService } from '../../../services/sesion.service';
 import { ReportesUsuarioService } from '../../../services/reportes-usuario.service';
+import type { ReporteUsuario } from '../../../services/reportes-usuario.service';
 import { DetalleReportePage } from './detalle-reporte/detalle-reporte';
 
 @Component({
@@ -28,8 +29,9 @@ import { DetalleReportePage } from './detalle-reporte/detalle-reporte';
 })
 export class UsuarioReportesPage implements OnInit {
 
-    reportes: any[] = [];
+    reportes: ReporteUsuario[] = [];
     cargando = true;
+    errorCarga: string | null = null;
 
     constructor(
         private sesionService: SesionService,
@@ -41,46 +43,56 @@ export class UsuarioReportesPage implements OnInit {
     }
 
     ngOnInit() {
-        const sesion: any = this.sesionService.usuario();
-        const idUsuario = sesion?._id || sesion?.id;
-
-        if (!idUsuario) {
+        if (!this.sesionService.usuario()) {
             this.cargando = false;
+            this.errorCarga = 'Iniciá sesión para consultar tus reportes.';
             return;
         }
 
-        this.reportesService.listarPorUsuario(idUsuario).subscribe({
+        this.cargarReportes();
+    }
+
+    cargarReportes() {
+        this.cargando = true;
+        this.errorCarga = null;
+        this.reportesService.listarPorUsuario().subscribe({
             next: (data) => {
-                this.reportes = data.sort((a: any, b: any) => {
-                return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
-                });
-                this.reportes = data;
+                this.reportes = [...data].sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
                 this.cargando = false;
                 this.cdr.markForCheck();
             },
             error: (error) => {
                 console.error('Error al cargar los reportes', error);
+                this.errorCarga = 'No pudimos cargar tus reportes. Revisá tu conexión e intentá nuevamente.';
                 this.cargando = false;
                 this.cdr.markForCheck();
             }
         });
     }
 
-    async abrirDetalle(reporte: any) {
+    async abrirDetalle(reporte: ReporteUsuario) {
         const modal = await this.modalController.create({
             component: DetalleReportePage,
             componentProps: { reporte }
         });
         await modal.present();
+        const { data } = await modal.onDidDismiss();
+        if (data?.eliminado) {
+            this.cargarReportes();
+        }
     }
 
-    esRevisado(estado: string): boolean {
-        return (estado || '').toLowerCase().includes('revisado');
+    textoEstado(reporte: ReporteUsuario): string {
+        if (reporte.estadoModeracion === 'rechazado') return 'Rechazado';
+        if (reporte.estadoVecinal === 'cerrado') return 'Cerrado';
+        if (reporte.estadoVecinal === 'confirmado') return 'Confirmado por vecinos';
+        if (reporte.fotos?.length && reporte.estadoModeracion === 'pendiente') return 'Fotos en moderación';
+        return 'Activo en mapa';
     }
 
-    textoEstado(estado: string): string {
-        if (this.esRevisado(estado)) return 'Revisado';
-        if ((estado || '').toLowerCase().includes('revi')) return 'En revisión';
-        return estado || '';
+    claseBadge(reporte: ReporteUsuario): string {
+        if (reporte.estadoModeracion === 'rechazado' || reporte.estadoVecinal === 'cerrado') return 'cerrado';
+        if (reporte.estadoVecinal === 'confirmado') return 'confirmado';
+        return 'pendiente';
     }
 }

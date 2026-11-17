@@ -11,7 +11,13 @@
 
 <ion-content class="ion-padding">
   @if (!cargando) {
-    @if (reportes.length === 0) {
+    @if (errorCarga) {
+      <div class="estado-vacio" role="alert">
+        <h2>No se pudieron cargar tus reportes</h2>
+        <p class="descripcion">{{ errorCarga }}</p>
+        <ion-button expand="block" (click)="cargarReportes()">Reintentar</ion-button>
+      </div>
+    } @else if (reportes.length === 0) {
       <div class="estado-vacio">
         <div class="icono-circulo">
           <ion-icon name="document-text-outline"></ion-icon>
@@ -36,10 +42,10 @@
 
       <div class="lista-reportes">
         @for (reporte of reportes; track reporte._id) {
-          <div class="reporte-card" [class.revisado]="esRevisado(reporte.estado)" (click)="abrirDetalle(reporte)">
+          <div class="reporte-card" [ngClass]="claseBadge(reporte)" (click)="abrirDetalle(reporte)">
             <div class="card-top">
-              <span class="estado-badge" [class.revisado]="esRevisado(reporte.estado)">
-                {{ textoEstado(reporte.estado) }}
+              <span class="estado-badge" [ngClass]="claseBadge(reporte)">
+                {{ textoEstado(reporte) }}
               </span>
               <span class="ver-detalles">
                 Ver detalles

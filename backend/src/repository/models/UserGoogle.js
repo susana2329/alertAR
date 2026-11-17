@@ -7,6 +7,7 @@ const usuarioSchema = new mongoose.Schema({
   password: { type: String, select: false },
   googleId: { type: String, unique: true, sparse: true },
   foto: { type: String, default: '' },
+  rol: { type: String, enum: ['usuario', 'moderador', 'admin'], default: 'usuario' },
   proveedor: { type: String, enum: ['local', 'google'], default: 'local' },
   ultimoAcceso: { type: Date, default: Date.now }
 }, { timestamps: true });

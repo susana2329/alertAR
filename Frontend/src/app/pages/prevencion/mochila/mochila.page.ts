@@ -57,8 +57,6 @@ export class MochilaPage {
   irACategoria(categoria: any) {
     if (categoria.ruta) {
       this.router.navigate([categoria.ruta]);
-    } else {
-      console.log('Página en construcción');
     }
   }
 }

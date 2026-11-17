@@ -127,6 +127,175 @@ ion-toolbar {
   text-align: center;
 }
 
+.header-action-icon {
+  font-size: 24px;
+  color: #03294F;
+}
+
+.emergency-contacts {
+  margin: 0 0 20px;
+
+  .emergency-contacts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    span {
+      font-size: 13px;
+      font-weight: 700;
+      color: #03294F;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0.8;
+    }
+  }
+
+  .emergency-pills {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .emergency-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+
+    &:active {
+      transform: scale(0.96);
+      background: #F1F5F9;
+    }
+
+    ion-icon {
+      font-size: 16px;
+      color: #0E7490;
+      margin-bottom: 2px;
+    }
+
+    .pill-number {
+      font-size: 15px;
+      font-weight: 800;
+      color: #03294F;
+      line-height: 1.1;
+    }
+
+    .pill-label {
+      font-size: 9px;
+      color: #64748B;
+      font-weight: 600;
+      text-align: center;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    &.pill-911 {
+      border-color: #FCA5A5;
+      background: #FEF2F2;
+
+      ion-icon {
+        color: #DC2626;
+      }
+
+      .pill-number {
+        color: #991B1B;
+      }
+
+      .pill-label {
+        color: #B91C1C;
+      }
+    }
+  }
+}
+
+.prevention-shortcuts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  .prevention-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #ffffff;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    .prevention-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      ion-icon {
+        font-size: 20px;
+      }
+
+      &.guide-icon {
+        background: #E0F2FE;
+        ion-icon {
+          color: #0284C7;
+        }
+      }
+
+      &.backpack-icon {
+        background: #FEF3C7;
+        ion-icon {
+          color: #D97706;
+        }
+      }
+    }
+
+    .prevention-card-text {
+      min-width: 0;
+
+      h4 {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: #03294F;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      p {
+        margin: 2px 0 0;
+        font-size: 10px;
+        color: #64748B;
+        line-height: 1.2;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    }
+  }
+}
+
 .empty-state, .location-notice {
   padding: 14px;
   margin: 0 0 12px;

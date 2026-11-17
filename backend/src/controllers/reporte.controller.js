@@ -1,55 +1,77 @@
-const {subirReporteService} = require('../service/reporte.service')
-const {getReporteService} = require('../service/reporte.service')
-const {getSegunIdService} = require('../service/reporte.service')
+const {
+    subirReporteService,
+    votarReporteVecinal,
+    listarReportesUsuario,
+    obtenerFotosReporteVecinal,
+    eliminarReporteService,
+    listarReportesPendientesModeracion,
+    moderarReporte
+} = require('../service/reporte.service')
+const alertaService = require('../service/alerta.service')
 
-exports.subirReporte = async (req,res) => {
-    try{    
-        console.log("Che aca esta el contorller", req.body)
-        const result = await subirReporteService(req.body, req.files, req.params.id)
-        if(!result){ 
-            return res.status(400).json({code:400, message:'No se pudo subir el reporte'})
-        }
-        return res.status(200).json(result)
-    }    
-    catch(error){ 
-        console.log(error)
-        res.status(500).send({code: 500, message:"Error al subir el reporte"})
+exports.subirReporte = async (req, res, next) => {
+    try {
+        const result = await subirReporteService(req.body, req.files, req.usuarioId)
+        alertaService.invalidarCacheMapa()
+        const reporte = typeof result.toObject === 'function' ? result.toObject() : result
+        const fotos = (reporte.fotos || []).map(({ fieldname, originalname, mimetype, size }) => ({ fieldname, originalname, mimetype, size }))
+        return res.status(201).json({ ...reporte, fotos })
+    } catch (error) {
+        return next(error)
     }
 }
-exports.mostrarTodosReportes = async (req,res)=>{ 
-    try{ 
 
-        const result = await getReporteService()
-        if(!result){ 
-            return res.status(400).json({code:400, message:'No se pudo encontrar los reportes'})
-            
-        }
+exports.votarReporteVecinal = async (req, res, next) => {
+    try {
+        const result = await votarReporteVecinal(req.params.id, req.usuarioId, req.body?.respuesta)
+        alertaService.invalidarCacheMapa()
         return res.status(200).json(result)
+    } catch (error) {
+        return next(error)
     }
-    catch(error){ 
-        console.log(error)
-        res.status(500).send({
-            code:500, 
-            message:'No se pudo mostrar los reportes'
-        })
-        return
-    }   
 }
-exports.getSegunId = async (req,res) => { 
-    try{ 
-        const id = req.params.iduser
-        const result = await getSegunIdService(id)
-        if(!result){ 
-            return res.status(400).json({code:400, message:'No se pudo recopilar el reporte segun el id'})
-        }
-        return res.status(200).json(result)
-
+exports.listarMisReportes = async (req, res, next) => {
+    try {
+        return res.status(200).json(await listarReportesUsuario(req.usuarioId))
+    } catch (error) {
+        return next(error)
     }
-    catch(error){ 
-        console.log(error)
-        res.status(500).send({
-            code:500, 
-            message:'No hay reporte con ese id'
-        })
+}
+
+exports.obtenerFotosVecinales = async (req, res, next) => {
+    try {
+        return res.status(200).json(await obtenerFotosReporteVecinal(req.params.id))
+    } catch (error) {
+        return next(error)
+    }
+}
+
+exports.eliminarReportePropio = async (req, res, next) => {
+    try {
+        const result = await eliminarReporteService(req.params.id, req.usuarioId)
+        alertaService.invalidarCacheMapa()
+        return res.status(200).json(result)
+    } catch (error) {
+        return next(error)
+    }
+}
+
+exports.listarPendientesModeracion = async (req, res, next) => {
+    try {
+        const reportes = await listarReportesPendientesModeracion()
+        return res.status(200).json(reportes)
+    } catch (error) {
+        return next(error)
+    }
+}
+
+exports.moderarReporteController = async (req, res, next) => {
+    try {
+        const { accion, motivo } = req.body || {}
+        const result = await moderarReporte(req.params.id, req.usuarioId, accion, motivo)
+        alertaService.invalidarCacheMapa()
+        return res.status(200).json(result)
+    } catch (error) {
+        return next(error)
     }
 }

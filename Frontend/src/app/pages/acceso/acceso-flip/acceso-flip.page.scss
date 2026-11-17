@@ -190,13 +190,6 @@ ion-content {
   font-size: 20px;
 }
 
-.olvide {
-  margin: -4px 0 16px 0;
-  text-align: right;
-  font-size: 13px;
-  color: #0E7490;
-}
-
 .mensaje-error {
   margin: 0 0 12px 0;
   font-size: 13px;
@@ -338,6 +331,17 @@ ion-content {
 .resaltado {
   font-weight: 600;
   color: #0E7490;
+}
+
+.enlace-legal {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #0E7490;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .volver-login {

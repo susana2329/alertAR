@@ -90,3 +90,41 @@ test('distancia y puntaje de relevancia son finitos y priorizan la gravedad', ()
     assert.equal(distancia.distanciaKm, 0);
     assert.ok(inicioService.puntuar(alerta({ nivel: 'emergencia' }), distancia, ahora) > inicioService.puntuar(alerta({ nivel: 'precaucion' }), distancia, ahora));
 });
+
+test('incluye sismos y alertas graves de nivel emergencia aunque estén fuera del radio local', async () => {
+    alertaService.listarCandidatasInicio = async () => [
+        alerta({
+            id: 'sismo-lejano',
+            tipo: 'sismo',
+            fuente: 'INPRES',
+            nivel: 'informativo',
+            naturaleza: 'observacion',
+            fechaFin: null,
+            ubicacion: { latitud: -31.5, longitud: -68.5 }, // San Juan (~1000 km)
+            geometria: { type: 'Point', coordinates: [-68.5, -31.5] }
+        }),
+        alerta({
+            id: 'emergencia-lejana',
+            tipo: 'meteorologica',
+            fuente: 'SMN',
+            nivel: 'emergencia',
+            ubicacion: { latitud: -38.0, longitud: -62.0 }, // Bahía Blanca (~600 km)
+            geometria: { type: 'Point', coordinates: [-62.0, -38.0] }
+        }),
+        alerta({
+            id: 'advertencia-lejana-ordinaria',
+            tipo: 'meteorologica',
+            fuente: 'SMN',
+            nivel: 'advertencia',
+            ubicacion: { latitud: -38.0, longitud: -62.0 },
+            geometria: { type: 'Point', coordinates: [-62.0, -38.0] }
+        })
+    ];
+
+    const resultado = await inicioService.obtenerInicio({ latitud: -34.6, longitud: -58.4 }, ahora);
+
+    assert.equal(resultado.eventos.length, 2);
+    assert.ok(resultado.eventos.some(e => e.id === 'sismo-lejano'));
+    assert.ok(resultado.eventos.some(e => e.id === 'emergencia-lejana'));
+    assert.ok(!resultado.eventos.some(e => e.id === 'advertencia-lejana-ordinaria'));
+});

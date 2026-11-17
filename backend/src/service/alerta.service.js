@@ -1,20 +1,13 @@
+
 const alertaRepository = require('../repository/alerta.repository');
 const alertaHistoricaRepository = require('../repository/alerta-historica.repository');
+const reporteRepository = require('../repository/repository.reporte');
 const { obtenerPuntoRepresentativo } = require('../geo/punto-representativo');
 const { presentarClasificacion } = require('./clasificacion-presentacion');
 const { clasificarSituacionMapaINA } = require('./ina-situacion-mapa');
-const logger = require('../logging/logger');
-const DURACION_CACHE_MAPA_MS = 5 * 60 * 1000;
+const DURACION_CACHE_MAPA_MS = 15 * 1000;
 let cacheMapa;
 let cargaMapaEnCurso;
-
-function contarPorFuente(docs) {
-    return docs.reduce((conteo, doc) => {
-        const fuente = doc.fuente || 'sin-fuente';
-        conteo[fuente] = (conteo[fuente] || 0) + 1;
-        return conteo;
-    }, {});
-}
 
 function fechaISOValida(fecha) {
     return fecha instanceof Date && Number.isFinite(fecha.getTime()) ? fecha.toISOString() : null;
@@ -48,16 +41,14 @@ function textoPreview(texto, limite = 180) {
 
 function construirDetalle(doc) {
     const datos = doc.datosFuente ?? {};
-    if (doc.fuente === 'INA') {
-        return {
-            estacion: datos.estacion ?? null,
-            medicion: datos.medicion ?? null,
-            estadoFuente: datos.estadoFuente ?? null,
-            umbrales: datos.umbrales ?? null,
-            serieTemporal: datos.serieTemporal ?? [],
-            clasificacion: datos.clasificacion ?? null
-        };
-    }
+    if (doc.fuente === 'INA') return {
+        estacion: datos.estacion ?? null,
+        medicion: datos.medicion ?? null,
+        estadoFuente: datos.estadoFuente ?? null,
+        umbrales: datos.umbrales ?? null,
+        serieTemporal: datos.serieTemporal ?? [],
+        clasificacion: datos.clasificacion ?? null
+    };
     if (doc.fuente === 'INPRES') return { ...datos };
     if (doc.fuente === 'SMN') return {
         estadoFuente: doc.estadoFuente ?? null,
@@ -72,73 +63,118 @@ function mapearAlerta(doc, ahora = new Date(), situacionMapa) {
     if (doc.fuente === 'SMN' && doc.fechaFin instanceof Date && doc.fechaFin < ahora) return null;
     let ubicacion = null;
     if (doc.geometria) {
-        try { ubicacion = obtenerPuntoRepresentativo(doc.geometria); }
-        catch (error) { console.warn(JSON.stringify({ nivel: 'warn', evento: 'geometria_no_presentable', id: String(doc._id), mensaje: error.message })); }
+        try {
+            ubicacion = obtenerPuntoRepresentativo(doc.geometria);
+        } catch (error) {
+            console.warn(`No se pudo calcular la ubicación de la alerta ${doc._id}:`, error.message);
+        }
     }
     if (!ubicacion && Number.isFinite(doc.ubicacion?.latitud) && Number.isFinite(doc.ubicacion?.longitud)) {
         ubicacion = { latitud: doc.ubicacion.latitud, longitud: doc.ubicacion.longitud };
     }
     if (ubicacion && (ubicacion.latitud < -90 || ubicacion.latitud > 90 || ubicacion.longitud < -180 || ubicacion.longitud > 180)) ubicacion = null;
-
     const presentacion = doc.fuente === 'INA'
         ? presentarAlertaINA(doc)
         : { titulo: doc.titulo || 'Alerta sin título', descripcion: doc.descripcion ?? '' };
     const nivel = doc.nivel ?? 'desconocido';
-    const completa = String(presentacion.descripcion ?? '').trim();
     const naturaleza = doc.naturaleza ?? (doc.fuente === 'SMN' ? 'alerta' : 'observacion');
     return {
-        id: doc._id.toString(), titulo: presentacion.titulo,
-        tipo: doc.tipo ?? 'observacion', naturaleza,
-        nivel, origen: doc.origen ?? 'oficial',
+        id: doc._id.toString(),
+        titulo: presentacion.titulo,
+        tipo: doc.tipo ?? 'observacion',
+        naturaleza,
+        nivel,
+        origen: doc.origen ?? 'oficial',
         ...presentarClasificacion(nivel, naturaleza),
-        descripcion: textoPreview(completa), descripcionPreview: textoPreview(completa), descripcionCompleta: completa,
-        fechaInicio: fechaISOValida(doc.fechaInicio), fechaFin: fechaISOValida(doc.fechaFin),
+        descripcion: textoPreview(presentacion.descripcion),
+        descripcionPreview: textoPreview(presentacion.descripcion),
+        descripcionCompleta: presentacion.descripcion,
+        fechaInicio: fechaISOValida(doc.fechaInicio),
+        fechaFin: fechaISOValida(doc.fechaFin),
         actualizadoEn: fechaISOValida(doc.updatedAt) || fechaISOValida(doc.createdAt),
         fechaUltimaMedicion: fechaISOValida(doc.fechaUltimaMedicion) || (doc.fuente === 'INA' ? fechaISOValida(doc.fechaInicio) : null),
         estadoActualizacion: doc.fuente === 'INA'
-            ? ((doc.fechaUltimaMedicion ?? doc.fechaInicio) instanceof Date && Date.now() - (doc.fechaUltimaMedicion ?? doc.fechaInicio).getTime() > 24 * 60 * 60 * 1000 ? 'desactualizada' : 'actualizada')
+            ? ((doc.fechaUltimaMedicion ?? doc.fechaInicio) instanceof Date &&
+                Date.now() - (doc.fechaUltimaMedicion ?? doc.fechaInicio).getTime() > 24 * 60 * 60 * 1000
+                ? 'desactualizada' : 'actualizada')
             : (doc.estadoActualizacion ?? null),
         ...(doc.identificadorFuente ? { identificadorFuente: doc.identificadorFuente } : {}),
         estadoFuente: doc.estadoFuente ?? null,
-        ubicacion, geometria: doc.geometria ?? null,
+        ubicacion,
+        geometria: doc.geometria ?? null,
         detalle: construirDetalle(doc),
         ...(situacionMapa ? { situacionMapa } : {}),
         ...(doc.fuente ? { fuente: doc.fuente } : {})
     };
 }
 
+function mapearReporteVecinal(doc) {
+    if (doc.geometria?.type !== 'Point' || !Array.isArray(doc.geometria.coordinates) ||
+        doc.geometria.coordinates.length !== 2) return null;
+    const [longitud, latitud] = doc.geometria.coordinates;
+    if (!Number.isFinite(latitud) || !Number.isFinite(longitud) ||
+        latitud < -90 || latitud > 90 || longitud < -180 || longitud > 180) return null;
+    const votos = doc.votosVecinales ?? [];
+    const nombresTipo = {
+        inundacion: 'inundación',
+        tormenta: 'tormenta',
+        crecida: 'crecida',
+        temperaturas: 'temperaturas extremas',
+        incidente: 'incidente',
+        arbol: 'caída de árbol',
+        transito: 'calle bloqueada',
+        meteorologica: 'situación meteorológica',
+        nevada: 'nevada',
+        sismo: 'sismo'
+    };
+    const tieneFotos = Array.isArray(doc.fotos) && doc.fotos.length > 0;
+    const estadoModeracion = doc.estadoModeracion || 'aprobado';
+    const fotosPendientes = tieneFotos && estadoModeracion === 'pendiente';
+    const cantidadFotos = tieneFotos && (doc.estadoModeracion === undefined || estadoModeracion === 'aprobado') ? doc.fotos.length : 0;
+    return {
+        id: `vecinal-${doc._id}`,
+        reporteId: doc._id.toString(),
+        titulo: `Reporte vecinal de ${nombresTipo[doc.tipo] ?? 'incidente'}`,
+        tipo: doc.tipo,
+        nivel: 'informativo',
+        naturaleza: 'observacion',
+        origen: 'vecinal',
+        fuente: 'Vecinos',
+        descripcion: doc.descripcion ?? '',
+        fechaInicio: fechaISOValida(doc.fecha),
+        fechaFin: null,
+        ubicacion: { latitud, longitud },
+        geometria: doc.geometria,
+        estadoVecinal: doc.estadoVecinal ?? 'sin_confirmar',
+        estadoModeracion,
+        fotosPendientes,
+        votosSigue: votos.filter(voto => voto.respuesta === 'sigue').length,
+        votosNoEsta: votos.filter(voto => voto.respuesta === 'no_esta').length,
+        cantidadFotos
+    };
+}
+
 exports.listarAlertas = async () => {
-    const inicio = process.hrtime.bigint();
     const docs = await alertaRepository.obtenerTodas();
-    const consultaMs = Number(process.hrtime.bigint() - inicio) / 1e6;
-    const presentacion = process.hrtime.bigint();
-    const alertas = docs.map(doc => mapearAlerta(doc)).filter(Boolean);
-    logger.info('alertas_listadas', { documentosRecuperados: docs.length, documentosPresentados: alertas.length,
-        documentosPorFuente: contarPorFuente(docs),
-        consultaMs: Math.round(consultaMs * 10) / 10, presentacionMs: Math.round(Number(process.hrtime.bigint() - presentacion) / 1e5) / 10 });
-    return alertas;
+    return docs.map(doc => mapearAlerta(doc)).filter(Boolean);
 };
 
 exports.listarAlertasMapa = async () => {
-    if (cacheMapa && cacheMapa.expiraEn > Date.now()) {
-        logger.info('alertas_mapa_cache', { cache: 'hit', documentosPresentados: cacheMapa.alertas.length });
-        return cacheMapa.alertas;
-    }
+    if (cacheMapa && cacheMapa.expiraEn > Date.now()) return cacheMapa.alertas;
     if (cargaMapaEnCurso) return cargaMapaEnCurso;
     cargaMapaEnCurso = (async () => {
-        const inicio = process.hrtime.bigint();
-        const docs = await alertaRepository.obtenerParaMapa();
-        const consultaMs = Number(process.hrtime.bigint() - inicio) / 1e6;
-        const presentacion = process.hrtime.bigint();
+        const [documentos, reportes] = await Promise.all([
+            alertaRepository.obtenerParaMapa(),
+            reporteRepository.obtenerParaMapa()
+        ]);
         const ahora = new Date();
-        let documentosINAExcluidos = 0;
-        const alertas = docs.flatMap(doc => {
+        const oficiales = documentos.flatMap(doc => {
             if (doc.fuente !== 'INA') {
                 const alerta = mapearAlerta(doc, ahora);
                 return alerta ? [alerta] : [];
             }
             const datos = doc.datosFuente ?? {};
-            const clasificacionMapa = clasificarSituacionMapaINA({
+            const clasificacion = clasificarSituacionMapaINA({
                 valor: datos.medicion?.valor,
                 valorPrecedente: datos.medicion?.valorPrecedente,
                 tendencia: datos.medicion?.tendencia,
@@ -147,49 +183,60 @@ exports.listarAlertasMapa = async () => {
                 fechaMedicion: doc.fechaUltimaMedicion ?? datos.medicion?.fecha ?? doc.fechaInicio,
                 ahora
             });
-            if (clasificacionMapa.discrepancias.length) {
-                logger.warn('ina_discrepancia_clasificacion_mapa', {
-                    id: String(doc._id), identificadorFuente: doc.identificadorFuente ?? null,
-                    estadoExplicito: datos.estadoFuente?.estado ?? doc.estadoFuente?.estado ?? null,
-                    valor: datos.medicion?.valor ?? null, umbrales: datos.umbrales ?? null,
-                    discrepancias: clasificacionMapa.discrepancias
-                });
-            }
-            if (!clasificacionMapa.situacionMapa) {
-                documentosINAExcluidos++;
-                return [];
-            }
-            const alerta = mapearAlerta(doc, ahora, clasificacionMapa.situacionMapa);
+            if (!clasificacion.situacionMapa) return [];
+            const alerta = mapearAlerta(doc, ahora, clasificacion.situacionMapa);
             return alerta ? [alerta] : [];
         });
-        logger.info('alertas_mapa_listadas', { documentosRecuperados: docs.length, documentosPresentados: alertas.length,
-            documentosINAExcluidos,
-            documentosPorFuente: contarPorFuente(docs),
-            consultaMs: Math.round(consultaMs * 10) / 10, presentacionMs: Math.round(Number(process.hrtime.bigint() - presentacion) / 1e5) / 10 });
+        const alertas = [
+            ...oficiales,
+            ...reportes.map(mapearReporteVecinal).filter(Boolean)
+        ];
         cacheMapa = { alertas, expiraEn: Date.now() + DURACION_CACHE_MAPA_MS };
         return alertas;
     })();
-    try { return await cargaMapaEnCurso; }
-    finally { cargaMapaEnCurso = undefined; }
+    try {
+        return await cargaMapaEnCurso;
+    } finally {
+        cargaMapaEnCurso = undefined;
+    }
 };
 
 exports.invalidarCacheMapa = () => { cacheMapa = undefined; };
 
 exports.listarCandidatasInicio = async ahora => {
-    const inicio = process.hrtime.bigint();
-    const docs = await alertaRepository.obtenerCandidatasInicio(ahora);
-    const consultaMs = Number(process.hrtime.bigint() - inicio) / 1e6;
-    const presentacion = process.hrtime.bigint();
-    const alertas = docs.map(doc => mapearAlerta(doc, ahora)).filter(Boolean);
-    logger.info('alertas_inicio_listadas', { documentosRecuperados: docs.length, documentosPresentados: alertas.length,
-        documentosPorFuente: contarPorFuente(docs),
-        consultaMs: Math.round(consultaMs * 10) / 10, presentacionMs: Math.round(Number(process.hrtime.bigint() - presentacion) / 1e5) / 10 });
-    return alertas;
+    const [docs, reportes] = await Promise.all([
+        alertaRepository.obtenerCandidatasInicio(ahora),
+        reporteRepository.obtenerParaMapa().catch(() => [])
+    ]);
+    const oficiales = docs.flatMap(doc => {
+        if (doc.fuente !== 'INA') {
+            const alerta = mapearAlerta(doc, ahora);
+            return alerta ? [alerta] : [];
+        }
+        const datos = doc.datosFuente ?? {};
+        const clasificacion = clasificarSituacionMapaINA({
+            valor: datos.medicion?.valor,
+            valorPrecedente: datos.medicion?.valorPrecedente,
+            tendencia: datos.medicion?.tendencia,
+            estado: datos.estadoFuente?.estado ?? doc.estadoFuente?.estado,
+            umbrales: datos.umbrales,
+            fechaMedicion: doc.fechaUltimaMedicion ?? datos.medicion?.fecha ?? doc.fechaInicio,
+            ahora
+        });
+        if (!clasificacion.situacionMapa) return [];
+        const alerta = mapearAlerta(doc, ahora, clasificacion.situacionMapa);
+        return alerta ? [alerta] : [];
+    });
+    return [
+        ...oficiales,
+        ...reportes.map(mapearReporteVecinal).filter(Boolean)
+    ];
 };
 
 exports.obtenerAlerta = async id => {
     const doc = await alertaRepository.obtenerPorId(id) || await alertaHistoricaRepository.obtenerPorId(id);
     return doc ? mapearAlerta(doc) : null;
 };
+
 exports._mapearAlerta = mapearAlerta;
-exports._textoPreview = textoPreview;
+exports._mapearReporteVecinal = mapearReporteVecinal;

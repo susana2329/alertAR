@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { NavController, IonContent, IonIcon } from '@ionic/angular';
+import { ModalController, NavController, IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { personOutline, mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline } from 'ionicons/icons';
 import { GoogleAuthService } from '../../../services/google-auth.service';
-import { AuthApiService } from '../../../services/auth-api.service';
+import { AuthService } from '../../../services/auth.service';
 
 addIcons({ personOutline, mailOutline, lockClosedOutline, eyeOutline, eyeOffOutline });
 
@@ -21,14 +21,13 @@ export class AccesoFlipPage {
 
   volteada = false;
   ciudad = [1, 2, 3, 4, 5, 6, 7, 8];
-  cargando = false;
 
 
   loginEmail = '';
   loginPassword = '';
   mostrarLoginPassword = false;
   errorLogin = '';
-
+  cargandoLogin = false;
 
   nombre = '';
   apellido = '';
@@ -37,13 +36,15 @@ export class AccesoFlipPage {
   mostrarRegistroPassword = false;
   aceptaTerminos = false;
   errorRegistro = '';
+  cargandoRegistro = false;
 
   constructor(
     private navCtrl: NavController,
     private googleAuth: GoogleAuthService,
-    private authApi: AuthApiService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private modalController: ModalController
   ) {
     this.volteada = this.route.snapshot.queryParamMap.get('modo') === 'registro';
   }
@@ -55,7 +56,13 @@ export class AccesoFlipPage {
     this.volteada = false;
   }
 
-  async iniciarSesion() {
+  async abrirDocumento(tipo: 'terminos' | 'privacidad') {
+    const { LegalPage } = await import('../../legal/legal.page');
+    const modal = await this.modalController.create({ component: LegalPage, componentProps: { tipo } });
+    await modal.present();
+  }
+
+  iniciarSesion() {
     this.errorLogin = '';
 
     if (this.loginEmail === '' || this.loginPassword === '') {
@@ -63,20 +70,21 @@ export class AccesoFlipPage {
       return;
     }
 
-    this.cargando = true;
-
-    try {
-      await this.authApi.iniciarSesion(this.loginEmail, this.loginPassword);
-      this.navCtrl.navigateRoot('/acceso/permisos-ubicacion');
-    } catch (error: any) {
-      this.errorLogin = error.message;
-    }
-
-    this.cargando = false;
-    this.cdr.markForCheck();
+    this.cargandoLogin = true;
+    this.authService.login({ email: this.loginEmail.trim(), password: this.loginPassword }).subscribe({
+      next: () => {
+        this.cargandoLogin = false;
+        this.navCtrl.navigateRoot('/acceso/permisos-ubicacion');
+      },
+      error: (error) => {
+        this.cargandoLogin = false;
+        this.errorLogin = error?.error?.mensaje || error?.message || 'Correo o contraseña incorrectos';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
-  async crearCuenta() {
+  crearCuenta() {
     this.errorRegistro = '';
 
     if (this.nombre === '' || this.apellido === '' || this.registroEmail === '' || this.registroPassword === '') {
@@ -99,17 +107,23 @@ export class AccesoFlipPage {
       return;
     }
 
-    this.cargando = true;
-
-    try {
-      await this.authApi.registrar(this.nombre, this.apellido, this.registroEmail, this.registroPassword);
-      this.navCtrl.navigateRoot('/acceso/permisos-ubicacion');
-    } catch (error: any) {
-      this.errorRegistro = error.message;
-    }
-
-    this.cargando = false;
-    this.cdr.markForCheck();
+    this.cargandoRegistro = true;
+    this.authService.registro({
+      nombre: this.nombre.trim(),
+      apellido: this.apellido.trim(),
+      email: this.registroEmail.trim(),
+      password: this.registroPassword
+    }).subscribe({
+      next: () => {
+        this.cargandoRegistro = false;
+        this.navCtrl.navigateRoot('/acceso/permisos-ubicacion');
+      },
+      error: (error) => {
+        this.cargandoRegistro = false;
+        this.errorRegistro = error?.error?.mensaje || error?.message || 'No se pudo crear la cuenta';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   async entrarConGoogle() {

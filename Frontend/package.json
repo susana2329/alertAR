@@ -1,14 +1,17 @@
 {
   "name": "Frontend",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:mock": "ng serve --configuration development-mock",
     "build": "ng build",
     "build:android:emulator": "ng build --configuration development-android-emulator",
     "build:android:device": "ng build --configuration development-android-device",
+    "build:android:release": "node scripts/build-android-release.mjs",
+    "package:android:release": "node scripts/package-android-release.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"

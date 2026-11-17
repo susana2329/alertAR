@@ -2,8 +2,11 @@ import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 import { SesionService } from './services/sesion.service';
 import { soloConSesion } from './guards/sesion.guard';
+import { environment } from '../environments/environment';
 
-const arranque = () => (inject(SesionService).logueado() ? '/inicio' : '/acceso');
+const arranque = () => environment.mockReportesVecinales
+  ? '/mapa'
+  : (inject(SesionService).logueado() ? '/inicio' : '/acceso');
 
 export const routes: Routes = [
   {
@@ -23,6 +26,16 @@ export const routes: Routes = [
   {
     path: 'acceso/permisos-ubicacion',
     loadComponent: () => import('./pages/acceso/permisos-ubicacion/permisos-ubicacion.page').then(m => m.PermisosUbicacionPage),
+  },
+  {
+    path: 'terminos',
+    data: { tipo: 'terminos' },
+    loadComponent: () => import('./pages/legal/legal.page').then(m => m.LegalPage),
+  },
+  {
+    path: 'privacidad',
+    data: { tipo: 'privacidad' },
+    loadComponent: () => import('./pages/legal/legal.page').then(m => m.LegalPage),
   },
 
   {
@@ -135,6 +148,12 @@ export const routes: Routes = [
   {
     path: 'usuario-mochilas',
     loadComponent: () => import('./pages/cuenta/usuario-mochilas/usuario-mochilas').then(m => m.UsuarioMochilasPage)
+  },
+  {
+    path: 'moderacion',
+    canActivate: [soloConSesion],
+    data: { aviso: 'Para moderar reportes' },
+    loadComponent: () => import('./pages/moderacion/moderacion.page').then(m => m.ModeracionPage)
   },
 
   {

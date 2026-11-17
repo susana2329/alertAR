@@ -4,18 +4,24 @@ const assert = require('node:assert/strict');
 
 const alertaRepository = require('../src/repository/alerta.repository');
 const alertaHistoricaRepository = require('../src/repository/alerta-historica.repository');
+const reporteRepository = require('../src/repository/repository.reporte');
 const alertaService = require('../src/service/alerta.service');
 
 const obtenerTodasOriginal = alertaRepository.obtenerTodas;
 const obtenerParaMapaOriginal = alertaRepository.obtenerParaMapa;
 const obtenerPorIdOriginal = alertaRepository.obtenerPorId;
 const historicaPorIdOriginal = alertaHistoricaRepository.obtenerPorId;
+const obtenerReportesParaMapaOriginal = reporteRepository.obtenerParaMapa;
 
+test.beforeEach(() => {
+    reporteRepository.obtenerParaMapa = async () => [];
+});
 test.afterEach(() => {
     alertaRepository.obtenerTodas = obtenerTodasOriginal;
     alertaRepository.obtenerParaMapa = obtenerParaMapaOriginal;
     alertaRepository.obtenerPorId = obtenerPorIdOriginal;
     alertaHistoricaRepository.obtenerPorId = historicaPorIdOriginal;
+    reporteRepository.obtenerParaMapa = obtenerReportesParaMapaOriginal;
     alertaService.invalidarCacheMapa();
 });
 
@@ -61,6 +67,32 @@ test('reutiliza el listado compacto del mapa hasta que se invalida la caché', a
     alertaService.invalidarCacheMapa();
     await alertaService.listarAlertasMapa();
     assert.equal(consultas, 2);
+});
+
+test('incluye reportes vecinales con estado y conteo de respuestas en el mapa', async () => {
+    alertaRepository.obtenerParaMapa = async () => [];
+    reporteRepository.obtenerParaMapa = async () => [{
+        _id: { toString: () => 'reporte-1' },
+        tipo: 'inundacion',
+        descripcion: 'Agua acumulada',
+        fecha: new Date('2026-11-11T12:00:00Z'),
+        geometria: { type: 'Point', coordinates: [-58.4, -34.6] },
+        estadoVecinal: 'confirmado',
+        votosVecinales: [{ respuesta: 'sigue' }, { respuesta: 'sigue' }, { respuesta: 'sigue' }],
+        fotos: [{ key: 'privado/foto.jpg' }, { key: 'privado/foto-2.jpg' }]
+    }];
+
+    const alertas = await alertaService.listarAlertasMapa();
+    assert.equal(alertas.length, 1);
+    assert.equal(alertas[0].id, 'vecinal-reporte-1');
+    assert.equal(alertas[0].titulo, 'Reporte vecinal de inundación');
+    assert.equal(alertas[0].origen, 'vecinal');
+    assert.deepEqual(alertas[0].ubicacion, { latitud: -34.6, longitud: -58.4 });
+    assert.equal(alertas[0].estadoVecinal, 'confirmado');
+    assert.equal(alertas[0].votosSigue, 3);
+    assert.equal(alertas[0].votosNoEsta, 0);
+    assert.equal(alertas[0].cantidadFotos, 2);
+    assert.equal(Object.hasOwn(alertas[0], 'fotos'), false);
 });
 
 test('filtra INA por situacionMapa y mantiene sin cambios las fuentes SMN e INPRES', async () => {

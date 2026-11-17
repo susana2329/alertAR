@@ -19,4 +19,8 @@ export class PersonalService {
   actualizarFotoPerfil(id: string, data: { fotoPerfil: string }): Observable<any> {
     return this._httpClient.patch<any>(`${this.API_URL}/${id}/avatar`, data);
   }
+
+  eliminarCuenta(id: string): Observable<any> {
+    return this._httpClient.delete<any>(`${this.API_URL}/${id}`);
+  }
 }

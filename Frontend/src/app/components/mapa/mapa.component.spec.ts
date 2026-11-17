@@ -79,6 +79,30 @@ describe('MapaComponent', () => {
     expect(coleccion.features[0].properties.nivel).toBe('informativo');
   });
 
+  it('distingue en el GeoJSON los reportes vecinales', () => {
+    component.alertas = [{
+      id: 'vecinal-reporte-1',
+      reporteId: 'reporte-1',
+      titulo: 'Reporte vecinal: inundacion',
+      tipo: 'inundacion',
+      nivel: 'informativo',
+      origen: 'vecinal',
+      descripcion: 'Agua acumulada',
+      fechaInicio: null,
+      fechaFin: null,
+      ubicacion: { latitud: -34.6, longitud: -58.4 },
+      geometria: null,
+      estadoVecinal: 'sin_confirmar',
+      votosSigue: 0,
+      votosNoEsta: 0
+    }];
+
+    const coleccion = (component as any).crearFeatureCollection();
+    expect(coleccion.features).toHaveLength(1);
+    expect(coleccion.features[0].properties.origen).toBe('vecinal');
+    expect(coleccion.features[0].properties.color).toBe('#0f9f8f');
+  });
+
   it('muestra magnitud y profundidad en el popup de sismos sin usar riesgo como identidad', () => {
     const alerta = {
       id: 'quake', titulo: 'Sismo', tipo: 'sismo', nivel: 'informativo',

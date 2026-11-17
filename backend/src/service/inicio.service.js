@@ -57,6 +57,7 @@ function distanciaAUbicacion(usuario, alerta) {
 }
 
 function datosVigentes(alerta, ahora) {
+    if (alerta.origen === 'vecinal') return alerta.estadoVecinal !== 'cerrado';
     const inicio = fechaValida(alerta.fechaInicio);
     if (!inicio || inicio > ahora) return false;
     const fin = fechaValida(alerta.fechaFin);
@@ -132,9 +133,17 @@ async function obtenerInicio(ubicacion = null, ahora = new Date()) {
     const eventos = [];
     for (const alerta of alertas) {
         if (!datosVigentes(alerta, ahora)) continue;
-        if (alerta.origen !== 'oficial' || !['SMN', 'INA', 'INPRES'].includes(alerta.fuente)) continue;
+        const esOficial = alerta.origen === 'oficial' && ['SMN', 'INA', 'INPRES'].includes(alerta.fuente);
+        const esVecinal = alerta.origen === 'vecinal';
+        if (!esOficial && !esVecinal) continue;
         const geo = distanciaAUbicacion(ubicacion, alerta);
-        if (ubicacion && (geo.distanciaKm == null || geo.distanciaKm > RADIO_MAXIMO_KM)) continue;
+        if (ubicacion) {
+            const fueraDeRadio = geo.distanciaKm == null || geo.distanciaKm > RADIO_MAXIMO_KM;
+            if (fueraDeRadio) {
+                const esTrascendente = alerta.tipo === 'sismo' || alerta.nivel === 'emergencia';
+                if (!esTrascendente) continue;
+            }
+        }
         const destacable = puedeSerDestacada(alerta, geo, ubicacion);
         if (!ubicacion && !destacable) continue;
         // Las observaciones se pueden mostrar como registros informativos; nunca se elevan a destacadas.

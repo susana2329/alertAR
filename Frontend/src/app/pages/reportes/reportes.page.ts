@@ -28,8 +28,8 @@ export class ReportesPage implements OnInit {
   }
   ngOnInit() {
   }
-  creandoReporte(event: Event) {
-    this.tiporeportes = (event.target as HTMLElement).id
+  creandoReporte(tipo: string) {
+    this.tiporeportes = tipo;
     this.router.navigate(['/reportes/form'], {
       queryParams: {
         tipoReporte: this.tiporeportes

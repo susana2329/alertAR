@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import {
   IonHeader,
   IonToolbar,
@@ -9,8 +8,7 @@ import {
   IonButton,
   IonIcon,
   IonContent,
-  IonFooter,
-  IonSearchbar
+  IonFooter
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
@@ -60,9 +58,7 @@ interface CategoriaEmergencia {
     IonIcon,
     IonContent,
     IonFooter,
-    IonSearchbar,
     CommonModule,
-    FormsModule,
     RouterLink
   ],
   templateUrl: './recomendaciones.page.html',
@@ -70,13 +66,9 @@ interface CategoriaEmergencia {
 })
 export class RecomendacionesPage {
 
-  terminoBusqueda = '';
-
-  // "activa: true" marca la categoría resaltada porque coincide con la
-  // alerta climática actual (ej: vino desde una alerta de lluvias intensas).
   categorias: CategoriaEmergencia[] = [
     { id: 'inundaciones', nombre: 'Inundaciones', icon: 'water-outline', iconColor: '#03294F' },
-    { id: 'tormentas', nombre: 'Tormentas', icon: 'thunderstorm', iconColor: '#FFFFFF', activa: true },
+    { id: 'tormentas', nombre: 'Tormentas', icon: 'thunderstorm', iconColor: '#03294F' },
     { id: 'sismos', nombre: 'Sismos', icon: 'pulse-outline', iconColor: '#79A288' },
     { id: 'incendios', nombre: 'Incendios', icon: 'flame-outline', iconColor: '#EE4129' },
     { id: 'olas-calor', nombre: 'Olas de calor', icon: 'sunny-outline', iconColor: '#F2A93B' },

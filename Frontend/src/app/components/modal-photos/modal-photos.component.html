@@ -22,7 +22,8 @@
       <ion-label>
         <p>Seleccionar una foto</p>
       </ion-label>
-      <ion-button (click)="selecfoto()">
+      <input #fileInput type="file" accept="image/*" multiple style="display: none" (change)="onArchivosSeleccionados($event)">
+      <ion-button (click)="selecfoto(fileInput)">
         <ion-icon size="large" name="image-outline"></ion-icon>
       </ion-button>
     </div>

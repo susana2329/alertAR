@@ -25,8 +25,11 @@ import { ModalPhotosComponent } from '../../components/modal-photos/modal-photos
 import { ModalConfirmacionComponent } from '../../components/modal-confirmacion/modal-confirmacion.component'
 import { ReportesPage } from '../reportes/reportes.page'
 import { Location } from '@angular/common';
-import { arrowBackOutline, checkmarkCircle } from 'ionicons/icons';
+import { arrowBackOutline, checkmarkCircle, trashOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
+import { SesionService } from '../../services/sesion.service';
+import { GeocodificacionService } from '../../services/geocodificacion.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-reportes-form',
@@ -54,11 +57,12 @@ export class ReportesFormPage implements OnInit {
   public reporte: Report = {
     tipo: "",
     descripcion: "",
-    ubicacion: "Lugano, Buenos Aires (ubicacion automatica)",
+    ubicacion: "",
     fecha: new Date(),
     imagen: [],
     fotos:[], 
-    estado: "En revicion"
+    estado: "En revicion",
+    coordenadas: null
   }
   public previewimg: string[] = []
   public bandera!: boolean
@@ -67,13 +71,14 @@ export class ReportesFormPage implements OnInit {
 
   public reporteEnviado: boolean = false; 
 
-  constructor(private route: ActivatedRoute, private router: Router, private modal: ModalController, private location: Location, private toastcontrol: ToastController) {
+  constructor(private route: ActivatedRoute, private router: Router, private modal: ModalController, private location: Location, private toastcontrol: ToastController, private sesion: SesionService, private geocodificacion: GeocodificacionService) {
     addIcons({
       'arrow-back-outline': arrowBackOutline,
-      'checkmark-circle': checkmarkCircle // Importación añadida para el ícono de éxito del botón
+      'checkmark-circle': checkmarkCircle,
+      'trash-outline': trashOutline
     })
   }
-  ngOnInit() {
+  async ngOnInit() {
     this.tipo = this.route.snapshot.queryParams['tipoReporte'] ?? 'otro'
     this.tipo = this.tipo.replaceAll("-", " ")
     if (this.tipo == "otro") {
@@ -83,19 +88,41 @@ export class ReportesFormPage implements OnInit {
       this.bandera = true
       this.reporte.tipo = this.tipo
     }
-    console.log(this.reporte.fecha)
+    await this.cargarUbicacion()
+  }
+
+  async cargarUbicacion(): Promise<void> {
+    try {
+      if (!this.sesion.ubicacionPermitida()) {
+        this.reporte.ubicacion = 'Ubicación no disponible';
+        return;
+      }
+      const coords = await this.sesion.obtenerCoordenadas();
+      if (!coords) {
+        this.reporte.ubicacion = 'Ubicación no disponible';
+        return;
+      }
+      this.reporte.coordenadas = coords;
+      const lugar = await firstValueFrom(this.geocodificacion.resolver(coords));
+      if (lugar) {
+        const partes = [lugar.nombre, lugar.localidad, lugar.provincia].filter(Boolean);
+        this.reporte.ubicacion = partes.length > 0 ? partes.join(', ') : 'Ubicación no disponible';
+      } else {
+        this.reporte.ubicacion = 'Ubicación no disponible';
+      }
+    } catch {
+      this.reporte.ubicacion = 'Ubicación no disponible';
+    }
   }
 
   ingresartipo(event: Event) {
     if (this.bandera == false) {
       this.reporte.tipo = (event as CustomEvent).detail.value
-      console.log(this.reporte.tipo)
     }
   }
 
   fecha(event: Event) {
     this.reporte.fecha = new Date((event as CustomEvent).detail.value)
-    console.log(this.reporte.fecha)
   }
 
   async abrirmodalphotos() {
@@ -151,7 +178,7 @@ export class ReportesFormPage implements OnInit {
     await modalcomfirmar.present()
     const { data } = await dismissal
     if (data?.enviado) {
-      await this.router.navigate(['/reportes'])
+      await this.router.navigate(['/mapa'])
       await this.toast('¡Reporte enviado correctamente!', 'success')
     } else {
       this.reporteEnviado = false
@@ -159,6 +186,21 @@ export class ReportesFormPage implements OnInit {
   }
 
   async confirmarreport() {
+    const coordenadas = this.reporte.coordenadas;
+    const ubicacionValida = coordenadas != null
+      && typeof coordenadas.latitud === 'number'
+      && Number.isFinite(coordenadas.latitud)
+      && coordenadas.latitud >= -90
+      && coordenadas.latitud <= 90
+      && typeof coordenadas.longitud === 'number'
+      && Number.isFinite(coordenadas.longitud)
+      && coordenadas.longitud >= -180
+      && coordenadas.longitud <= 180;
+
+    if (!ubicacionValida) {
+      await this.toast('No pudimos obtener una ubicación válida. Volvé a intentar obtener tu ubicación antes de enviar el reporte.');
+      return;
+    }
     if (this.reporte.descripcion) {
       this.reporteEnviado = true;
 
@@ -169,12 +211,24 @@ export class ReportesFormPage implements OnInit {
     }
   }
 
-  siguientefoto() {
-    this.contador = this.contador + 1
-
-    if (this.contador == this.reporte.imagen.length) {
-      this.contador = 0
+  eliminarFotoActual() {
+    if (this.reporte.imagen.length === 0) return;
+    if (this.previewimg[this.contador]) {
+      URL.revokeObjectURL(this.previewimg[this.contador]);
     }
+    this.reporte.imagen.splice(this.contador, 1);
+    this.previewimg.splice(this.contador, 1);
+    if (this.contador >= this.reporte.imagen.length) {
+      this.contador = Math.max(0, this.reporte.imagen.length - 1);
+    }
+  }
+
+  siguientefoto() {
+    if (this.reporte.imagen.length === 0) {
+      this.contador = 0;
+      return;
+    }
+    this.contador = (this.contador + 1) % this.reporte.imagen.length;
   }
 
   async toast(message = '¡Error! Tenés que completar la descripción.', color: 'danger' | 'success' = 'danger') {
@@ -188,9 +242,13 @@ export class ReportesFormPage implements OnInit {
   }
 
   atrasfoto() {
-    this.contador = this.contador
+    if (this.reporte.imagen.length === 0) {
+      this.contador = 0;
+      return;
+    }
+    this.contador = this.contador - 1;
     if (this.contador < 0) {
-      this.contador = this.reporte.imagen.length - 1
+      this.contador = this.reporte.imagen.length - 1;
     }
   }
 

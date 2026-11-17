@@ -9,7 +9,9 @@ import {
   IonIcon,
   IonTitle,
   IonContent,
-  IonSpinner
+  IonSpinner,
+  IonRefresher,
+  IonRefresherContent
 } from '@ionic/angular';
 import { firstValueFrom, timeout } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -27,6 +29,11 @@ import {
   thunderstormOutline,
   leafOutline,
   checkmarkCircleOutline,
+  personCircleOutline,
+  callOutline,
+  shieldCheckmarkOutline,
+  briefcaseOutline,
+  settingsOutline
 } from 'ionicons/icons';
 import { SesionService } from '../../services/sesion.service';
 import { InicioService, EventoInicio, RespuestaInicio } from '../../services/inicio.service';
@@ -46,6 +53,11 @@ addIcons({
   'thunderstorm-outline': thunderstormOutline,
   'leaf-outline': leafOutline,
   'checkmark-circle-outline': checkmarkCircleOutline,
+  'person-circle-outline': personCircleOutline,
+  'call-outline': callOutline,
+  'shield-checkmark-outline': shieldCheckmarkOutline,
+  'briefcase-outline': briefcaseOutline,
+  'settings-outline': settingsOutline,
 });
 
 @Component({
@@ -54,12 +66,13 @@ addIcons({
   imports: [
     IonHeader,
     IonToolbar,
-    IonButtons,
     IonButton,
     IonIcon,
     IonTitle,
     IonContent,
     IonSpinner,
+    IonRefresher,
+    IonRefresherContent,
     CommonModule,
     RouterLink
   ],
@@ -88,6 +101,11 @@ export class InicioPage implements OnInit {
   ) { }
 
   ngOnInit(): void { void this.cargarInicio(); }
+
+  async recargarConPull(event: any): Promise<void> {
+    await this.cargarInicio();
+    event?.target?.complete();
+  }
 
   async cargarInicio(): Promise<void> {
     const secuencia = ++this.secuenciaCarga;
@@ -143,12 +161,20 @@ export class InicioPage implements OnInit {
     }
   }
 
-  verAlerta(alerta: EventoInicio): void { this.router.navigate(['/detalle-alerta', alerta.id]); }
+  verAlerta(alerta: EventoInicio): void {
+    if (alerta.origen === 'vecinal') {
+      this.router.navigate(['/mapa']);
+    } else {
+      this.router.navigate(['/detalle-alerta', alerta.id]);
+    }
+  }
 
   icono(alerta: EventoInicio): string {
     if (alerta.tipo === 'sismo') return 'pulse-outline';
     if (alerta.tipo === 'crecida' || alerta.tipo === 'inundacion') return 'water-outline';
     if (alerta.tipo === 'tormenta' || alerta.tipo === 'meteorologica' || alerta.tipo === 'nevada') return 'thunderstorm-outline';
+    if (alerta.tipo === 'transito') return 'car-outline';
+    if (alerta.tipo === 'arbol') return 'leaf-outline';
     return 'warning-outline';
   }
 

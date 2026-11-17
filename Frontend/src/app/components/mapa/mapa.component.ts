@@ -28,7 +28,7 @@ import { AlertaService } from '../../services/alerta.service';
 import { configurarWorkerMapLibre } from './maplibre-worker';
 import { diagnosticarError } from '../../utils/diagnostico-error';
 import { environment } from '../../../environments/environment';
-import { Subscription, timeout } from 'rxjs';
+import { firstValueFrom, Subscription, timeout } from 'rxjs';
 
 type EstiloMapa =
   | 'voyager'
@@ -77,6 +77,7 @@ const CAPAS_ALERTAS = [
 const SPIDER_SEARCH_RADIUS = 72;
 const OVERLAP_RADIUS = 52;
 const TIMEOUT_ALERTAS_MS = 20000;
+const INTERVALO_ACTUALIZACION_ALERTAS_MS = 30000;
 
 const ICON_EMERGENCIA = 'alerta-icon-emergencia';
 const ICON_ADVERTENCIA = 'alerta-icon-advertencia';
@@ -84,12 +85,14 @@ const ICON_PRECAUCION = 'alerta-icon-precaucion';
 const ICON_INFORMATIVO = 'alerta-icon-informativo';
 const ICON_DEFAULT = 'alerta-icon-default';
 const ICON_SISMO = 'alerta-icon-sismo';
+const ICON_VECINAL = 'alerta-icon-vecinal';
 
 const COLORES_ALERTAS = {
   emergencia: '#ef3b3b',
   advertencia: '#f59e0b',
   precaucion: '#f6c945',
   informativo: '#2878bd',
+  vecinal: '#0f9f8f',
   default: '#64748b'
 };
 
@@ -111,11 +114,26 @@ const ICONOS_ALERTAS = [
   styleUrl: './mapa.component.scss'
 })
 export class MapaComponent implements AfterViewInit, OnDestroy {
+  readonly modoMock = environment.mockReportesVecinales;
+  private registrarDebug(mensaje: string): void {
+    if (!environment.production) console.info(mensaje);
+  }
   filtroActual: FiltroAlertas = 'todas';
   selectorEstilosAbierto = false;
-  estiloMapaActual: EstiloMapa = 'dark';
+  estiloMapaActual: EstiloMapa = this.recuperarEstiloGuardado();
   estadoAlertas: 'cargando' | 'cargado' | 'error' = 'cargando';
   mensajeError = '';
+
+  private recuperarEstiloGuardado(): EstiloMapa {
+    try {
+      const guardado = localStorage.getItem('alertar_map_style') as EstiloMapa;
+      const validos: EstiloMapa[] = ['voyager', 'light', 'dark', 'lightNoLabels', 'darkNoLabels', 'satellite'];
+      if (guardado && validos.includes(guardado)) {
+        return guardado;
+      }
+    } catch { /* Fallback */ }
+    return 'dark';
+  }
 
   private map?: MapLibreMap;
   alertas: Alerta[] = [];
@@ -134,6 +152,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   private handlersRegistrados = false;
   private configurandoAlertas = false;
   private solicitudAlertas?: Subscription;
+  private actualizacionPeriodica?: ReturnType<typeof setInterval>;
   private generacionFuenteAlertas = 0;
   private revisionDatosFuenteAlertas = 0;
   private readonly urlAlertasMapa = `${environment.apiUrl.replace(/\/$/, '')}/alertas/mapa`;
@@ -242,15 +261,32 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     this.map.on('resize', () => this.manejarCambioDeVista());
 
     void this.obtenerUbicacion();
+    this.actualizacionPeriodica = setInterval(() => {
+      if (!this.popupActivo) this.cargarAlertas(true);
+    }, INTERVALO_ACTUALIZACION_ALERTAS_MS);
   }
 
-  cargarAlertas(): void {
-    if (this.estadoAlertas === 'cargando' && this.solicitudAlertas) return;
-    this.estadoAlertas = 'cargando';
-    this.mensajeError = '';
-    this.changeDetector.markForCheck();
+  private crearSvgVecinal(): string {
+    return `
+      <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+        <path d="M50 8 L94 88 H6 Z" fill="${COLORES_ALERTAS.vecinal}" />
+        <path d="M32 40h36v23H53l-9 8v-8h-12z" fill="none" stroke="#ffffff" stroke-width="5" stroke-linejoin="round" />
+        <circle cx="42" cy="51" r="2.5" fill="#ffffff" />
+        <circle cx="50" cy="51" r="2.5" fill="#ffffff" />
+        <circle cx="58" cy="51" r="2.5" fill="#ffffff" />
+      </svg>
+    `;
+  }
 
-    console.info('[Mapa] Solicitando alertas ' + JSON.stringify({ url: this.urlAlertasMapa }));
+  cargarAlertas(enSegundoPlano = false): void {
+    if (this.solicitudAlertas && !this.solicitudAlertas.closed) return;
+    if (!enSegundoPlano) {
+      this.estadoAlertas = 'cargando';
+      this.mensajeError = '';
+      this.changeDetector.markForCheck();
+    }
+
+    this.registrarDebug('[Mapa] Solicitando alertas ' + JSON.stringify({ url: this.urlAlertasMapa }));
     this.solicitudAlertas = this.alertaService.listarParaMapa().pipe(
       timeout({ first: TIMEOUT_ALERTAS_MS })
     ).subscribe({
@@ -262,14 +298,14 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
           if (this.alertaSeleccionada) {
             this.alertaSeleccionada = this.alertasPorId.get(this.alertaSeleccionada.id);
           }
-          this.cerrarPopupActivo();
+          if (!enSegundoPlano) this.cerrarPopupActivo();
           this.sincronizarCoberturaConAlertas();
           this.cerrarSpiderfy(false);
           this.actualizarFuenteAlertas();
           this.estadoAlertas = 'cargado';
           this.changeDetector.markForCheck();
           const geojson = this.crearFeatureCollection();
-          console.info('[Mapa] Alertas recibidas ' + JSON.stringify({
+          this.registrarDebug('[Mapa] Alertas recibidas ' + JSON.stringify({
             cantidad: alertas.length,
             conUbicacionValida: alertas.filter(alerta => this.ubicacionValida(alerta?.ubicacion)).length,
             featuresGeoJSON: geojson.features.length
@@ -282,9 +318,11 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
         }
       },
       error: (error: unknown) => {
-        this.estadoAlertas = 'error';
-        this.mensajeError = 'No se pudieron cargar las alertas. Revisá la conexión e intentá nuevamente.';
-        this.changeDetector.markForCheck();
+        if (!enSegundoPlano || this.alertas.length === 0) {
+          this.estadoAlertas = 'error';
+          this.mensajeError = 'No se pudieron cargar las alertas. Revisá la conexión e intentá nuevamente.';
+          this.changeDetector.markForCheck();
+        }
         console.error('[Mapa] Falló la solicitud de alertas ' + JSON.stringify(diagnosticarError(error, this.urlAlertasMapa)));
         this.solicitudAlertas = undefined;
       }
@@ -292,6 +330,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.actualizacionPeriodica) clearInterval(this.actualizacionPeriodica);
     this.solicitudAlertas?.unsubscribe();
     this.modoCobertura = false;
     this.alertaPoligonoSeleccionada = undefined;
@@ -309,6 +348,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
 
     this.cerrarSpiderfy();
     this.estiloMapaActual = estilo;
+    try {
+      localStorage.setItem('alertar_map_style', estilo);
+    } catch { /* Fallback seguro */ }
     this.map.setStyle(this.estilosMapa[estilo], { diff: false });
   }
 
@@ -336,7 +378,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
           tipo: alerta.tipo,
           nivel: alerta.nivel,
           prioridad: this.obtenerPrioridad(alerta.nivel, alerta.naturaleza),
-          color: this.obtenerColorAlerta(alerta.nivel, alerta.color, alerta.naturaleza),
+          color: alerta.origen === 'vecinal'
+            ? COLORES_ALERTAS.vecinal
+            : this.obtenerColorAlerta(alerta.nivel, alerta.color, alerta.naturaleza),
           origen: alerta.origen,
           fuente: alerta.fuente ?? '',
           descripcion: alerta.descripcion,
@@ -395,6 +439,10 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     })), {
       id: ICON_SISMO,
       svg: this.crearSvgSismo(),
+      pixelRatio: 100 / 38
+    }, {
+      id: ICON_VECINAL,
+      svg: this.crearSvgVecinal(),
       pixelRatio: 100 / 38
     }];
 
@@ -474,7 +522,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
 
       const opcionesFuenteAlertas = this.opcionesFuenteAlertas();
       const generacion = ++this.generacionFuenteAlertas;
-      console.info('[MapLibre] Creando fuente GeoJSON ' + JSON.stringify({
+    this.registrarDebug('[MapLibre] Creando fuente GeoJSON ' + JSON.stringify({
         estilo: this.estiloMapaActual,
         generacion,
         ...this.resumirGeoJSON(opcionesFuenteAlertas.data)
@@ -508,7 +556,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   }
 
   private async inicializarEstiloAlertas(): Promise<void> {
-    console.info('[MapLibre] style.load ' + JSON.stringify({
+    this.registrarDebug('[MapLibre] style.load ' + JSON.stringify({
       estilo: this.estiloMapaActual,
       generacionFuenteAlertas: this.generacionFuenteAlertas,
       fuenteExisteAntesDeConfigurar: !!this.map?.getSource(SOURCE_ID)
@@ -534,7 +582,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       }
     }
 
-    console.info('[MapLibre] Estado de fuente y capas ' + JSON.stringify({
+    this.registrarDebug('[MapLibre] Estado de fuente y capas ' + JSON.stringify({
       etapa,
       estilo: this.estiloMapaActual,
       generacion: this.generacionFuenteAlertas,
@@ -554,7 +602,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     tile?: { uid?: number; state?: string; tileID?: { toString: () => string } };
   }): void {
     if (evento.sourceId !== SOURCE_ID) return;
-    console.info('[MapLibre] Evento de fuente GeoJSON ' + JSON.stringify({
+    this.registrarDebug('[MapLibre] Evento de fuente GeoJSON ' + JSON.stringify({
       tipo,
       estilo: this.estiloMapaActual,
       generacion: this.generacionFuenteAlertas,
@@ -692,6 +740,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     const colorPorNivel: ExpressionSpecification = [
       'match',
       ['get', 'color'],
+      COLORES_ALERTAS.vecinal, COLORES_ALERTAS.vecinal,
       COLORES_ALERTAS.emergencia, COLORES_ALERTAS.emergencia,
       COLORES_ALERTAS.advertencia, COLORES_ALERTAS.advertencia,
       COLORES_ALERTAS.precaucion, COLORES_ALERTAS.precaucion,
@@ -732,6 +781,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       layout: {
         'icon-image': [
           'case',
+          ['==', ['get', 'origen'], 'vecinal'], ICON_VECINAL,
           ['==', ['get', 'tipo'], 'sismo'], ICON_SISMO,
           ['match', ['get', 'nivel'],
             'emergencia', ICON_EMERGENCIA,
@@ -957,6 +1007,26 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     const resumenSismo = this.construirResumenSismo(alerta, color);
     this.alertaSeleccionada = alerta;
     const accionCobertura = this.crearAccionCoberturaPopup(alerta);
+    const resumenVecinal = alerta.origen === 'vecinal'
+      ? `<p class="estado-vecinal">${alerta.estadoVecinal === 'confirmado' ? 'Confirmado por vecinos' : 'Sin confirmar'} · ${alerta.votosSigue ?? 0} “sigue ahí” · ${alerta.votosNoEsta ?? 0} “ya no está”</p>
+        ${environment.mockReportesVecinales
+          ? '<p class="alerta-popup__demo-note">Datos de muestra: las respuestas no se guardan.</p>'
+          : `<div class="acciones-vecinales">
+              <button class="alerta-popup__button alerta-popup__vote-button" data-respuesta="sigue" type="button">Sigue ahí</button>
+              <button class="alerta-popup__button alerta-popup__vote-button" data-respuesta="no_esta" type="button">Ya no está</button>
+            </div>
+            <p class="alerta-popup__vote-status" aria-live="polite"></p>`}
+        ${alerta.fotosPendientes
+          ? '<p class="alerta-popup__demo-note" style="color: #64748b;">📷 Fotos en revisión de moderación.</p>'
+          : (alerta.cantidadFotos
+            ? `<button class="alerta-popup__button alerta-popup__photos-button" type="button">Ver fotos (${alerta.cantidadFotos})</button>
+               <p class="alerta-popup__photos-status" aria-live="polite"></p>
+               <div class="alerta-popup__photos" hidden></div>`
+            : '')}`
+      : '';
+    const accionDetalle = alerta.origen === 'oficial'
+      ? '<button class="alerta-popup__button alerta-popup__detail-button" type="button">Ver alerta completa</button>'
+      : '';
 
     const popup = new Popup({ offset: 25, closeButton: true, closeOnClick: true, maxWidth: 'min(320px, calc(100vw - 32px))' })
       .setLngLat(coordinates)
@@ -966,8 +1036,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
           ${this.construirEtiquetaClasificacion(alerta)}
           ${resumen}${resumenMedicionINA}${resumenSismo}
           <div class="fuente">${alerta.origen === 'oficial' ? `✓ ${fuente}` : 'Fuente: Vecinal'}</div>
+          ${resumenVecinal}
           ${accionCobertura}
-          <button class="alerta-popup__button alerta-popup__detail-button" type="button">Ver alerta completa</button>
+          ${accionDetalle}
         </div>
       `);
 
@@ -991,6 +1062,96 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
         console.error('[Navegación] No se pudo abrir el detalle de la alerta ' + JSON.stringify(diagnosticarError(error)));
       });
     });
+    popup.getElement().querySelectorAll<HTMLButtonElement>('.alerta-popup__vote-button').forEach(button => {
+      button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const respuesta = button.dataset['respuesta'];
+        if (respuesta === 'sigue' || respuesta === 'no_esta') {
+          void this.votarReporteVecinal(alerta, respuesta, popup.getElement());
+        }
+      });
+    });
+    popup.getElement().querySelector<HTMLButtonElement>('.alerta-popup__photos-button')?.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (alerta.reporteId) void this.cargarFotosReporteVecinal(alerta, popup.getElement());
+    });
+  }
+
+  private async cargarFotosReporteVecinal(alerta: Alerta, popupElement: HTMLElement): Promise<void> {
+    if (!alerta.reporteId) return;
+    const boton = popupElement.querySelector<HTMLButtonElement>('.alerta-popup__photos-button');
+    const estado = popupElement.querySelector<HTMLElement>('.alerta-popup__photos-status');
+    const galeria = popupElement.querySelector<HTMLElement>('.alerta-popup__photos');
+    if (!boton || !galeria) return;
+    boton.disabled = true;
+    if (estado) estado.textContent = 'Cargando fotos…';
+    try {
+      const fotos = await firstValueFrom(this.alertaService.obtenerFotosReporteVecinal(alerta.reporteId));
+      galeria.replaceChildren();
+      for (const [indice, foto] of fotos.entries()) {
+        const url = new URL(foto.url, location.href);
+        const esImagenLocalDeDemo = environment.mockReportesVecinales &&
+          url.origin === location.origin &&
+          url.pathname.startsWith('/assets/mock-reportes/');
+        if (url.protocol !== 'https:' && !esImagenLocalDeDemo) {
+          throw new TypeError('El servidor devolvió una URL de imagen no segura.');
+        }
+        const figura = document.createElement('figure');
+        const imagen = document.createElement('img');
+        imagen.src = url.href;
+        imagen.alt = `Foto ${indice + 1} del reporte vecinal`;
+        imagen.loading = 'lazy';
+        imagen.addEventListener('error', () => {
+          if (estado) estado.textContent = 'No se pudo cargar una de las fotos. Podés volver a intentar.';
+          boton.disabled = false;
+          boton.textContent = 'Reintentar fotos';
+        }, { once: true });
+        figura.append(imagen);
+        if (foto.originalname) {
+          const pie = document.createElement('figcaption');
+          pie.textContent = foto.originalname;
+          figura.append(pie);
+        }
+        galeria.append(figura);
+      }
+      galeria.hidden = fotos.length === 0;
+      if (estado) estado.textContent = fotos.length ? '' : 'Este reporte no tiene fotos disponibles.';
+      boton.textContent = fotos.length ? `Fotos (${fotos.length})` : 'Sin fotos disponibles';
+    } catch (error) {
+      if (estado) estado.textContent = 'No se pudieron cargar las fotos. Intentá nuevamente.';
+      boton.disabled = false;
+      console.error('[Mapa] No se pudieron cargar las fotos del reporte vecinal ' + JSON.stringify({
+        id: alerta.reporteId,
+        error: diagnosticarError(error)
+      }));
+    }
+  }
+
+  private async votarReporteVecinal(
+    alerta: Alerta,
+    respuesta: 'sigue' | 'no_esta',
+    popupElement: HTMLElement
+  ): Promise<void> {
+    if (!alerta.reporteId) return;
+    const botones = popupElement.querySelectorAll<HTMLButtonElement>('.alerta-popup__vote-button');
+    const estado = popupElement.querySelector<HTMLElement>('.alerta-popup__vote-status');
+    botones.forEach(button => button.disabled = true);
+    if (estado) estado.textContent = 'Enviando tu respuesta…';
+    try {
+      await firstValueFrom(this.alertaService.votarReporteVecinal(alerta.reporteId, respuesta));
+      this.cerrarPopupActivo();
+      this.cargarAlertas();
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : 'No se pudo registrar tu respuesta.';
+      if (estado) estado.textContent = mensaje;
+      botones.forEach(button => button.disabled = false);
+      console.error('[Mapa] No se pudo registrar la respuesta vecinal ' + JSON.stringify({
+        id: alerta.reporteId,
+        error: diagnosticarError(error)
+      }));
+    }
   }
 
   filtrarAlertas(filtro: FiltroAlertas): void {
@@ -1110,7 +1271,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
 
     const data = this.crearFeatureCollection();
     const revisionDatos = ++this.revisionDatosFuenteAlertas;
-    console.info('[MapLibre] Actualizando fuente de alertas ' + JSON.stringify({
+    this.registrarDebug('[MapLibre] Actualizando fuente de alertas ' + JSON.stringify({
       generacion: this.generacionFuenteAlertas,
       revisionDatos,
       featuresGeoJSON: data.features.length,
@@ -1118,7 +1279,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
     }));
     void source.setData(data)
       .then(() => {
-        console.info('[MapLibre] Promesa setData resuelta ' + JSON.stringify({
+        this.registrarDebug('[MapLibre] Promesa setData resuelta ' + JSON.stringify({
           generacion: this.generacionFuenteAlertas,
           revisionDatos,
           nota: 'La resolución no confirma por sí sola que los tiles estén cargados; revisar eventos sourcedata y error.'

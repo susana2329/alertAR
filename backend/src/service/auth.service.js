@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const authRepository = require('../repository/auth.repository');
+const { randomUUID } = require('node:crypto');
+const logger = require('../logging/logger');
 
 const clienteGoogle = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
@@ -17,7 +19,7 @@ class ErrorApp extends Error {
 }
 
 function crearToken(usuario) {
-  return jwt.sign({ id: usuario._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign({ id: usuario._id, rol: usuario.rol || 'usuario' }, process.env.JWT_SECRET, { expiresIn: '7d' });
 }
 
 function datosPublicos(usuario) {
@@ -26,7 +28,8 @@ function datosPublicos(usuario) {
     nombre: usuario.nombre,
     apellido: usuario.apellido,
     email: usuario.email,
-    foto: usuario.foto
+    foto: usuario.foto,
+    rol: usuario.rol || 'usuario'
   };
 }
 
@@ -68,21 +71,39 @@ async function registrar({ nombre, apellido, email, password }) {
 }
 
 async function iniciarSesion({ email, password }) {
+  const idSolicitud = randomUUID();
+  let usuarioEncontrado = false;
+  let proveedorLocal = false;
+  let comparacionBcryptExitosa = false;
+  const registrarDiagnostico = () => logger.info('diagnostico_login_local', {
+    idSolicitud,
+    usuarioEncontrado,
+    proveedorLocal,
+    comparacionBcryptExitosa
+  });
+
   if (!email || !password) {
+    registrarDiagnostico();
     throw new ErrorApp('Completá tu correo y tu contraseña', 400);
   }
 
   const usuario = await authRepository.buscarPorEmail(email, true);
+  usuarioEncontrado = Boolean(usuario);
+  proveedorLocal = usuario?.proveedor === 'local';
 
   if (!usuario) {
+    registrarDiagnostico();
     throw new ErrorApp('Correo o contraseña incorrectos', 401);
   }
 
   if (!usuario.password) {
+    registrarDiagnostico();
     throw new ErrorApp('Esa cuenta se creó con Google. Iniciá sesión con el botón de Google.', 401);
   }
 
   const coincide = await bcrypt.compare(password, usuario.password);
+  comparacionBcryptExitosa = coincide;
+  registrarDiagnostico();
   if (!coincide) {
     throw new ErrorApp('Correo o contraseña incorrectos', 401);
   }

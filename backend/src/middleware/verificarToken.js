@@ -11,6 +11,7 @@ module.exports = function verificarToken(req, res, next) {
   try {
     const datos = jwt.verify(token, process.env.JWT_SECRET);
     req.usuarioId = datos.id;
+    req.usuarioRol = datos.rol || 'usuario';
     next();
   } catch (error) {
     res.status(401).json({ mensaje: 'Tu sesión venció, volvé a iniciar sesión' });

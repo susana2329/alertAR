@@ -1,0 +1,106 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="custom-toolbar">
+    <ion-buttons slot="start">
+      <ion-button routerLink="/cuenta">
+        <ion-icon name="chevron-back-outline" class="arrow-icon-title"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Moderación de fotos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  @if (cargando) {
+    <div class="cargando-box">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando reportes pendientes…</p>
+    </div>
+  } @else if (errorCarga) {
+    <div class="estado-vacio" role="alert">
+      <h2>Error al cargar</h2>
+      <p class="descripcion">{{ errorCarga }}</p>
+      <ion-button expand="block" (click)="cargarPendientes()">Reintentar</ion-button>
+    </div>
+  } @else if (reportes.length === 0) {
+    <div class="estado-vacio">
+      <div class="icono-circulo">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+      </div>
+      <h2>Todo al día</h2>
+      <p class="descripcion">
+        No hay fotos de reportes pendientes de revisión. ¡Buen trabajo!
+      </p>
+    </div>
+  } @else {
+    <div class="intro">
+      <h2>Reportes con fotos por revisar ({{ reportes.length }})</h2>
+      <p>Revisá que las imágenes sean fotos reales del incidente y no contengan contenido inapropiado antes de publicarlas en el mapa.</p>
+    </div>
+
+    <div class="lista-moderacion">
+      @for (reporte of reportes; track reporte._id) {
+        <div class="tarjeta-moderacion">
+          <div class="tarjeta-cabecera">
+            <span class="tipo-badge">{{ reporte.tipo }}</span>
+            <span class="fecha">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ reporte.fecha | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+          </div>
+
+          <p class="descripcion-reporte">{{ reporte.descripcion }}</p>
+
+          <div class="meta-info">
+            <div class="dato">
+              <ion-icon name="location-outline"></ion-icon>
+              <span>{{ reporte.ubicacion }}</span>
+            </div>
+            @if (reporte.usuario) {
+              <div class="dato">
+                <ion-icon name="person-outline"></ion-icon>
+                <span>{{ reporte.usuario.nombre }} ({{ reporte.usuario.email }})</span>
+              </div>
+            }
+          </div>
+
+          @if (reporte.fotos.length > 0) {
+            <div class="galeria-moderacion">
+              <p class="label-fotos">
+                <ion-icon name="image-outline"></ion-icon>
+                Fotos adjuntas ({{ reporte.fotos.length }}):
+              </p>
+              <div class="fotos-grid">
+                @for (foto of reporte.fotos; track foto.url) {
+                  <a [href]="foto.url" target="_blank" rel="noopener noreferrer" class="foto-link">
+                    <img [src]="foto.url" alt="Foto reporte" loading="lazy">
+                  </a>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="acciones-moderacion">
+            <ion-button
+              color="success"
+              expand="block"
+              [disabled]="procesandoId === reporte._id"
+              (click)="confirmarAprobacion(reporte)">
+              <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+              Aprobar fotos
+            </ion-button>
+
+            <ion-button
+              color="danger"
+              fill="outline"
+              expand="block"
+              [disabled]="procesandoId === reporte._id"
+              (click)="confirmarRechazo(reporte)">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Rechazar y borrar
+            </ion-button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</ion-content>

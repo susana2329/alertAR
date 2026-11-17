@@ -8,12 +8,15 @@ const crearProgramadorIngesta = require('./src/ingestion/ingesta.scheduler');
 const crearProgramadorArchivado = require('./src/ingestion/archivado.scheduler');
 const alertaService = require('./src/service/alerta.service');
 const { archivarAlertas } = require('./src/service/archivado-alertas.service');
+const retencionService = require('./src/service/retencion.service');
 const inaRepository = require('./src/repository/ina.repository');
 const logger = require('./src/logging/logger');
 const errorHandler = require('./src/middleware/error-handler');
 const routerReporte = require('./src/routes/reporte.router');
 const cuentaRouter = require('./src/routes/cuenta.router');
 const app = express();
+// Habilitar solo cuando Nginx sea el único proxy local y el puerto Node no sea público.
+if (process.env.TRUST_PROXY_LOOPBACK === 'true') app.set('trust proxy', 'loopback');
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const origenesDesarrollo = ['http://localhost:8100', 'http://localhost:4200', 'http://localhost', 'capacitor://localhost'];
@@ -42,16 +45,17 @@ app.use('/api/geocodificacion', require('./src/routes/geocodificacion.router'));
 app.use('/api/auth', require('./src/routes/auth.router'));
 app.use('/api/cuenta', cuentaRouter);
 app.use('/api', require('./src/routes/mochila.router'));
+app.use('/api/reportes', routerReporte);
 app.use('/reportes', routerReporte);
 app.use(errorHandler);
 
 
-function crearCierreOrdenado({ server, programador, programadorArchivado }) {
+function crearCierreOrdenado({ server, programador, programadorArchivado, programadorRetencion }) {
     let cierreEnCurso;
     return function cerrarOrdenadamente() {
         if (cierreEnCurso) return cierreEnCurso;
         cierreEnCurso = (async () => {
-            await Promise.all([programador.detener(), programadorArchivado?.detener()]);
+            await Promise.all([programador.detener(), programadorArchivado?.detener(), programadorRetencion?.detener()]);
             await new Promise((resolve, reject) => {
                 server.close(error => error ? reject(error) : resolve());
             });
@@ -90,7 +94,22 @@ async function iniciarServidor() {
             });
             programadorArchivado.iniciar();
 
-            const cerrarOrdenadamente = crearCierreOrdenado({ server, programador, programadorArchivado });
+            const programadorRetencion = process.env.RETENCION_AUTOMATICA === 'true'
+                ? crearProgramadorArchivado({
+                    ejecutarArchivado: () => retencionService.ejecutar(),
+                    intervaloMs: 24 * 60 * 60 * 1000,
+                    logger: {
+                        info: (_evento, resumen) => logger.info('retencion_periodica_completada', resumen),
+                        error: (_evento, detalle) => logger.error('retencion_periodica_fallida', detalle)
+                    }
+                })
+                : null;
+            if (programadorRetencion) {
+                programadorRetencion.iniciar();
+                void programadorRetencion.ejecutarRonda();
+            }
+
+            const cerrarOrdenadamente = crearCierreOrdenado({ server, programador, programadorArchivado, programadorRetencion });
             const manejarSenal = senal => {
                 logger.info('cierre_solicitado', { senal });
                 cerrarOrdenadamente().catch(error => {

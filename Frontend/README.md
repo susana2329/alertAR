@@ -1,5 +1,20 @@
 # Desarrollo local con Android
 
+## APK de producción para la landing
+
+El backend de producción debe estar accesible por HTTPS en una URL pública terminada en `/api`. El APK se construye con esa URL, no con la IP privada de desarrollo. La API debe permitir `https://localhost` en `CORS_ORIGINS`, que es el origen de la WebView Android configurada en Capacitor.
+
+La primera vez, generar la firma con `node scripts/create-android-signing.mjs` desde `Frontend/`. Guardar una copia segura de **toda** la carpeta `android/release-signing/` fuera de esta computadora. Está excluida de Git. Todas las actualizaciones del APK deben usar la misma firma.
+
+Con la URL definitiva disponible:
+
+```sh
+cd Frontend
+ALERTAR_API_URL=https://api.alertar.example/api npm run package:android:release
+```
+
+Reemplazar el dominio de ejemplo por el real. El comando valida HTTPS, compila Angular, sincroniza Capacitor y crea `android/app/build/outputs/apk/release/app-release.apk` firmado. También imprime su SHA-256 para verificar el archivo publicado. Subir ese APK a la landing y probar la descarga e instalación en un teléfono real, seguido de login, mapa, permisos de ubicación y reportes contra la API de EC2. No publicar APKs creados con las configuraciones `development-android-*`.
+
 ## Direcciones de la API
 
 - Navegador en la computadora: `http://localhost:3000/api` (configuración Angular `development`).
@@ -17,7 +32,17 @@ Desde `Frontend/`:
 npm start
 ```
 
-Esto sirve Angular localmente para el navegador. Para preparar los recursos que se instalarán en Android, ejecutar el perfil deseado y luego sincronizar Capacitor:
+Esto sirve Angular localmente para el navegador.
+
+Para ver el mapa con reportes vecinales y fotos de muestra, sin backend ni AWS:
+
+```sh
+npm run start:mock
+```
+
+Abrir la dirección local que muestra Angular y navegar al mapa. El modo mock está aislado de producción y de los perfiles Android; las respuestas vecinales se muestran como no persistentes. Los tiles del mapa base siguen necesitando conexión a internet.
+
+Para preparar los recursos que se instalarán en Android, ejecutar el perfil deseado y luego sincronizar Capacitor:
 
 ```sh
 npm run build:android:device

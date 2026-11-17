@@ -3,7 +3,7 @@ import { SesionService } from './sesion.service';
 import { environment } from '../../environments/environment';
 import { diagnosticarError } from '../utils/diagnostico-error';
 declare const google: any;
-const GOOGLE_CLIENT_ID = '1047238975139-gt4obqstc0k95l9i7lbpudj2skrtkgs8.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = environment.googleClientId || '1047238975139-gt4obqstc0k95l9i7lbpudj2skrtkgs8.apps.googleusercontent.com';
 const API_URL = environment.apiUrl.replace(/\/$/, '');
 
 @Injectable({ providedIn: 'root' })

@@ -11,9 +11,12 @@ import { AlertaService } from './alerta.service';
 describe('AlertaService', () => {
   let service: AlertaService;
   let http: HttpTestingController;
+  let mockReportesVecinalesOriginal: boolean;
   const endpoint = `${environment.apiUrl.replace(/\/$/, '')}/alertas`;
+  const reportesEndpoint = `${environment.apiUrl.replace(/\/api\/?$/, '')}/reportes/reporte`;
 
   beforeEach(() => {
+    mockReportesVecinalesOriginal = environment.mockReportesVecinales;
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()]
     });
@@ -21,7 +24,10 @@ describe('AlertaService', () => {
     http = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => http.verify());
+  afterEach(() => {
+    environment.mockReportesVecinales = mockReportesVecinalesOriginal;
+    http.verify();
+  });
 
   it('resolves the selected alert from the list already loaded by the map', () => {
     const alerta: Alerta = {
@@ -69,6 +75,17 @@ describe('AlertaService', () => {
     http.expectOne(`${endpoint}/mapa`).flush([]);
   });
 
+  it('sirve reportes vecinales de muestra sin consultar la API en modo demo', () => {
+    environment.mockReportesVecinales = true;
+    service.listarParaMapa().subscribe(alertas => {
+      expect(alertas.length).toBeGreaterThan(0);
+      expect(alertas.every(alerta => alerta.origen === 'vecinal')).toBe(true);
+      expect(alertas.some(alerta => (alerta.cantidadFotos ?? 0) > 0)).toBe(true);
+    });
+
+    http.expectNone(`${endpoint}/mapa`);
+  });
+
   it('rechaza una respuesta de mapa que no cumple el contrato de arreglo', () => {
     let error: unknown;
     service.listarParaMapa().subscribe({ error: value => error = value });
@@ -86,5 +103,39 @@ describe('AlertaService', () => {
     };
     service.obtenerPorId(alerta.id).subscribe(resultado => expect(resultado).toEqual(alerta));
     http.expectOne(`${endpoint}/${alerta.id}`).flush(alerta);
+  });
+
+  it('envía la respuesta vecinal con la sesión iniciada', () => {
+    localStorage.setItem('alertar_token', 'token-de-prueba');
+    service.votarReporteVecinal('reporte-1', 'sigue').subscribe(resultado => {
+      expect(resultado.estadoVecinal).toBe('sin_confirmar');
+    });
+
+    const request = http.expectOne(`${reportesEndpoint}/reporte-1/voto`);
+    expect(request.request.method).toBe('POST');
+    expect(request.request.headers.get('Authorization')).toBe('Bearer token-de-prueba');
+    expect(request.request.body).toEqual({ respuesta: 'sigue' });
+    request.flush({ estadoVecinal: 'sin_confirmar' });
+    localStorage.removeItem('alertar_token');
+  });
+
+  it('carga las fotos de un reporte vecinal solo cuando se solicitan', () => {
+    service.obtenerFotosReporteVecinal('reporte-1').subscribe(fotos => {
+      expect(fotos).toEqual([{ url: 'https://s3.example/foto?firma=temporal' }]);
+    });
+
+    const request = http.expectOne(`${reportesEndpoint}/reporte-1/imagenes`);
+    expect(request.request.method).toBe('GET');
+    request.flush([{ url: 'https://s3.example/foto?firma=temporal' }]);
+  });
+
+  it('devuelve fotos locales de muestra sin consultar S3 en modo demo', () => {
+    environment.mockReportesVecinales = true;
+    service.obtenerFotosReporteVecinal('demo-1').subscribe(fotos => {
+      expect(fotos).toHaveLength(2);
+      expect(fotos[0].url).toBe('/assets/mock-reportes/calle-inundada.svg');
+    });
+
+    http.expectNone(`${reportesEndpoint}/demo-1/imagenes`);
   });
 });

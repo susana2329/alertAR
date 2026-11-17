@@ -6,6 +6,7 @@ import { addIcons } from 'ionicons';
 import { ItemMochila } from '../../../models/mochila.model';
 import { arrowBackOutline, briefcaseOutline } from 'ionicons/icons';
 import { MochilaService } from '../../../services/mochila.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-mochila-individual',
@@ -56,14 +57,22 @@ export class MochilaIndividualPage {
     return Math.round((elementosCompletados / this.checklist.length) * 100);
   }
 
-async guardarProgreso() {
+  async guardarProgreso() {
     const idsCompletados = this.checklist.filter(item => item.completado).map(item => item.id);
     const porcentajeActual = this.porcentaje;
 
-    this.mochilaService.guardarProgreso('individual', idsCompletados).subscribe({
-      next: (res) => console.log('Guardado de mochila exitoso', res),
-      error: (err) => console.error('Error al guardar la mochila individual', err)
-    });
+    try {
+      await firstValueFrom(this.mochilaService.guardarProgreso('individual', idsCompletados));
+    } catch {
+      const errorToast = await this.toastController.create({
+        message: 'No se pudo guardar tu mochila. Intentá de nuevo.',
+        duration: 3500,
+        position: 'bottom',
+        color: 'danger'
+      });
+      await errorToast.present();
+      return;
+    }
 
     const toast = await this.toastController.create({
       message: `Tu mochila individual se guardó (${porcentajeActual}% completado).`,

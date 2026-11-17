@@ -34,13 +34,13 @@
             </button>
           </div>
 
-          <p class="olvide">¿Olvidaste tu contraseña?</p>
-
           @if (errorLogin) {
           <p class="mensaje-error">{{ errorLogin }}</p>
           }
 
-          <button class="boton-principal" [disabled]="cargando" (click)="iniciarSesion()">Iniciar sesión</button>
+          <button class="boton-principal" [disabled]="cargandoLogin" (click)="iniciarSesion()">
+            {{ cargandoLogin ? 'Iniciando sesión...' : 'Iniciar sesión' }}
+          </button>
 
           <div class="separador">o continuar con</div>
 
@@ -103,17 +103,22 @@
             Google
           </button>
 
-          <label class="terminos">
-            <input type="checkbox" [(ngModel)]="aceptaTerminos">
-            <span>Acepto los <span class="resaltado">terminos y condiciones</span> y la <span class="resaltado">politica
-                de privacidad</span></span>
-          </label>
+          <div class="terminos">
+            <input id="acepta-terminos" type="checkbox" [(ngModel)]="aceptaTerminos">
+            <div>
+              <label for="acepta-terminos">Acepto los </label>
+              <button type="button" class="enlace-legal" (click)="abrirDocumento('terminos')">Términos de uso</button>
+              y la <button type="button" class="enlace-legal" (click)="abrirDocumento('privacidad')">Política de privacidad</button>.
+            </div>
+          </div>
 
           @if (errorRegistro) {
           <p class="mensaje-error">{{ errorRegistro }}</p>
           }
 
-          <button class="boton-principal" [disabled]="cargando" (click)="crearCuenta()">Crear cuenta</button>
+          <button class="boton-principal" [disabled]="cargandoRegistro" (click)="crearCuenta()">
+            {{ cargandoRegistro ? 'Creando cuenta...' : 'Crear cuenta' }}
+          </button>
 
           <button class="volver-login" (click)="mostrarLogin()">Volver al login</button>
 

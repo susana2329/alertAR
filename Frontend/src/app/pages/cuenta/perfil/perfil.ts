@@ -35,6 +35,7 @@ import { ModalPhotosComponent } from "../../../components/modal-photos/modal-pho
 export class PerfilPage implements OnInit {
 
     public usuario: UsuarioPerfil | null = null;
+    public datosSinActualizar = false;
 
     constructor(
         private alertController: AlertController,
@@ -68,35 +69,39 @@ export class PerfilPage implements OnInit {
     }
 
     ngOnInit() {
-        console.log('PerfilPage funcionando correctamente');
         this.cargarDatosUsuario();
     }
 
     cargarDatosUsuario() {
-        const sesion: any = this.sesionService.usuario();
+        const sesion = this.sesionService.usuario();
         const idUsuario = sesion?._id || sesion?.id;
-        if (!idUsuario) {
-            if (sesion) {
-                this.usuario = {
-                    _id: '',
-                    nombre: sesion.nombre ?? '',
-                    apellido: sesion.apellido ?? '',
-                    email: sesion.email ?? '',
-                    foto: sesion.foto ?? ''
-                };
-                this.cdr.markForCheck();
-            }
-            return;
+        if (sesion) {
+            this.usuario = {
+                _id: idUsuario ?? '',
+                nombre: sesion.nombre ?? '',
+                apellido: sesion.apellido ?? '',
+                email: sesion.email ?? '',
+                foto: sesion.foto ?? '',
+                proveedor: sesion.proveedor
+            };
+            this.cdr.markForCheck();
         }
+        if (!idUsuario) return;
 
         this.personalService.obtenerDatosUsuario(idUsuario).subscribe({
             next: (data: UsuarioPerfil) => {
                 this.usuario = data;
+                this.datosSinActualizar = false;
+                this.sesionService.actualizarUsuario({
+                    id: data._id, nombre: data.nombre, apellido: data.apellido,
+                    email: data.email, foto: data.foto, proveedor: data.proveedor
+                });
                 this.cdr.markForCheck();
-                console.log('Datos de cuenta cargados con éxito', data);
             },
             error: (error) => {
                 console.error('Error al cargar los datos de la cuenta', error);
+                this.datosSinActualizar = true;
+                this.cdr.markForCheck();
             }
         });
     }
@@ -146,9 +151,9 @@ export class PerfilPage implements OnInit {
 
             this.personalService.actualizarFotoPerfil(idUsuario, { fotoPerfil: imagenBase64 }).subscribe({
                 next: (usuarioActualizado: any) => {
-                    console.log('Foto de perfil actualizada con éxito');
                     if (this.usuario) {
                         this.usuario.foto = usuarioActualizado.fotoPerfil || imagenBase64;
+                        this.sesionService.actualizarUsuario({ foto: this.usuario.foto });
                     }
                     this.cdr.markForCheck();
                 },
@@ -157,8 +162,7 @@ export class PerfilPage implements OnInit {
                 }
             });
 
-        } catch (error) {
-            console.log('Selección de foto cancelada o error', error);
+        } catch {
         }
     }
 
@@ -170,16 +174,36 @@ export class PerfilPage implements OnInit {
                 {
                     text: 'Cancelar',
                     role: 'cancel',
-                    cssClass: 'secondary',
-                    handler: () => {
-                        console.log('Eliminación cancelada');
-                    }
+                    cssClass: 'secondary'
                 },
                 {
                     text: 'Si, eliminar cuenta',
                     cssClass: 'danger-alert-button',
                     handler: () => {
-                        this.router.navigate(['/acceso']);
+                        const sesion: any = this.sesionService.usuario();
+                        const idUsuario = sesion?._id || sesion?.id;
+
+                        if (!idUsuario) {
+                            this.sesionService.cerrarSesion();
+                            this.router.navigate(['/acceso']);
+                            return;
+                        }
+
+                        this.personalService.eliminarCuenta(idUsuario).subscribe({
+                            next: () => {
+                                this.sesionService.cerrarSesion();
+                                this.router.navigate(['/acceso']);
+                            },
+                            error: async (err: any) => {
+                                console.error('Error al eliminar la cuenta', err);
+                                const errorAlert = await this.alertController.create({
+                                    header: 'Error',
+                                    message: 'No se pudo eliminar la cuenta. Intentá de nuevo más tarde.',
+                                    buttons: ['Aceptar']
+                                });
+                                await errorAlert.present();
+                            }
+                        });
                     }
                 }
             ]

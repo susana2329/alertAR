@@ -65,6 +65,13 @@ export interface Alerta {
   descripcionPreview?: string;
   descripcionCompleta?: string;
   detalle?: DetalleFuente;
+  reporteId?: string;
+  estadoVecinal?: 'sin_confirmar' | 'confirmado' | 'cerrado';
+  estadoModeracion?: 'pendiente' | 'aprobado' | 'rechazado';
+  fotosPendientes?: boolean;
+  votosSigue?: number;
+  votosNoEsta?: number;
+  cantidadFotos?: number;
 }
 
 export type ColorPresentacionAlerta = 'rojo' | 'naranja' | 'amarillo' | 'azul' | 'neutro';

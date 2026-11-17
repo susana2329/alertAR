@@ -2,9 +2,12 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AlertController, NavController } from '@ionic/angular';
 import { SesionService } from '../services/sesion.service';
+import { environment } from '../../environments/environment';
 
 
 export const soloConSesion: CanActivateFn = async () => {
+  if (environment.mockReportesVecinales) return true;
+
   const sesion = inject(SesionService);
   const router = inject(Router);
   const alertCtrl = inject(AlertController);

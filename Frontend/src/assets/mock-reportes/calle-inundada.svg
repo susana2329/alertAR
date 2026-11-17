@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#b9dbe8"/>
+      <stop offset="1" stop-color="#eef4ed"/>
+    </linearGradient>
+    <linearGradient id="water" x2="0" y2="1">
+      <stop stop-color="#4f9fb4"/>
+      <stop offset="1" stop-color="#17677e"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#sky)"/>
+  <path d="M0 235 95 190l90 41 82-66 100 59 82-45 107 49 84-37v229H0Z" fill="#a5b69a"/>
+  <path d="M0 300 163 245l127 21 128-58 222 61v151H0Z" fill="#626d70"/>
+  <path d="M0 330q116-28 225 0t207 0 208 0v90H0Z" fill="url(#water)"/>
+  <path d="M30 358q75-16 149 0m55 19q88-17 172 0m39-27q68-13 139 0" fill="none" stroke="#c7edf0" stroke-linecap="round" stroke-width="8" opacity=".8"/>
+  <path d="M80 185h80v67H80zm405-10h74v70h-74z" fill="#e7d6bd"/>
+  <path d="M68 185h103l-51-48zm405-10h88l-44-44z" fill="#bc795b"/>
+  <rect x="101" y="207" width="18" height="24" fill="#78a9b5"/>
+  <rect x="133" y="207" width="18" height="24" fill="#78a9b5"/>
+  <rect x="510" y="197" width="18" height="24" fill="#78a9b5"/>
+  <text x="320" y="395" fill="#fff" font-family="Arial,sans-serif" font-size="17" font-weight="700" text-anchor="middle">IMAGEN DE MUESTRA · INUNDACIÓN</text>
+</svg>

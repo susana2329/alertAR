@@ -1,25 +1,19 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button>
-        <ion-icon name="menu-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
     <ion-title class="app-logo">
       <span class="logo-imgs" role="img" aria-label="AlertAR">
         <img src="assets/image/ALERT.png" alt="" class="logo-alert">
         <img src="assets/image/AR.png" alt="" class="logo-ar">
       </span>
     </ion-title>
-    <ion-buttons slot="end">
-      <ion-button>
-        <ion-icon name="notifications-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding home-content">
+  <ion-refresher slot="fixed" (ionRefresh)="recargarConPull($event)">
+    <ion-refresher-content pullingText="Deslizá para actualizar" refreshingSpinner="crescent"></ion-refresher-content>
+  </ion-refresher>
+
   <div class="location-row">
     <ion-icon name="location-outline"></ion-icon>
     <div>
@@ -62,17 +56,46 @@
     }
   </div>
 
+  <!-- Accesos rápidos a llamadas de emergencia -->
+  <div class="emergency-contacts">
+    <div class="emergency-contacts-header">
+      <span>Teléfonos de emergencia</span>
+    </div>
+    <div class="emergency-pills">
+      <a href="tel:911" class="emergency-pill pill-911">
+        <ion-icon name="call-outline"></ion-icon>
+        <span class="pill-number">911</span>
+        <span class="pill-label">Emergencias</span>
+      </a>
+      <a href="tel:103" class="emergency-pill">
+        <ion-icon name="call-outline"></ion-icon>
+        <span class="pill-number">103</span>
+        <span class="pill-label">Defensa Civil</span>
+      </a>
+      <a href="tel:107" class="emergency-pill">
+        <ion-icon name="call-outline"></ion-icon>
+        <span class="pill-number">107</span>
+        <span class="pill-label">SAME</span>
+      </a>
+      <a href="tel:100" class="emergency-pill">
+        <ion-icon name="call-outline"></ion-icon>
+        <span class="pill-number">100</span>
+        <span class="pill-label">Bomberos</span>
+      </a>
+    </div>
+  </div>
+
   <div class="section-header">
     <h3>{{ ubicacion ? 'Alertas cerca tuyo' : 'Alertas oficiales recientes' }}</h3>
     <a class="see-map-link" routerLink="/mapa">Ver mapa</a>
   </div>
 
-  @if (mensajeSinUbicacion && !errorCarga) {
+  @if (mensajeSinUbicacion && !errorCarga && !alertasCercanas.length) {
     <p class="location-notice">{{ mensajeSinUbicacion }}</p>
   }
 
   @if (cargando) {
-    <div class="empty-state">Consultando eventos oficiales…</div>
+    <div class="empty-state">Consultando eventos importantes…</div>
   } @else if (errorCarga) {
     <div class="empty-state">{{ errorCarga }}</div>
   } @else if (alertasCercanas.length) {

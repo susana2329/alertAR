@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { App } from '@capacitor/app';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonAvatar, IonRouterLink, IonIcon, IonButton, IonButtons, IonTabBar, IonLabel, IonTabButton,IonAccordionGroup, IonAccordion, IonItem } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { chevronBackOutline, chevronForwardOutline, openOutline,informationCircleOutline, schoolOutline, shareSocialOutline, heartOutline,homeOutline, mapOutline, fileTrayFullOutline, shieldOutline, personOutline  } from 'ionicons/icons';
+import { chevronBackOutline, chevronForwardOutline, openOutline,informationCircleOutline, schoolOutline, heartOutline,homeOutline, mapOutline, fileTrayFullOutline, shieldOutline, personOutline, shareSocialOutline  } from 'ionicons/icons';
 
 @Component({
   selector: 'app-informacion',
@@ -32,15 +33,23 @@ import { chevronBackOutline, chevronForwardOutline, openOutline,informationCircl
   ]
 })
 export class InformacionPage implements OnInit {
+  version = '1.0.0';
   constructor() {
     addIcons({ chevronBackOutline,
       chevronForwardOutline,
       openOutline,
       informationCircleOutline,
-      schoolOutline,shareSocialOutline, 
-      heartOutline
+      schoolOutline,
+      heartOutline,
+      shareSocialOutline
      });
   }
 
-  ngOnInit() {}
+  async ngOnInit() {
+    try {
+      this.version = (await App.getInfo()).version;
+    } catch {
+      // La versión nativa no está disponible en el navegador.
+    }
+  }
 }

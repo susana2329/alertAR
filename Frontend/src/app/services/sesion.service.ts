@@ -4,10 +4,13 @@ import { Geolocation } from '@capacitor/geolocation';
 
 export interface UsuarioSesion {
   id?: string;
+  _id?: string;
   nombre: string;
   apellido?: string;
   email: string;
   foto?: string;
+  rol?: 'usuario' | 'moderador' | 'admin';
+  proveedor?: 'local' | 'google';
 }
 
 export interface CoordenadasUsuario {
@@ -27,22 +30,57 @@ export class SesionService {
   private coordenadasCapturadasEn = 0;
   private solicitudEnCurso: Promise<CoordenadasUsuario | null> | null = null;
 
-  logueado = computed(() => this.usuario() !== null);
+  logueado = computed(() => this.usuario() !== null && this.tokenValido());
+  esModerador = computed(() => {
+    const rol = this.usuario()?.rol;
+    return rol === 'moderador' || rol === 'admin';
+  });
 
   iniciar(token: string, usuario: UsuarioSesion) {
     localStorage.setItem('alertar_token', token);
     localStorage.setItem('alertar_usuario', JSON.stringify(usuario));
     this.usuario.set(usuario);
   }
-    
-  obtenerToken(): string | null {
-    return localStorage.getItem('alertar_token');
+
+  actualizarUsuario(cambios: Partial<UsuarioSesion>) {
+    const actual = this.usuario();
+    if (!actual) return;
+    const usuario = { ...actual, ...cambios };
+    try {
+      localStorage.setItem('alertar_usuario', JSON.stringify(usuario));
+    } catch {
+      // Una foto en base64 puede exceder el espacio local; conservar al menos los datos de la cuenta.
+      const datos = { ...usuario, foto: undefined };
+      try { localStorage.setItem('alertar_usuario', JSON.stringify(datos)); } catch { /* La vista actual sigue disponible. */ }
+    }
+    this.usuario.set(usuario);
   }
 
   cerrarSesion() {
     localStorage.removeItem('alertar_token');
     localStorage.removeItem('alertar_usuario');
     this.usuario.set(null);
+  }
+
+  tokenValido(): boolean {
+    const token = this.obtenerToken();
+    if (!token) return false;
+    try {
+      const partes = token.split('.');
+      if (partes.length !== 3) return false;
+      const payloadJson = atob(partes[1].replace(/-/g, '+').replace(/_/g, '/'));
+      const payload = JSON.parse(payloadJson);
+      if (payload.exp && Date.now() >= payload.exp * 1000) {
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  obtenerToken(): string | null {
+    return localStorage.getItem('alertar_token');
   }
 
   guardarUbicacion(permitida: boolean) {
@@ -172,6 +210,19 @@ export class SesionService {
 
   private leerUsuario(): UsuarioSesion | null {
     try {
+      const token = localStorage.getItem('alertar_token');
+      if (token) {
+        const partes = token.split('.');
+        if (partes.length === 3) {
+          const payloadJson = atob(partes[1].replace(/-/g, '+').replace(/_/g, '/'));
+          const payload = JSON.parse(payloadJson);
+          if (payload.exp && Date.now() >= payload.exp * 1000) {
+            localStorage.removeItem('alertar_token');
+            localStorage.removeItem('alertar_usuario');
+            return null;
+          }
+        }
+      }
       const guardado = localStorage.getItem('alertar_usuario');
       return guardado ? JSON.parse(guardado) : null;
     } catch {
