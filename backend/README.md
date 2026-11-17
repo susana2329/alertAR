@@ -8,7 +8,7 @@ Los reportes activos no vencen por edad. Al cerrarse por consenso se registra `f
 
 La eliminación de cuenta retira primero sus reportes, anonimiza sus votos en reportes ajenos, desvincula las moderaciones que realizó y después borra el usuario. Si falla un paso, la cuenta permanece para permitir el reintento. El borrado de cuentas por 24 meses de inactividad **no está activo**: falta un servicio de correo para dar aviso previo.
 
-Antes de activar la retención, ejecutar `node scripts/procesar-retencion.js` para ver conteos sin modificar datos. `node scripts/procesar-retencion.js --ejecutar` procesa reportes vencidos y reintenta fotos; no ejecutarlo sin revisar el resultado de consulta y una copia de seguridad. En producción, `RETENCION_AUTOMATICA=true` ejecuta el proceso al iniciar el backend y luego cada 24 horas. Sin esa variable, no hay borrado periódico. Se requiere configuración válida de S3 para completar la limpieza de fotos.
+Antes de activar la retención, ejecutar `node scripts/procesar-retencion.js` para ver conteos sin modificar datos. `node scripts/procesar-retencion.js --ejecutar` procesa reportes vencidos y reintenta fotos; no ejecutarlo sin revisar el resultado de consulta y una copia de seguridad. En producción, `RETENCION_AUTOMATICA=true` ejecuta el proceso al iniciar el backend y luego cada 24 horas. Sin esa variable, no hay borrado periódico. Se requieren región, bucket y un rol IAM de EC2 con permisos S3 para completar la limpieza de fotos.
 
 Los reportes cerrados antes de esta versión pueden no tener `fechaCierre`; se omiten automáticamente para evitar un borrado prematuro. Deben revisarse y fecharse con evidencia antes de incorporarlos al plazo. La política visible en la app describe esta excepción.
 

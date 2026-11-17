@@ -1,19 +1,10 @@
-const env = require('dotenv')
+require('dotenv').config()
 const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3')
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-env.config()
-const client = new S3Client({
-    
-    region: process.env.AWS_REGION, 
-    credentials: { 
-        accessKeyId: process.env.ACCESSKEYID, 
-        secretAccessKey: process.env.SECRETACCESSKEY, 
-        sessionToken:process.env.SESSIONTOKEN
-    }
-});
+const client = new S3Client({ region: process.env.AWS_REGION });
 
 function estaS3Configurado() {
-    return Boolean(process.env.S3_BUCKET && process.env.ACCESSKEYID && process.env.SECRETACCESSKEY);
+    return Boolean(process.env.S3_BUCKET && process.env.AWS_REGION);
 }
 
 exports.estaS3Configurado = estaS3Configurado;
