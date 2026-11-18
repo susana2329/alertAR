@@ -5,7 +5,7 @@
         <ion-icon name="chevron-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title class="ion-text-center">Más informacion</ion-title>
+    <ion-title class="ion-text-center">Sobre AlertAR</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -16,8 +16,9 @@
       <div class="shield-box">
         <img src="assets/icon/logo-alertar.png" alt="Información de AlertAR">
       </div>
-      <h2>Conocé más sobre AlertAR</h2>
-      <p>Tecnología y prevención al servicio de la comunidad</p>
+      <h2>Sobre AlertAR</h2>
+      <p>Información para anticiparse y herramientas para prepararse</p>
+      <p>Versión {{ version }}</p>
     </div>
 
     <ion-accordion-group class="sources-accordion-group">
@@ -29,16 +30,16 @@
           </div>
           <ion-label>
             <h3>¿Qué es AlertAR?</h3>
-            <p>Bienvenida y propósito principal</p>
+            <p>Para qué sirve y qué información muestra</p>
           </ion-label>
           <ion-icon name="chevron-forward-outline" slot="end" class="accordion-arrow"></ion-icon>
         </ion-item>
         
         <div class="accordion-content" slot="content">
           <div class="info-block">
-            <h4 class="question-title">¡Bienvenido/a a AlertAR!</h4>
+            <h4 class="question-title">Información para tomar mejores decisiones</h4>
             <p class="source-description">
-              Somos tu plataforma de prevención y asistencia climática diseñada para acompañarte y protegerte a vos y a tu familia ante situaciones de emergencia. Nuestro objetivo principal es centralizar información oficial y reportes de la comunidad en tiempo real, brindándote datos claros, geolocalizados y confiables para que puedas anticiparte, prever riesgos y saber cómo actuar frente a fenómenos climáticos críticos (como tormentas severas, inundaciones, sismos u olas de calor).
+              AlertAR reúne alertas de organismos oficiales y reportes de vecinos para ayudarte a conocer situaciones de riesgo. Podés consultar el mapa, ver la fuente y fecha de cada alerta, leer recomendaciones y preparar tus mochilas de emergencia. Los reportes vecinales muestran lo que informa la comunidad y no reemplazan los avisos oficiales.
             </p>
           </div>
         </div>
@@ -51,52 +52,51 @@
             <ion-icon name="school-outline"></ion-icon>
           </div>
           <ion-label>
-            <h3>¿Quiénes somos?</h3>
-            <p>El equipo y nuestra institución</p>
+            <h3>Equipo y créditos</h3>
+            <p>Quiénes desarrollaron la app</p>
           </ion-label>
           <ion-icon name="chevron-forward-outline" slot="end" class="accordion-arrow"></ion-icon>
         </ion-item>
         
         <div class="accordion-content" slot="content">
           <div class="info-block">
-            <h4 class="question-title">Compromiso con impacto social</h4>
+            <h4 class="question-title">Equipo AlertAR</h4>
             <p class="source-description">
-              Somos un equipo de estudiantes de la Tecnicatura Superior en Desarrollo de Software del IFTS N.º 11, comprometidos con el desarrollo tecnológico con impacto social. AlertAR nace como un proyecto integrador enfocado en ofrecer soluciones digitales útiles, accesibles y seguras para la comunidad de la Ciudad de Buenos Aires y sus alrededores, priorizando siempre la prevención y el cuidado ciudadano.
+              AlertAR fue desarrollado por un equipo de estudiantes de la Tecnicatura Superior en Desarrollo de Software del IFTS N.º 11. El proyecto nació para acercar información sobre riesgos y herramientas de prevención a la comunidad.
             </p>
+            <ul class="team-list">
+              <li><strong>Juliana Choque</strong><span>Desarrollo frontend y QA</span></li>
+              <li><strong>Susana Cordón</strong><span>Gestión de producto y desarrollo frontend</span></li>
+              <li><strong>Miguel Díaz</strong><span>Infraestructura en la nube y desarrollo backend</span></li>
+              <li><strong>Tobias Sánchez Aguirre</strong><span>Líder de backend y arquitectura de software</span></li>
+            </ul>
           </div>
         </div>
       </ion-accordion>
 
-    
       <ion-accordion value="redes" class="source-card-accordion">
         <ion-item slot="header" lines="none" class="accordion-header-item">
           <div class="card-icon-box" slot="start">
             <ion-icon name="share-social-outline"></ion-icon>
           </div>
           <ion-label>
-            <h3>Redes Sociales y Contacto</h3>
-            <p>Canales oficiales y comunicación</p>
+            <h3>Redes y comunidad</h3>
+            <p>Seguí a AlertAR en sus canales</p>
           </ion-label>
           <ion-icon name="chevron-forward-outline" slot="end" class="accordion-arrow"></ion-icon>
         </ion-item>
-        
+
         <div class="accordion-content" slot="content">
-          <div class="info-block">
-            <h4 class="question-title">¿Querés saber más sobre nosotros?</h4>
-            <p class="source-description" style="margin-bottom: 10px;">
-              Seguí el desarrollo del proyecto o ponete en contacto con el equipo a través de nuestras vías oficiales:
-            </p>
-            <ul class="social-list">
-              <li><strong>Sitio Web:</strong> <a href="#" target="_blank">Aca va el link</a></li>
-              <li><strong>GitHub / Repositorio:</strong> <a href="#" target="_blank">Aca va el link</a></li>
-              <li><strong>Correo de Contacto:</strong> soporte.alertar@gmail.com</li>
-              <li><strong>Instagram:</strong> @AlertAR.Oficial</li>
-            </ul>
-          </div>
+          <ul class="social-list">
+            <li><strong>TikTok:</strong> <a href="https://www.tiktok.com/@alertar.oficial" target="_blank" rel="noopener noreferrer">@alertar.oficial</a></li>
+            <li><strong>X (Twitter):</strong> <a href="https://x.com/alertarOficial" target="_blank" rel="noopener noreferrer">@alertarOficial</a></li>
+            <li><strong>Canal de WhatsApp:</strong> <a href="https://whatsapp.com/channel/0029Vb9SFMqLY6d9OeYMwo2I" target="_blank" rel="noopener noreferrer">Unirse al canal</a></li>
+            <li><strong>YouTube:</strong> <a href="https://www.youtube.com/@AlertAR-Oficial" target="_blank" rel="noopener noreferrer">@AlertAR-Oficial</a></li>
+            <li><strong>Facebook:</strong> <a href="https://www.facebook.com/share/1EoaxVKM5n/" target="_blank" rel="noopener noreferrer">Ifts Alertar</a></li>
+          </ul>
         </div>
       </ion-accordion>
 
-  
       <ion-accordion value="agradecimientos" class="source-card-accordion">
         <ion-item slot="header" lines="none" class="accordion-header-item">
           <div class="card-icon-box" slot="start">
@@ -104,7 +104,7 @@
           </div>
           <ion-label>
             <h3>Agradecimientos</h3>
-            <p>A quienes hicieron posible este proyecto</p>
+            <p>Apoyo durante el desarrollo</p>
           </ion-label>
           <ion-icon name="chevron-forward-outline" slot="end" class="accordion-arrow"></ion-icon>
         </ion-item>
@@ -112,22 +112,8 @@
         <div class="accordion-content" slot="content">
           <div class="info-block">
             <h4 class="question-title">Agradecimientos</h4>
-            <p class="source-description" style="margin-bottom: 10px;">
-              Queremos expresar nuestro más sincero agradecimiento al <strong>IFTS N.º 11</strong> y a todos los docentes que nos acompañaron a lo largo de nuestra formación académica.
-            </p>
-            <p class="source-description" style="margin-bottom: 10px;">
-              Gracias por brindarnos los conocimientos, las herramientas y el apoyo necesarios para crecer tanto profesional como personalmente. Cada enseñanza, consejo y experiencia compartida fue fundamental para llegar hasta esta instancia y hacer posible el desarrollo de Alertar, un proyecto que refleja nuestro aprendizaje, esfuerzo, compromiso y trabajo en equipo.
-            </p>
-            <p class="source-description" style="margin-bottom: 10px;">
-              Agradecemos también al instituto por ofrecernos un espacio para formarnos, afrontar nuevos desafíos y transformar los conocimientos adquiridos en una aplicación con un propósito real: aportar valor a la comunidad.
-            </p>
-            <p class="source-description" style="margin-bottom: 10px;">
-              Este proyecto representa mucho más que la culminación de una etapa académica; es el resultado de un recorrido de aprendizaje, dedicación y crecimiento que no habría sido posible sin el acompañamiento de quienes nos guiaron durante el camino.
-            </p>
-            <p class="source-description" style="margin-bottom: 12px;">
-              ¡Gracias por ser parte de este recorrido y por ayudarnos a convertir nuestras ideas en realidad!<br>
-              <strong>Con gratitud,</strong><br>
-              Equipo Alertar
+            <p class="source-description">
+              Agradecemos al IFTS N.º 11 y a sus docentes por acompañar el desarrollo de este proyecto.
             </p>
           </div>
 
@@ -139,6 +125,11 @@
       </ion-accordion>
 
     </ion-accordion-group>
+
+    <div class="legal-links">
+      <a routerLink="/terminos">Términos de uso</a>
+      <a routerLink="/privacidad">Política de privacidad</a>
+    </div>
 
   </div>
 </ion-content>

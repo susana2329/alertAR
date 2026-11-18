@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 import { IonContent, IonIcon } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
@@ -37,6 +38,7 @@ function numero(valor: unknown): number | null {
 })
 export class DetalleAlertaPage implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
   alerta?: Alerta;
   cargando = true;
@@ -71,10 +73,14 @@ export class DetalleAlertaPage implements OnInit {
         this.alerta = undefined;
         this.errorCarga = false;
         this.cargando = Boolean(id);
+        this.changeDetector.markForCheck();
         if (!id) return of({ alerta: undefined, error: false });
         return this.alertaService.obtenerPorId(id).pipe(
           map(alerta => ({ alerta, error: false })),
           catchError((error: unknown) => {
+            if (error instanceof HttpErrorResponse && error.status === 404) {
+              return of({ alerta: undefined, error: false });
+            }
             console.error('No se pudo cargar el detalle de la alerta:', error);
             return of({ alerta: undefined, error: true });
           })
@@ -85,6 +91,7 @@ export class DetalleAlertaPage implements OnInit {
       this.alerta = alerta;
       this.errorCarga = error;
       this.cargando = false;
+      this.changeDetector.markForCheck();
     });
   }
 

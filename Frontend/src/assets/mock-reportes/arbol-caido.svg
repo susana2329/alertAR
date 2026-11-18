@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#c5e0e9"/>
+      <stop offset="1" stop-color="#f2f2e7"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#sky)"/>
+  <path d="M0 235 95 200l106 31 98-59 106 54 94-47 141 56v185H0Z" fill="#99ad8a"/>
+  <path d="M0 290h640v130H0Z" fill="#596568"/>
+  <path d="M0 347h640v73H0Z" fill="#454f52"/>
+  <path d="M68 228h110v67H68zm409-9h98v76h-98z" fill="#e2d2b7"/>
+  <path d="m55 228 68-56 68 56zm409-9 54-48 54 48z" fill="#bd7659"/>
+  <path d="M300 294 425 236m-84 39 38-79m-9 90 91-50m-72 41 51 20" fill="none" stroke="#765338" stroke-linecap="round" stroke-width="17"/>
+  <path d="m422 239 14-67m-20 72 45-56m-25 69 68-19m-145 66-43 39m75-52 45 38" fill="none" stroke="#476b47" stroke-linecap="round" stroke-width="27"/>
+  <path d="M255 331h130" stroke="#f1d57c" stroke-dasharray="20 18" stroke-width="5"/>
+  <text x="320" y="395" fill="#fff" font-family="Arial,sans-serif" font-size="17" font-weight="700" text-anchor="middle">IMAGEN DE MUESTRA · ÁRBOL CAÍDO</text>
+</svg>

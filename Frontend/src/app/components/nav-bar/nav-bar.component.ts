@@ -32,7 +32,13 @@ export class NavBarComponent {
   url = signal('');
   menuAbierto = signal(false);
 
-  indice = computed(() => this.tabs.findIndex(tab => this.url().startsWith(tab.ruta)));
+  indice = computed(() => {
+    const ruta = this.url();
+    if (ruta.startsWith('/inicio/recomendaciones') || ruta.startsWith('/prevencion')) {
+      return this.tabs.findIndex(tab => tab.ruta === '/prevencion');
+    }
+    return this.tabs.findIndex(tab => ruta.startsWith(tab.ruta));
+  });
   visible = computed(() => this.indice() !== -1);
 
   constructor(private router: Router, private navCtrl: NavController) {

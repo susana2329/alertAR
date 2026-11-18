@@ -12,6 +12,8 @@ function resumenParaRegistro(resumen) {
         normalizados: resultado?.cantidadNormalizada ?? 0,
         guardados: resultado?.cantidadGuardada ?? 0,
         actualizados: resultado?.cantidadActualizada ?? 0,
+        archivados: resultado?.cantidadArchivada ?? 0,
+        revision: resultado?.cantidadRevision ?? 0,
         eliminados: resultado?.cantidadEliminada ?? 0,
         omitidos: resultado?.cantidadOmitida ?? 0,
         fallidos: resultado?.cantidadFallida ?? 0,

@@ -29,55 +29,50 @@
       </ion-title>
       <div class="buttons-reports">
         <div class="cardInundaciones">
-          <ion-card id="Indundaciones" (click)="creandoReporte($event)">
-            <ion-card-content (click)="$event.stopPropagation()">
-              <img src="\assets\icon\casa.png" alt="">
-              <p>Inundaciones </p>
+          <ion-card (click)="creandoReporte('Inundaciones')">
+            <ion-card-content>
+              <img src="assets/icon/casa.png" alt="">
+              <p>Inundaciones</p>
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardCalle">
-          <ion-card id="Calle-bloqueada" (click)="creandoReporte($event)">
+          <ion-card (click)="creandoReporte('Calle bloqueada')">
             <ion-card-content>
-              <img src="\assets\icon\tormenta.png" alt="">
+              <img src="assets/icon/tormenta.png" alt="">
               <p>Calle bloqueada</p>
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardArbol">
-          <ion-card id="Caida-de-arbol" (click)="creandoReporte($event)">
+          <ion-card (click)="creandoReporte('Caida de arbol')">
             <ion-card-content>
-              <img src="\assets\icon\arbol-malo.png" alt="">
+              <img src="assets/icon/arbol-malo.png" alt="">
               <p>Caida de arbol</p>
-              
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardCorteLuz">
-          <ion-card id="Corte-de-luz" (click)="creandoReporte($event)">
+          <ion-card (click)="creandoReporte('Corte de luz')">
             <ion-card-content>
-              <img src="\assets\icon\foco.png" alt="">
+              <img src="assets/icon/foco.png" alt="">
               <p>Corte de luz</p>
-              
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardIncendios">
-          <ion-card id="Incendios" (click)="creandoReporte($event)">
+          <ion-card (click)="creandoReporte('Incendios')">
             <ion-card-content>
-              <img src="\assets\icon\flama.png" alt="">
-              <p>incendios</p>
-              
+              <img src="assets/icon/flama.png" alt="">
+              <p>Incendios</p>
             </ion-card-content>
           </ion-card>
         </div>
         <div class="cardMas">
-          <ion-card id="otro" (click)="creandoReporte($event)">
+          <ion-card (click)="creandoReporte('otro')">
             <ion-card-content>
-              <img src="\assets\icon\mas.png" alt="">
-              <p>
-                Otro
-              </p>
+              <img src="assets/icon/mas.png" alt="">
+              <p>Otro</p>
             </ion-card-content>
           </ion-card>
         </div>
@@ -85,9 +80,9 @@
     </div>
    <div class="avisoPublic">
       <div class="escudoPublic">
-        <img src="\assets\icon\seguridad.png" alt="seguridad">
+        <img src="assets/icon/seguridad.png" alt="seguridad">
       </div>
-      <p>Tu reporte sera revisado antes de publicarse en el mapa</p>
+      <p>Tu reporte alertará a la comunidad de inmediato y las fotos pasarán por moderación.</p>
     </div>
   </div> 
 </ion-content>

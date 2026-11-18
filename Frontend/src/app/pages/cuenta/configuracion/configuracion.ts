@@ -1,91 +1,46 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-
-import { IonContent, IonHeader, IonToolbar, IonTitle, IonRouterLink, IonIcon, IonButton, IonButtons, IonTabBar, IonLabel, IonTabButton, IonToggle, IonSelectOption,IonSelect, ToastController } from '@ionic/angular';
+import { IonContent, IonHeader, IonToolbar, IonTitle, IonIcon, IonButton, IonButtons, IonToggle, ToastController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { chevronBackOutline, chevronForwardOutline, notificationsOutline, medkitOutline, documentTextOutline, briefcaseOutline,locateOutline,syncOutline, key} from 'ionicons/icons';
+import { chevronBackOutline } from 'ionicons/icons';
+import { SesionService } from '../../../services/sesion.service';
 
 @Component({
   selector: 'app-configuracion',
   templateUrl: './configuracion.html',
   styleUrls: ['./configuracion.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    RouterLink,
-    IonContent,
-    IonHeader,
-    IonToolbar,
-    IonTitle, 
-    IonIcon,
-    IonButtons,
-    IonButton,
-    IonTabBar,
-    IonSelect,
-    IonSelectOption,
-    IonLabel,
-    IonTabButton,
-    IonToggle
-]
+  imports: [RouterLink, IonContent, IonHeader, IonToolbar, IonTitle, IonIcon, IonButton, IonButtons, IonToggle]
 })
 export class ConfiguracionPage implements OnInit {
-  constructor( private toastController:ToastController) {
-    addIcons({ 
-      chevronBackOutline,
-      chevronForwardOutline,
-      notificationsOutline,
-      medkitOutline,
-      documentTextOutline,
-      briefcaseOutline,
-      locateOutline,
-      syncOutline
-     });
+  ubicacionActiva = false;
+  private readonly sesionService = inject(SesionService);
+  private readonly toastController = inject(ToastController);
+
+  constructor() {
+    addIcons({ chevronBackOutline });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.ubicacionActiva = this.sesionService.ubicacionPermitida();
+  }
 
-  async onUbicacionChange (event:any){
-    const isChecked = event.detail.checked;
-
-    if(!isChecked){
-      const toast= await this.toastController.create({
-        message:'Al desactivar la ubicación, perderás precisión en las alertas de tu zona',
-        duration: 5000,
-        position: 'bottom',
-        color: 'dark',
-        buttons: [{
-          text: 'Entendido',
-          role: 'cancel'
-          }
-        ]
-      });
-      await toast.present();
+  async onUbicacionChange(event: CustomEvent<{ checked: boolean }>) {
+    if (event.detail.checked) {
+      this.ubicacionActiva = await this.sesionService.pedirUbicacion();
+      if (!this.ubicacionActiva) this.sesionService.guardarUbicacion(false);
+      return;
     }
-  }
 
-  async onFrecuenciaChange(event:any){
-    const valorSeleccionado = event.detail.value;
-
-    const textosFrecuencia: {[key:string]: string} ={
-      '30m':'Cada 30 minutos',
-      '1h':'Cada 1 hora',
-      '2h':'Cada 2 horas',
-      '5h':'Cada 5 horas',
-      '10h':'Cada 10 horas',
-      '24h':'Cada 24 horas'
-    };
-
-    const textoLegible = textosFrecuencia[valorSeleccionado] || valorSeleccionado;
+    this.ubicacionActiva = false;
+    this.sesionService.guardarUbicacion(false);
     const toast = await this.toastController.create({
-      message: `Frecuencia de sincronización actualizada: ${textoLegible}`,
+      message: 'Al desactivar la ubicación, perderás precisión en las alertas de tu zona',
       duration: 5000,
       position: 'bottom',
-      color: 'dark'
+      color: 'dark',
+      buttons: [{ text: 'Entendido', role: 'cancel' }]
     });
     await toast.present();
   }
-
 }

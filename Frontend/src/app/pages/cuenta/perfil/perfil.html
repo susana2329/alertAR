@@ -11,6 +11,9 @@
 
 <ion-content class="ion-padding">
     <div class="perfil-container">
+        @if (datosSinActualizar && usuario) {
+            <p role="status">Mostrando tus datos guardados. No pudimos actualizarlos ahora.</p>
+        }
 
         <div class="main-config-card profile-hero-card">
             <div class="avatar-container">

@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { SesionService } from './sesion.service';
+import { environment } from '../../environments/environment';
+import { diagnosticarError } from '../utils/diagnostico-error';
 declare const google: any;
-const GOOGLE_CLIENT_ID = '1047238975139-gt4obqstc0k95l9i7lbpudj2skrtkgs8.apps.googleusercontent.com';
-const API_URL = 'http://localhost:3000/api';
+const GOOGLE_CLIENT_ID = environment.googleClientId || '1047238975139-gt4obqstc0k95l9i7lbpudj2skrtkgs8.apps.googleusercontent.com';
+const API_URL = environment.apiUrl.replace(/\/$/, '');
 
 @Injectable({ providedIn: 'root' })
 export class GoogleAuthService {
@@ -35,6 +37,10 @@ export class GoogleAuthService {
             const datos = await llamada.json();
 
             if (!llamada.ok) {
+              console.error('[HTTP]', diagnosticarError({
+                name: 'FetchHttpError', message: datos?.mensaje || llamada.statusText,
+                status: llamada.status, url: llamada.url, detail: datos
+              }));
               reject(new Error(datos.mensaje || 'No se pudo entrar con Google'));
               return;
             }
@@ -42,6 +48,7 @@ export class GoogleAuthService {
             this.sesion.iniciar(datos.token, datos.usuario);
             resolve(datos.usuario);
           } catch (error) {
+            console.error('[HTTP]', diagnosticarError(error, `${API_URL}/auth/google`));
             reject(new Error('No pudimos conectar con el servidor'));
           }
         },

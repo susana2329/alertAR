@@ -55,6 +55,7 @@ export interface Alerta {
   descripcion: string;
   fechaInicio: string | null;
   fechaFin: string | null;
+  actualizadoEn?: string | null;
   ubicacion: UbicacionAlerta | null;
   geometria: GeometriaPunto | GeometriaPoligono | GeometriaMultiPoligono | null;
   fuente?: string;
@@ -64,6 +65,13 @@ export interface Alerta {
   descripcionPreview?: string;
   descripcionCompleta?: string;
   detalle?: DetalleFuente;
+  reporteId?: string;
+  estadoVecinal?: 'sin_confirmar' | 'confirmado' | 'cerrado';
+  estadoModeracion?: 'pendiente' | 'aprobado' | 'rechazado';
+  fotosPendientes?: boolean;
+  votosSigue?: number;
+  votosNoEsta?: number;
+  cantidadFotos?: number;
 }
 
 export type ColorPresentacionAlerta = 'rojo' | 'naranja' | 'amarillo' | 'azul' | 'neutro';

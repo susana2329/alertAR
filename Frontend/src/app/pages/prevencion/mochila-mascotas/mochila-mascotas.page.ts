@@ -6,6 +6,7 @@ import { addIcons } from 'ionicons';
 import { arrowBackOutline } from 'ionicons/icons';
 import { ItemMochila } from '../../../models/mochila.model';
 import { MochilaService } from '../../../services/mochila.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-mochila-mascotas',
@@ -57,10 +58,18 @@ export class MochilaMascotasPage {
     const idsCompletados = this.checklist.filter(item => item.completado).map(item => item.id);
     const porcentajeActual = this.porcentaje;
 
-    this.mochilaService.guardarProgreso('mascotas', idsCompletados).subscribe({
-      next: (res) => console.log('Guardado de mascotas exitoso', res),
-      error: (err) => console.error('Error al guardar mascotas', err)
-    });
+    try {
+      await firstValueFrom(this.mochilaService.guardarProgreso('mascotas', idsCompletados));
+    } catch {
+      const errorToast = await this.toastController.create({
+        message: 'No se pudo guardar el kit de tu mascota. Intentá de nuevo.',
+        duration: 3500,
+        position: 'bottom',
+        color: 'danger'
+      });
+      await errorToast.present();
+      return;
+    }
 
     const toast = await this.toastController.create({
       message: `El kit de tu mascota se ha guardado (${porcentajeActual}% completado).`,

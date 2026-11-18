@@ -50,9 +50,17 @@
 
             <img [src]="previewimg[contador] || previewimg[0] || 'assets/icon/camara.png'" alt="Vista previa de foto">
 
+            @if (reporte.imagen.length > 0) {
+              <div class="btn-eliminar-foto-wrap" style="position: absolute; top: 8px; right: 8px; z-index: 10;">
+                <ion-button size="small" color="danger" (click)="eliminarFotoActual()">
+                  <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
+            }
+
           </div>
           <div class="selectimg" (click)="abrirmodalphotos()">
-            <img src="assets\icon\agregar.png" alt="">
+            <img src="assets/icon/agregar.png" alt="Agregar foto">
           </div>
         </div>
       </div>
@@ -83,7 +91,7 @@
           </div>
           <div class="buttonubi">
 
-            <ion-button><img src="assets\icon\mapas.png" alt="mapita" style="width:100%; height: 27px;"></ion-button>
+            <ion-button (click)="cargarUbicacion()"><img src="assets/icon/mapas.png" alt="mapita" style="width:100%; height: 27px;"></ion-button>
           </div>
         </div>
       </div>
@@ -106,7 +114,7 @@
           </div>
         </div>
 
-        <ion-modal [keepContentsMounted]="true">
+        <ion-modal #dateModal [keepContentsMounted]="true">
           <ion-header class="ion-no-border">
             <ion-item>
               <ion-title>
@@ -115,7 +123,7 @@
             </ion-item>
           </ion-header>
           <ion-datetime id="datetime" (ionChange)="fecha($event)"></ion-datetime>
-          <ion-button>Aceptar</ion-button>
+          <ion-button (click)="dateModal.dismiss()">Aceptar</ion-button>
         </ion-modal>
       </div>
      

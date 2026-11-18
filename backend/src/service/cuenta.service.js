@@ -1,9 +1,9 @@
 const cuentaRepository = require('../repository/cuenta.repository');
+const { eliminarReporteService } = require('./reporte.service');
 
 //Con esto se obtiene los datos basicos del perfil
 exports.obtenerPerfilUsuario = async (id) =>{
     try{
-        console.log("SERVICE - obtenerPerfilUsuario id:", id);
 
         const usuario = await cuentaRepository.findUsuarioById(id);
         if(!usuario){
@@ -27,7 +27,6 @@ exports.obtenerPerfilUsuario = async (id) =>{
 //Aca se maneja la actualizacion de foto de perfil
 exports.modificarFotoPerfil = async (id,nuevaFotoUrl) =>{
     try{
-        console.log("SERVICE -modificarFotoPerfil id:", id);
 
         if(!nuevaFotoUrl){
             throw new Error("La URL de la foto perfil es obligatoria");
@@ -43,7 +42,6 @@ exports.modificarFotoPerfil = async (id,nuevaFotoUrl) =>{
 //Aca se obtienen los reportes del usuario
 exports.obtenerReportesPorUsuario = async (idUsuario)=>{
     try{
-        console.log("SERVICE - obtenerReportesPorUsuario idUsuario:", idUsuario);
         const reportes = await cuentaRepository.findReportesByUsuarioId(idUsuario);
         return reportes || [];
     } catch (error) {
@@ -55,7 +53,6 @@ exports.obtenerReportesPorUsuario = async (idUsuario)=>{
 //Aca se trae los reportes individuales
 exports.obtenerReportePorId = async (reporteId)=>{
     try{
-        console.log("SERVICE - obtenerReportePorId reporteId:", reporteId);
         return await cuentaRepository.findReporteById(reporteId);
     }catch (error){
         console.error("Error en SERVICE obtenerReportePorId:", error);
@@ -65,9 +62,27 @@ exports.obtenerReportePorId = async (reporteId)=>{
 
 //Aca voy a enlistar las mochilas creadas por el usuario
 
+exports.eliminarCuenta = async (id, dependencias = {}) => {
+    try {
+        const repo = dependencias.repositorio || cuentaRepository;
+        const eliminarReporte = dependencias.eliminarReporte || eliminarReporteService;
+        const reportes = await repo.listarReportesDeUsuario(id);
+        for (const reporte of reportes) {
+            await eliminarReporte(String(reporte._id), id);
+        }
+        await repo.anonimizarVotosDeUsuario(id);
+        await repo.anonimizarModeracionesDeUsuario(id);
+        return await repo.deleteUsuarioById(id);
+    } catch (error) {
+        console.error("Error en SERVICE eliminarCuenta:", error);
+        throw error;
+    }
+};
+
+//Aca voy a enlistar las mochilas creadas por el usuario
+
 exports.obtenerMochilasPorUsuario = async (idUsuario) =>{
     try{
-        console.log("SERVICE - obtenerMochilasPorUsuario idUsuario:", idUsuario);
         const mochilas = await cuentaRepository.findMochilasByUsuarioId(idUsuario);
         return mochilas || [];
     }catch (error){
@@ -79,7 +94,6 @@ exports.obtenerMochilasPorUsuario = async (idUsuario) =>{
 //Aca se obtienen detalle de mochila individual
 exports.obtenerMochilaPorId = async (mochilaId) =>{
     try{
-        console.log("SERVICE - obtenerMochilaPorId mochilaId:", mochilaId);
         return await cuentaRepository.findMochilaById(mochilaId);
     }catch (error){
         console.error("Error en SERVICE obtenerMochilaPorId:", error);

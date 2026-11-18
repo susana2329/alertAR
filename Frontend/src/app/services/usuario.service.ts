@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UsuarioPerfil } from '../models/usuario.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PersonalService {
-  private API_URL = 'http://localhost:3000/api/cuenta/perfil';
+  private readonly API_URL = `${environment.apiUrl.replace(/\/$/, '')}/cuenta/perfil`;
 
   constructor(private _httpClient: HttpClient) {}
 
@@ -16,6 +17,10 @@ export class PersonalService {
   }
 
   actualizarFotoPerfil(id: string, data: { fotoPerfil: string }): Observable<any> {
-  return this._httpClient.patch(`http://localhost:3000/api/cuenta/perfil/${id}/avatar`, data);
-}
+    return this._httpClient.patch<any>(`${this.API_URL}/${id}/avatar`, data);
+  }
+
+  eliminarCuenta(id: string): Observable<any> {
+    return this._httpClient.delete<any>(`${this.API_URL}/${id}`);
+  }
 }

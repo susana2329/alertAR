@@ -5,7 +5,10 @@ exports.getPerfilUsuario = async (req, res) =>{
     try{
         
         const id = req.params.id;
-        console.log("CONTROLLER - getPerfilUsuario id:", id);
+
+        if (req.usuarioId && String(req.usuarioId) !== String(id)) {
+            return res.status(403).json({ code: 403, message: "No tenés permiso para acceder a este perfil" });
+        }
 
         const usuario = await cuentaService.obtenerPerfilUsuario(id);
 
@@ -18,7 +21,6 @@ exports.getPerfilUsuario = async (req, res) =>{
         res.setHeader('Content-Type','application/json');
         res.status(200).send(JSON.stringify(usuario));
     }catch (error){
-        console.log("Error en CONTROLLER getPerfilUsuario:", error);
         res.status(500).send({
             code:500,
             message: "Error al obtener el perfil del usuario"
@@ -30,7 +32,10 @@ exports.actualizarFotoPerfil = async (req,res) =>{
     try{
         const id = req.params.id;
         const {fotoPerfil} = req.body;
-        console.log("CONTROLLER - actualizarFotoPerfil id: ", id);
+
+        if (req.usuarioId && String(req.usuarioId) !== String(id)) {
+            return res.status(403).json({ code: 403, message: "No tenés permiso para actualizar esta cuenta" });
+        }
 
         const usuarioActualizado = await cuentaService.modificarFotoPerfil(id,fotoPerfil);
 
@@ -46,7 +51,6 @@ exports.actualizarFotoPerfil = async (req,res) =>{
 
 
     }catch(error){
-        console.log("Error en CONTROLLER actualizarFotoPerfil:", error);
         res.status(500).send({
             code:500,
             message:"Error al actualizar la foto de perfil"
@@ -55,12 +59,45 @@ exports.actualizarFotoPerfil = async (req,res) =>{
     }
 };
 
+exports.eliminarCuenta = async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        if (req.usuarioId && String(req.usuarioId) !== String(id)) {
+            return res.status(403).json({ code: 403, message: "No tenés permiso para eliminar esta cuenta" });
+        }
+
+        const resultado = await cuentaService.eliminarCuenta(id);
+
+        if (!resultado) {
+            return res.status(404).send({
+                code: 404,
+                message: `No se encontró un usuario con el id: ${id}`
+            });
+        }
+
+        res.status(200).json({
+            code: 200,
+            message: "Cuenta eliminada correctamente"
+        });
+    } catch (error) {
+        console.error("Error en CONTROLLER eliminarCuenta:", error);
+        res.status(500).send({
+            code: 500,
+            message: "Error al eliminar la cuenta"
+        });
+    }
+};
+
 //Aca se enlistan todos los reportes hechos por el usuario
 
 exports.getReportesPorUsuario = async (req, res) => {
     try{
         const idUsuario = req.params.id;
-        console.log("CONTROLLER - getReportesPorUsuario idUsuario:", idUsuario);
+
+        if (req.usuarioId && String(req.usuarioId) !== String(idUsuario)) {
+            return res.status(403).json({ code: 403, message: "No tenés permiso para ver estos reportes" });
+        }
 
         if (!mongoose.isValidObjectId(idUsuario)) {
             return res.status(400).json({ code: 400, message: "El id del usuario no es válido" });
@@ -80,8 +117,8 @@ exports.getReporteDetalle = async(req,res) =>{
     try{
 
         const reporteId = req.params.reporteId;
-        console.log("CONTROLLER -getReporteDetalle id:",reporteId);
 
+        const reporte = await cuentaService.obtenerReportePorId(reporteId);
         if(!reporte){
 
             return res.status(404).send({
@@ -93,7 +130,6 @@ exports.getReporteDetalle = async(req,res) =>{
         res.status(200).send(JSON.stringify(reporte));
     }catch (error){
 
-        console.log("Error en CONTROLLER getReporteDetalle",error);
         res.status(500).send({
             code:500,
             message:"Error al obtener el detalle del reporte"
@@ -107,7 +143,6 @@ exports.getMochilasPorUsuario = async(req,res) =>{
 
     try{
         const idUsuario = req.params.id;
-        console.log("CONTROLLER -getMochilasPorUsuario idUsuario", idUsuario);
 
         const mochilas = await cuentaService.obtenerMochilasPorUsuario(idUsuario);
 
@@ -115,7 +150,6 @@ exports.getMochilasPorUsuario = async(req,res) =>{
         res.status(200).send(JSON.stringify(mochilas));
 
     }catch (error){
-        console.log("Error en CONTROLLER getMochilasPorUsuario",erorr);
         res.status(500).send({
             code:500,
             message:"Error al obtener las mochilas del usuario"
@@ -129,7 +163,6 @@ exports.getMochilaDetalle = async(req,res) =>{
     try{
 
         const mochilaId = req.params.mochilaId;
-        console.log("CONTROLLER - getMochilaDetalle id:", mochilaId);
 
         const mochila = await cuentaService.obtenerMochilaPorId(mochilaId);
 
@@ -143,7 +176,6 @@ exports.getMochilaDetalle = async(req,res) =>{
         res.setHeader('Content-Type','application/json');
         res.status(200).send(JSON.stringify(mochila));
     }catch (error){
-        console.log("Error en CONTROLLER getMochilaDetalle", error);
         res.status(500).send({
             code:500,
             message:"Error al obtener el detalle de la mochila"

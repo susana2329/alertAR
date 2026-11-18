@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { SesionService } from '../../services/sesion.service';
 import { IonContent, IonHeader, IonToolbar, IonTitle, IonAvatar, IonRouterLink, IonIcon, IonButton, IonButtons, IonTabBar, IonLabel, IonTabButton, AlertController } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { chevronForwardOutline, logOutOutline, chevronBackOutline, homeOutline, mapOutline, bookmarkOutline, fileTrayFullOutline, personOutline, shieldOutline } from 'ionicons/icons';
+import { chevronForwardOutline, logOutOutline, chevronBackOutline, homeOutline, mapOutline, bookmarkOutline, fileTrayFullOutline, personOutline, shieldOutline, shieldCheckmarkOutline } from 'ionicons/icons';
 import { UsuarioPerfil } from '../../models/usuario.model';
 import { PersonalService } from '../../services/usuario.service';
 
@@ -35,6 +35,8 @@ import { PersonalService } from '../../services/usuario.service';
 })
 export class CuentaPage implements OnInit {
   public usuario: UsuarioPerfil | null = null;
+  public datosSinActualizar = false;
+  public esModerador = this.sesionService.esModerador;
   constructor(
     private router: Router,
     private alertController: AlertController,
@@ -52,7 +54,8 @@ export class CuentaPage implements OnInit {
       fileTrayFullOutline,
       personOutline,
       bookmarkOutline,
-      shieldOutline
+      shieldOutline,
+      shieldCheckmarkOutline
     });
 
   }
@@ -64,35 +67,39 @@ export class CuentaPage implements OnInit {
 
 
   ngOnInit() {
-    console.log('CuentaPage funcionando correctamente');
     this.cargarDatosUsuario();
   }
 
   cargarDatosUsuario() {
-    const sesion: any = this.sesionService.usuario();
+    const sesion = this.sesionService.usuario();
     const idUsuario = sesion?._id || sesion?.id;
-  if (!idUsuario) {
     if (sesion) {
       this.usuario = {
-        _id: '',
+        _id: idUsuario ?? '',
         nombre: sesion.nombre ?? '',
         apellido: sesion.apellido ?? '',
         email: sesion.email ?? '',
-        foto: sesion.foto ?? ''
+        foto: sesion.foto ?? '',
+        proveedor: sesion.proveedor
       };
       this.cdr.markForCheck();
     }
-    return;
-  }
+    if (!idUsuario) return;
 
     this.personalService.obtenerDatosUsuario(idUsuario).subscribe({
       next: (data: UsuarioPerfil) => {
         this.usuario = data;
+        this.datosSinActualizar = false;
+        this.sesionService.actualizarUsuario({
+          id: data._id, nombre: data.nombre, apellido: data.apellido,
+          email: data.email, foto: data.foto, proveedor: data.proveedor
+        });
         this.cdr.markForCheck();
-        console.log('Datos de cuenta cargados con éxito', data);
       },
       error: (error) => {
         console.error('Error al cargar los datos de la cuenta', error);
+        this.datosSinActualizar = true;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -104,10 +111,7 @@ export class CuentaPage implements OnInit {
       buttons: [
         {
           text: 'Cancelar',
-          role: 'cancel',
-          handler: () => {
-            console.log('Cierre de sesión cancelado');
-          }
+          role: 'cancel'
         },
         {
           text: 'Si, cerrar sesión',

@@ -81,6 +81,13 @@ function normalizarINA(documento, registrarError = () => {}) {
             const fecha = fechaISO(p.fecha);
             if (!fecha) throw new Error('Observación del INA sin fecha válida');
 
+            const unid = numero(p.unid);
+            const seriesId = numero(p.series_id);
+            if (!Number.isSafeInteger(unid) || unid <= 0 || !Number.isSafeInteger(seriesId) || seriesId <= 0) {
+                reportarError({ indice, identificador: String(identificador), campo: 'identidad', codigo: 'identidad_ina_no_confiable', mensaje: 'Se requiere unid y series_id numéricos para identificar la estación' });
+                return [];
+            }
+
             const c = feature.geometry?.coordinates;
             const geometria = feature.geometry?.type === 'Point' && Array.isArray(c) && c.length >= 2 &&
                 ['number', 'string'].includes(typeof c[0]) && ['number', 'string'].includes(typeof c[1]) &&
@@ -97,10 +104,11 @@ function normalizarINA(documento, registrarError = () => {}) {
             const clasificacion = clasificarMedicion({ valor: medicion, estado: p.estado, umbrales });
             const nombre = typeof p.nombre === 'string' && p.nombre.trim() ? p.nombre.trim() : null;
             const rio = typeof p.rio === 'string' && p.rio.trim() ? p.rio.trim() : null;
-            const estacion = { unid: numero(p.unid), seriesId: numero(p.series_id), nombre, rio };
+            const estacion = { unid, seriesId, nombre, rio };
             const tendencia = typeof p.tendencia === 'string' ? p.tendencia.trim().toLowerCase() : null;
             return [{
                 origen: 'oficial', fuente: 'INA', identificadorFuente: String(identificador),
+                claveOperativaINA: `INA:ESTACION:${unid}`,
                 claveIdempotencia: `INA:${String(identificador)}:${fecha}`,
                 titulo: nombre || rio || `Estación INA ${identificador}`,
                 tipo: 'observacion', naturaleza: clasificacion.naturaleza, nivel: clasificacion.nivel,

@@ -5,7 +5,7 @@ const { normalizarINA, clasificarMedicion } = require('../src/ingestion/normaliz
 function feature(overrides = {}) {
     return {
         id: 'station.1', geometry: { type: 'Point', coordinates: [-60, -35] },
-        properties: { unid: 1, fecha: '2026-10-21T00:00:00Z', valor: 5, valor_precedente: 4.9,
+        properties: { unid: 1, series_id: 101, fecha: '2026-10-21T00:00:00Z', valor: 5, valor_precedente: 4.9,
             tendencia: 'crece', estado: 'normal', nivel_de_alerta: 4.7,
             nivel_de_evacuacion: 6, nivel_de_aguas_bajas: 0, timeseries: '[]', ...overrides }
     };
@@ -48,4 +48,14 @@ test('aísla fecha, identificador y geometría inválidos y conserva observacion
     assert.equal(registros[1].geometria.type, 'Point');
     assert.equal(errores.length, 3);
     assert.equal(normalizarINA({ type: 'FeatureCollection', features: [] }).length, 0);
+});
+
+test('envía a revisión las observaciones INA sin unid o series_id confiables', () => {
+    const errores = [];
+    const items = normalizarINA({ type: 'FeatureCollection', features: [
+        feature({ series_id: null }), feature({ unid: 'no-numérico' })
+    ] }, error => errores.push(error));
+    assert.deepEqual(items, []);
+    assert.equal(errores.length, 2);
+    assert.ok(errores.every(error => error.codigo === 'identidad_ina_no_confiable'));
 });

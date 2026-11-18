@@ -11,22 +11,16 @@
 
 <ion-content class="ion-padding">
   @if (reporte) {
-    <div class="hero" [class.revisado]="esRevisado(reporte.estado)">
+    <div class="hero" [class.revisado]="reporte.estadoVecinal === 'confirmado'">
       <div class="hero-icono">
-        <ion-icon [name]="esRevisado(reporte.estado) ? 'checkmark-circle-outline' : 'time-outline'"></ion-icon>
+        <ion-icon [name]="reporte.estadoVecinal === 'confirmado' ? 'checkmark-circle-outline' : 'time-outline'"></ion-icon>
       </div>
       <div class="hero-texto">
-        <span class="estado-badge" [class.revisado]="esRevisado(reporte.estado)">
-          {{ textoEstado(reporte.estado) }}
+        <span class="estado-badge" [class.revisado]="reporte.estadoVecinal === 'confirmado'">
+          {{ textoEstado(reporte) }}
         </span>
         <h2>{{ reporte.tipo }}</h2>
-        <p>
-          @if (esRevisado(reporte.estado)) {
-            Tu reporte ya fue revisado. ¡Gracias por aportar a tu comunidad!
-          } @else {
-            Tu reporte está en revisión.
-          }
-        </p>
+        <p>{{ mensajeEstado(reporte) }}</p>
       </div>
     </div>
 
@@ -34,6 +28,20 @@
     <div class="detalle-card">
       <p class="descripcion-texto">{{ reporte.descripcion }}</p>
     </div>
+
+    @if (reporte.fotos.length) {
+      <p class="seccion-label">Fotos del reporte</p>
+      <div class="galeria-fotos">
+        @for (foto of reporte.fotos; track foto.url; let i = $index) {
+          <figure>
+            <img [src]="foto.url" [alt]="'Foto ' + (i + 1) + ' del reporte'" loading="lazy" (error)="mostrarErrorFoto($event)">
+            @if (foto.originalname) {
+              <figcaption>{{ foto.originalname }}</figcaption>
+            }
+          </figure>
+        }
+      </div>
+    }
 
     <div class="detalle-card">
       <div class="dato">
@@ -57,6 +65,13 @@
           <p>{{ reporte.fecha | date:'dd/MM/yyyy' }}</p>
         </div>
       </div>
+    </div>
+
+    <div class="acciones-reporte">
+      <ion-button expand="block" color="danger" fill="outline" [disabled]="eliminando" (click)="confirmarEliminacion()">
+        <ion-icon name="trash-outline" slot="start"></ion-icon>
+        {{ eliminando ? 'Eliminando...' : 'Eliminar este reporte' }}
+      </ion-button>
     </div>
   }
 </ion-content>

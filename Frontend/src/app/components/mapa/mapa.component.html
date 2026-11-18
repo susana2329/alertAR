@@ -2,6 +2,10 @@
 <div class="map-container">
   <div id="map"></div>
 
+  @if (modoMock) {
+    <p class="map-demo-banner">Demostración: reportes y fotos de muestra, sin conexión a AWS</p>
+  }
+
   @if (estadoAlertas !== 'cargado' || alertas.length === 0) {
     <section class="alertas-status" aria-live="polite">
       @if (estadoAlertas === 'cargando') {

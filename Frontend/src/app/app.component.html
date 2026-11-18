@@ -1,4 +1,12 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
   <app-nav-bar></app-nav-bar>
+  @if (showStartupSplash()) {
+    <div class="startup-splash" [class.startup-splash-exiting]="splashExiting()" aria-hidden="true">
+      <picture>
+        <source media="(orientation: landscape)" srcset="assets/splash-alertar-landscape.png">
+        <img src="assets/splash-alertar-portrait.png" alt="">
+      </picture>
+    </div>
+  }
 </ion-app>

@@ -1,0 +1,44 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cerrar()" aria-label="Volver">Volver</ion-button>
+    </ion-buttons>
+    <ion-title>{{ documento === 'privacidad' ? 'Privacidad' : 'Términos de uso' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <article>
+    @if (documento === 'privacidad') {
+      <h1>Política de privacidad de AlertAR</h1>
+      <p class="fecha">Versión del 17 de noviembre de 2026</p>
+      <h2>Responsable y contacto</h2>
+      <p>El responsable de AlertAR es Tobias Sanchez. Para consultas sobre datos personales, acceso, corrección o eliminación, escribí a <a href="mailto:contacto@alertarapp.com.ar">contacto@alertarapp.com.ar</a>.</p>
+      <h2>Datos y finalidades</h2>
+      <p>Para crear y mantener tu cuenta usamos tu nombre, apellido, correo y una contraseña protegida mediante hash, o los datos básicos que Google entrega si elegís ese inicio de sesión. Podés elegir una foto de perfil.</p>
+      <p>Si permitís la ubicación, la usamos para mostrar información cercana y obtener el nombre de un lugar. Si publicás un reporte, guardamos su descripción, fecha, ubicación, coordenadas y fotos. Los reportes activos se muestran en el mapa; las fotos se revisan antes de publicarse. También guardamos las respuestas vecinales que sirven para confirmar o cerrar reportes.</p>
+      <p>El servidor registra datos técnicos de solicitudes y errores para operar y proteger el servicio.</p>
+      <h2>Servicios externos</h2>
+      <p>Usamos MongoDB Atlas para los datos de la aplicación, Amazon S3 para fotos de reportes, Google para el acceso opcional y OpenStreetMap/Nominatim para geocodificación. El mapa base usa servicios de terceros. La geocodificación recibe coordenadas aproximadas.</p>
+      <h2>Conservación</h2>
+      <p>Conservamos los datos de una cuenta mientras esté activa. Si pedís eliminarla desde tu perfil, eliminamos el registro de cuenta y sus reportes, anonimizamos sus respuestas en reportes ajenos y desvinculamos las moderaciones que realizó. Las fotos asociadas se eliminan o quedan en una cola de reintento si falla el almacenamiento.</p>
+      <p>Los reportes activos se conservan mientras el incidente siga vigente. Los reportes cerrados desde esta versión se eliminan al cumplirse 12 meses desde el cierre; los rechazados por moderación, al cumplirse 30 días. Las fotos se eliminan con su reporte o antes si la moderación las rechaza. Si eliminás un reporte propio, se retira de inmediato y se intenta limpiar sus fotos. Los reportes antiguos sin fecha de cierre requieren revisión antes de aplicarles el plazo.</p>
+      <p>En esta versión no hay eliminación automática por inactividad. Ese proceso se activará cuando sea posible avisar previamente por correo.</p>
+      <h2>Tus derechos</h2>
+      <p>Podés solicitar información, acceso, rectificación, actualización o supresión de tus datos a <a href="mailto:contacto@alertarapp.com.ar">contacto@alertarapp.com.ar</a>. Podés retirar el permiso de ubicación en la app o desde el dispositivo; algunas funciones dejarán de estar disponibles. Si tu solicitud no recibe una respuesta adecuada, podés acudir a la Agencia de Acceso a la Información Pública.</p>
+    } @else {
+      <h1>Términos de uso de AlertAR</h1>
+      <p class="fecha">Versión del 17 de noviembre de 2026</p>
+      <h2>Qué ofrece AlertAR</h2>
+      <p>AlertAR reúne alertas de organismos oficiales, reportes de vecinos, recomendaciones y herramientas de preparación. El responsable es Tobias Sanchez. Podés escribir a <a href="mailto:contacto@alertarapp.com.ar">contacto@alertarapp.com.ar</a>.</p>
+      <h2>Alcance de la información</h2>
+      <p>Las alertas oficiales indican su fuente y fecha. Los reportes vecinales pueden estar sin confirmar y no equivalen a un aviso oficial. La información puede demorarse o no estar disponible por problemas de conexión o de las fuentes. Ante una emergencia, seguí las indicaciones de las autoridades y usá los canales oficiales de asistencia.</p>
+      <h2>Cuenta y reportes</h2>
+      <p>Protegé el acceso a tu cuenta y publicá reportes de buena fe sobre hechos que hayas observado. No publiques datos personales de terceros ni contenido engañoso, ofensivo o ajeno al incidente. Las fotos están sujetas a moderación y los reportes pueden retirarse si incumplen estas reglas. Las respuestas vecinales contribuyen al estado de cada reporte.</p>
+      <h2>Ubicación y servicios externos</h2>
+      <p>La ubicación es opcional para consultar información cercana, pero se requiere una ubicación válida para publicar un reporte geolocalizado. Algunas funciones dependen de proveedores externos de datos oficiales, mapas, autenticación y almacenamiento.</p>
+      <h2>Cambios</h2>
+      <p>Podemos actualizar el servicio y estos términos. Publicaremos la fecha de la versión vigente en esta página.</p>
+    }
+  </article>
+</ion-content>

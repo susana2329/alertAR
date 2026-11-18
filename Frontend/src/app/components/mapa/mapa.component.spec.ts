@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of, Subject, throwError } from 'rxjs';
 
 import { MapaComponent } from './mapa.component';
 import { AlertaService } from '../../services/alerta.service';
@@ -6,15 +7,65 @@ import { AlertaService } from '../../services/alerta.service';
 describe('MapaComponent', () => {
   let component: MapaComponent;
   let fixture: ComponentFixture<MapaComponent>;
+  let alertaService: { listarParaMapa: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [{ provide: AlertaService, useValue: { listar: () => ({ subscribe: () => undefined }) } }] });
+    alertaService = { listarParaMapa: vi.fn(() => new Subject()) };
+    TestBed.configureTestingModule({ providers: [{ provide: AlertaService, useValue: alertaService }] });
     fixture = TestBed.createComponent(MapaComponent);
     component = fixture.componentInstance;
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('termina la carga y expone las alertas recibidas', () => {
+    const marcarVista = vi.spyOn((component as any).changeDetector, 'markForCheck');
+    alertaService.listarParaMapa.mockReturnValue(of([{
+      id: 'alerta-1', titulo: 'Alerta', tipo: 'crecida', nivel: 'advertencia',
+      origen: 'oficial', descripcion: '', fechaInicio: null, fechaFin: null,
+      ubicacion: { latitud: -34, longitud: -58 }, geometria: null
+    }]));
+
+    component.cargarAlertas();
+
+    expect(component.estadoAlertas).toBe('cargado');
+    expect(component.alertas).toHaveLength(1);
+    expect(marcarVista).toHaveBeenCalled();
+  });
+
+  it('muestra error en vez de dejar el indicador activo cuando falla la petición', () => {
+    alertaService.listarParaMapa.mockReturnValue(throwError(() => new Error('offline')));
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    component.cargarAlertas();
+
+    expect(component.estadoAlertas).toBe('error');
+    expect(component.mensajeError).toContain('No se pudieron cargar');
+    errorSpy.mockRestore();
+  });
+
+  it('finaliza una petición que no emite dentro del tiempo límite', () => {
+    vi.useFakeTimers();
+    alertaService.listarParaMapa.mockReturnValue(new Subject());
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    component.cargarAlertas();
+    vi.advanceTimersByTime(20001);
+
+    expect(component.estadoAlertas).toBe('error');
+    errorSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it('evita iniciar solicitudes concurrentes', () => {
+    const solicitud = new Subject();
+    alertaService.listarParaMapa.mockReturnValue(solicitud);
+    component.cargarAlertas();
+    component.cargarAlertas();
+    expect(alertaService.listarParaMapa).toHaveBeenCalledTimes(1);
+    solicitud.complete();
   });
 
   it('omite ubicaciones ausentes o fuera de rango y conserva cada punto válido una sola vez', () => {
@@ -26,6 +77,30 @@ describe('MapaComponent', () => {
     expect(coleccion.features).toHaveLength(1);
     expect(coleccion.features[0].geometry.coordinates).toEqual([-60, -35]);
     expect(coleccion.features[0].properties.nivel).toBe('informativo');
+  });
+
+  it('distingue en el GeoJSON los reportes vecinales', () => {
+    component.alertas = [{
+      id: 'vecinal-reporte-1',
+      reporteId: 'reporte-1',
+      titulo: 'Reporte vecinal: inundacion',
+      tipo: 'inundacion',
+      nivel: 'informativo',
+      origen: 'vecinal',
+      descripcion: 'Agua acumulada',
+      fechaInicio: null,
+      fechaFin: null,
+      ubicacion: { latitud: -34.6, longitud: -58.4 },
+      geometria: null,
+      estadoVecinal: 'sin_confirmar',
+      votosSigue: 0,
+      votosNoEsta: 0
+    }];
+
+    const coleccion = (component as any).crearFeatureCollection();
+    expect(coleccion.features).toHaveLength(1);
+    expect(coleccion.features[0].properties.origen).toBe('vecinal');
+    expect(coleccion.features[0].properties.color).toBe('#0f9f8f');
   });
 
   it('muestra magnitud y profundidad en el popup de sismos sin usar riesgo como identidad', () => {
