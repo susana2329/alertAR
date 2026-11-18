@@ -1,49 +1,18 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {
   IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonButton,
   IonIcon,
-  IonContent,
-  IonFooter
+  IonContent
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import {
-  arrowBackOutline,
-  waterOutline,
-  thunderstorm,
-  pulseOutline,
-  flameOutline,
-  sunnyOutline,
-  home,
-  mapOutline,
-  documentTextOutline,
-  shieldCheckmarkOutline,
-  personOutline,
-} from 'ionicons/icons';
-
-addIcons({
-  'arrow-back-outline': arrowBackOutline,
-  'water-outline': waterOutline,
-  thunderstorm,
-  'pulse-outline': pulseOutline,
-  'flame-outline': flameOutline,
-  'sunny-outline': sunnyOutline,
-  home,
-  'map-outline': mapOutline,
-  'document-text-outline': documentTextOutline,
-  'shield-checkmark-outline': shieldCheckmarkOutline,
-  'person-outline': personOutline,
-});
+import { arrowBackOutline } from 'ionicons/icons';
 
 interface CategoriaEmergencia {
   id: string;
   nombre: string;
-  icon: string;
-  iconColor: string;
+  icono: string;
   activa?: boolean;
 }
 
@@ -51,15 +20,10 @@ interface CategoriaEmergencia {
   selector: 'app-recomendaciones',
   standalone: true,
   imports: [
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonButton,
-    IonIcon,
-    IonContent,
-    IonFooter,
     CommonModule,
-    RouterLink
+    IonHeader,
+    IonIcon,
+    IonContent
   ],
   templateUrl: './recomendaciones.page.html',
   styleUrls: ['./recomendaciones.page.scss']
@@ -67,15 +31,19 @@ interface CategoriaEmergencia {
 export class RecomendacionesPage {
 
   categorias: CategoriaEmergencia[] = [
-    { id: 'inundaciones', nombre: 'Inundaciones', icon: 'water-outline', iconColor: '#03294F' },
-    { id: 'tormentas', nombre: 'Tormentas', icon: 'thunderstorm', iconColor: '#03294F' },
-    { id: 'sismos', nombre: 'Sismos', icon: 'pulse-outline', iconColor: '#79A288' },
-    { id: 'incendios', nombre: 'Incendios', icon: 'flame-outline', iconColor: '#EE4129' },
-    { id: 'olas-calor', nombre: 'Olas de calor', icon: 'sunny-outline', iconColor: '#F2A93B' },
-    { id: 'viento-fuerte', nombre: 'Viento fuerte', icon: 'viento-custom', iconColor: '#0E7490' },
+    { id: 'inundaciones', nombre: 'Inundaciones', icono: 'assets/icon/inundaciones.png' },
+    { id: 'tormentas', nombre: 'Tormentas', icono: 'assets/icon/tormentas.png' },
+    { id: 'sismos', nombre: 'Sismos', icono: 'assets/icon/sismos.png' },
+    { id: 'incendios', nombre: 'Incendios', icono: 'assets/icon/incendios.png' },
+    { id: 'olas-calor', nombre: 'Olas de calor', icono: 'assets/icon/olas-calor.png' },
+    { id: 'viento-fuerte', nombre: 'Viento fuerte', icono: 'assets/icon/viento-fuerte.png' },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    addIcons({
+      'arrow-back-outline': arrowBackOutline
+    });
+  }
 
   volver(): void {
     this.router.navigate(['/inicio']);

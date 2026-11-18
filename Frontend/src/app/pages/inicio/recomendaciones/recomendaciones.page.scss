@@ -1,113 +1,157 @@
-.recomendaciones-content {
-  --background: #F8FAFC;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+* {
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-ion-toolbar {
-  --background: #ffffff;
+:host {
+  padding-left: 2%;
+  padding-right: 2%;
+  background-color: #F8FAFC;
 }
 
-.page-heading {
-  margin: 4px 0 20px;
+ion-content {
+  --background: hsl(210, 40%, 98%);
+  --color: black;
+}
 
-  h1 {
-    margin: 0 0 4px;
-    font-size: 22px;
-    font-weight: 700;
-    color: #03294F;
-  }
+ion-header {
+  display: flex;
+  box-shadow: none;
+  --border-style: none;
+  background: #F8FAFC;
+}
 
-  p {
-    margin: 0;
-    font-size: 13px;
-    color: #03294F;
-    opacity: 0.6;
-  }
+.report-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 20px 16px;
+  width: 100%;
+}
+
+.back-button {
+  position: absolute;
+  left: 16px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #03294F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  z-index: 10;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.logo-img {
+  height: 16px;
+  object-fit: contain;
+}
+
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 115px 16px;
+}
+
+.titulos {
+  margin-top: 16px;
+  margin-bottom: 28px;
+}
+
+.titulos h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #03294F;
+  display: flex;
+  align-items: center;
+}
+
+.titulos h1::before {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 20px;
+  background-color: #0E7490;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.titulos p {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748B;
 }
 
 .section-title {
-  margin: 0 0 16px;
-  font-size: 16px;
+  margin: 0 0 16px 0;
+  font-size: 15px;
   font-weight: 700;
   color: #03294F;
 }
 
 .categorias-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  padding-bottom: 24px;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 .categoria-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 20px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  justify-content: center;
+  padding: 18px 10px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #E2E4E7;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease;
+  min-height: 165px;
+  cursor: pointer;
+
+  &:active {
+    transform: scale(0.97);
+  }
 
   &.activa {
     background: rgba(253, 211, 113, 0.18);
+    border-color: rgba(14, 116, 144, 0.4);
   }
 }
 
 .icon-circle {
-  width: 56px;
-  height: 56px;
+  width: 85px;
+  height: 85px;
+  margin-bottom: 14px;
   border-radius: 50%;
+  background: #EFEFEE;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
   display: flex;
-  align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  align-items: center;
 
-  ion-icon {
-    font-size: 28px;
-  }
-
-  .wind-icon {
-    width: 28px;
-    height: 28px;
+  img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
   }
 }
 
 .categoria-label {
   margin: 0;
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 600;
   color: #03294F;
   text-align: center;
-}
-
-ion-footer {
-  .bottom-nav {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    background: #ffffff;
-    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.06);
-  }
-
-  .nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    color: #03294F;
-    opacity: 0.5;
-    text-decoration: none;
-    font-size: 11px;
-
-    ion-icon {
-      font-size: 22px;
-    }
-
-    &.active {
-      color: #0E7490;
-      opacity: 1;
-      font-weight: 600;
-    }
-  }
 }
