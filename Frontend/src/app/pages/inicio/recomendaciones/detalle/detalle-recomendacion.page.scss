@@ -5,34 +5,65 @@
 .contenido {
   position: relative;
   min-height: 100%;
-  padding: 0 22px 40px;
+  padding: 0 22px 115px;
 }
 
-.fondo {
+.hero-fondo {
   position: absolute;
-  inset: 0;
-  background-color: #2B93AE;
-  background-image: linear-gradient(to bottom, #3B4046 0, #747C83 150px, #2B93AE 210px);
-  background-repeat: no-repeat;
-  background-size: 100% auto;
-  background-position: top center;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 245px;
+  background: linear-gradient(to bottom, #3B4046 0%, #64748B 65%, #2B93AE 100%);
+  overflow: hidden;
+  pointer-events: none;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+
+  .scrim-superior {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(3, 41, 79, 0.72) 0%,
+      rgba(3, 41, 79, 0.32) 48%,
+      rgba(3, 41, 79, 0) 75%
+    );
+  }
+
+  .degradado-inferior {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 65px;
+    background: linear-gradient(to bottom, rgba(43, 147, 174, 0) 0%, #2B93AE 100%);
+  }
 }
 
 .barra {
   position: relative;
+  z-index: 2;
   display: flex;
   align-items: flex-start;
-  gap: 28px;
-  padding-top: max(18px, env(safe-area-inset-top));
+  gap: 20px;
+  padding-top: max(20px, env(safe-area-inset-top));
 }
 
 .volver {
   all: unset;
   cursor: pointer;
   color: #FFFFFF;
-  font-size: 30px;
+  font-size: 28px;
   line-height: 1;
   margin-top: 2px;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.35));
 }
 
 .encabezado {
@@ -41,25 +72,29 @@
     font-size: 20px;
     font-weight: 700;
     color: #FFFFFF;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
   }
 
   p {
     margin: 0;
     font-size: 13px;
-    color: #D3D8DD;
+    font-weight: 500;
+    color: #F1F5F9;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   }
 }
 
 .tarjetas {
   position: relative;
-  margin-top: 118px;
+  z-index: 2;
+  margin-top: 122px;
 }
 
 .tarjeta {
   background: #F8FAFC;
-  border-radius: 10px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
-  margin-bottom: 34px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  margin-bottom: 24px;
   overflow: hidden;
 }
 
@@ -127,33 +162,60 @@
 .lista {
   list-style: none;
   margin: 0;
-  padding: 4px 18px 16px 34px;
+  padding: 4px 18px 18px 24px;
 
   li {
     display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 6px 0;
-    font-size: 13px;
-    font-weight: 600;
-    color: #1F2933;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 0;
   }
 
   .vacio {
+    font-size: 13px;
     font-weight: 500;
     opacity: 0.6;
   }
 }
 
+.item-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #03294F;
+    line-height: 1.3;
+  }
+
+  span {
+    font-size: 12px;
+    font-weight: 400;
+    color: #4A5560;
+    line-height: 1.4;
+  }
+}
+
 .check {
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
+  margin-top: 1px;
   border-radius: 50%;
   background: #4E9461;
   color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 16px;
+}
+
+.fuente-nota {
+  margin: -6px 4px 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
 }
