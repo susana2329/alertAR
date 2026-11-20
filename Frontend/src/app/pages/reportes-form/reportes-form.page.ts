@@ -30,6 +30,7 @@ import { addIcons } from 'ionicons';
 import { SesionService } from '../../services/sesion.service';
 import { GeocodificacionService } from '../../services/geocodificacion.service';
 import { firstValueFrom } from 'rxjs';
+import { BorradorReporteService } from '../../services/borrador-reporte.service';
 
 @Component({
   selector: 'app-reportes-form',
@@ -71,7 +72,7 @@ export class ReportesFormPage implements OnInit {
 
   public reporteEnviado: boolean = false; 
 
-  constructor(private route: ActivatedRoute, private router: Router, private modal: ModalController, private location: Location, private toastcontrol: ToastController, private sesion: SesionService, private geocodificacion: GeocodificacionService) {
+  constructor(private route: ActivatedRoute, private router: Router, private modal: ModalController, private location: Location, private toastcontrol: ToastController, private sesion: SesionService, private geocodificacion: GeocodificacionService, private borrador: BorradorReporteService) {
     addIcons({
       'arrow-back-outline': arrowBackOutline,
       'checkmark-circle': checkmarkCircle,
@@ -79,6 +80,17 @@ export class ReportesFormPage implements OnInit {
     })
   }
   async ngOnInit() {
+    if (this.route.snapshot.queryParams['recuperarFoto'] === '1') {
+      const recuperado = await this.borrador.recuperar().catch(() => null);
+      if (recuperado) {
+        this.reporte = recuperado;
+        this.tipo = recuperado.tipo;
+        this.bandera = this.tipo !== 'otro';
+        this.previewimg = recuperado.imagen.map(foto => URL.createObjectURL(foto));
+        await this.borrador.limpiar();
+        return;
+      }
+    }
     this.tipo = this.route.snapshot.queryParams['tipoReporte'] ?? 'otro'
     this.tipo = this.tipo.replaceAll("-", " ")
     if (this.tipo == "otro") {
@@ -134,6 +146,12 @@ export class ReportesFormPage implements OnInit {
   }
 
   async abrirmodalphotos() {
+    try {
+      await this.borrador.guardar(this.reporte);
+    } catch {
+      await this.toast('No pudimos guardar el reporte antes de abrir la cámara. Liberá espacio e intentá de nuevo.');
+      return;
+    }
     const modalbuttons = await this.modal.create({
       component: ModalPhotosComponent,
       initialBreakpoint: 0.25,
@@ -142,6 +160,7 @@ export class ReportesFormPage implements OnInit {
     const dismissal = modalbuttons.onDidDismiss<Blob[]>()
     await modalbuttons.present()
     const { data } = await dismissal
+    await this.borrador.limpiar().catch(() => {});
     if (data) {
       this.guardarfotos(data);
     } else {

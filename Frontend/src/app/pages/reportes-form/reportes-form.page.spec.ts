@@ -6,19 +6,36 @@ describe('ReportesFormPage', () => {
     const toast = vi.fn().mockResolvedValue(undefined);
     const sesion = { ubicacionPermitida: vi.fn().mockReturnValue(false), pedirUbicacion: vi.fn().mockResolvedValue(true), obtenerCoordenadas: vi.fn().mockResolvedValue({ latitud: -34.6, longitud: -58.4 }) };
     const geocodificacion = { resolver: vi.fn().mockReturnValue(of(null)) };
+    const route = { snapshot: { queryParams: {} as Record<string, string> } };
+    const borrador = { guardar: vi.fn(), recuperar: vi.fn(), limpiar: vi.fn().mockResolvedValue(undefined) };
     const pagina = new ReportesFormPage(
-      { snapshot: { queryParams: {} } } as never,
+      route as never,
       {} as never,
       {} as never,
       {} as never,
       { create: vi.fn().mockResolvedValue({ present: vi.fn() }) } as never,
       sesion as never,
-      geocodificacion as never
+      geocodificacion as never,
+      borrador as never
     );
     pagina.toast = toast;
     const crearModal = vi.spyOn(pagina, 'crearModal').mockResolvedValue();
-    return { pagina, toast, crearModal, sesion, geocodificacion };
+    return { pagina, toast, crearModal, sesion, geocodificacion, route, borrador };
   }
+
+  it('recupera el formulario tras volver de la cámara sin sobrescribir su ubicación', async () => {
+    const { pagina, route, borrador, sesion } = crearPagina();
+    route.snapshot.queryParams['recuperarFoto'] = '1';
+    borrador.recuperar.mockResolvedValue({ ...pagina.reporte, tipo: 'incendio', descripcion: 'Humo', coordenadas: { latitud: -34, longitud: -58 } });
+
+    await pagina.ngOnInit();
+
+    expect(pagina.reporte.descripcion).toBe('Humo');
+    expect(pagina.tipo).toBe('incendio');
+    expect(pagina.reporte.coordenadas).toEqual({ latitud: -34, longitud: -58 });
+    expect(sesion.obtenerCoordenadas).not.toHaveBeenCalled();
+    expect(borrador.limpiar).toHaveBeenCalledOnce();
+  });
 
   it('vuelve a pedir permiso al tocar ubicación y conserva coordenadas si falla la geocodificación', async () => {
     const { pagina, sesion } = crearPagina();

@@ -6,6 +6,7 @@ import { addIcons } from 'ionicons';
 import { Camera } from '@capacitor/camera'
 import { __metadata } from 'tslib';
 import { ModalController } from '@ionic/angular';
+import { leerArchivoFoto } from '../../services/borrador-reporte.service';
 @Component({
   selector: 'app-modal-photos',
   templateUrl: './modal-photos.component.html',
@@ -33,7 +34,9 @@ export class ModalPhotosComponent implements OnInit {
     this.errorFoto = '';
     try {
       const result = await Camera.takePhoto({
-        quality: 90,
+        quality: 80,
+        targetWidth: 1600,
+        targetHeight: 1600,
         includeMetadata: true,
       });
       if (this.fotos.length < 3) {
@@ -103,18 +106,7 @@ export class ModalPhotosComponent implements OnInit {
 
   async obtenerBlobDeFoto(foto: any): Promise<Blob | null> {
     try {
-      if (foto.webPath) {
-        const res = await fetch(foto.webPath);
-        return await res.blob();
-      }
-      if (foto.thumbnail) {
-        return await this.base64blob(foto.thumbnail);
-      }
-      if (foto.dataUrl) {
-        const res = await fetch(foto.dataUrl);
-        return await res.blob();
-      }
-      return null;
+      return await leerArchivoFoto(foto);
     } catch {
       return null;
     }
