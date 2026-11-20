@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, TimeoutError, timeout } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { IonButton, IonContent, IonDatetime, IonDatetimeButton, IonFooter, IonHeader, IonInput, IonLabel, IonTextarea, IonTitle, IonToolbar } from '@ionic/angular';
 import { Report } from '../../models/reporte';
 import { CommonModule } from '@angular/common';
@@ -55,11 +56,18 @@ export class ModalConfirmacionComponent implements OnInit {
     this.enviando = true
     this.errorEnvio = ''
     try {
-      await firstValueFrom(this.httpReport.postreporte(formdata))
+      await firstValueFrom(this.httpReport.postreporte(formdata).pipe(timeout({ first: 45000 })))
       await this.modalController.dismiss({ enviado: true })
     } catch (error) {
       console.error('No se pudo enviar el reporte:', error)
-      this.errorEnvio = 'No pudimos enviar el reporte. Revisá tu conexión e intentá nuevamente.'
+      const mensajeServidor = error instanceof HttpErrorResponse
+        ? error.error?.error?.mensaje || error.error?.mensaje
+        : undefined
+      this.errorEnvio = error instanceof TimeoutError
+        ? 'La subida tardó demasiado. Revisá Mis reportes antes de volver a intentarlo.'
+        : typeof mensajeServidor === 'string'
+          ? mensajeServidor
+          : 'No pudimos enviar el reporte. Revisá tu conexión e intentá nuevamente.'
     } finally {
       this.enviando = false
     }

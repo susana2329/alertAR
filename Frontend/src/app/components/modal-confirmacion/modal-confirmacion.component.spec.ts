@@ -1,4 +1,4 @@
-import { of, throwError } from 'rxjs';
+import { NEVER, of, throwError } from 'rxjs';
 import { ModalConfirmacionComponent } from './modal-confirmacion.component';
 
 const reporte = {
@@ -39,5 +39,27 @@ describe('ModalConfirmacionComponent', () => {
     await component.cancelar();
     expect(modal.dismiss).toHaveBeenCalledWith({ enviado: false });
     log.mockRestore();
+  });
+
+  it('libera la confirmación si la subida queda pendiente', async () => {
+    vi.useFakeTimers();
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    try {
+      const servicio = { postreporte: vi.fn().mockReturnValue(NEVER) };
+      const modal = { dismiss: vi.fn() };
+      const component = new ModalConfirmacionComponent(servicio as any, modal as any);
+      component.reporte = reporte;
+
+      const envio = component.enviar();
+      await vi.advanceTimersByTimeAsync(45000);
+      await envio;
+
+      expect(component.enviando).toBe(false);
+      expect(component.errorEnvio).toContain('tardó demasiado');
+      expect(modal.dismiss).not.toHaveBeenCalled();
+    } finally {
+      log.mockRestore();
+      vi.useRealTimers();
+    }
   });
 });
