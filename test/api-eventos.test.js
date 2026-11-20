@@ -64,3 +64,24 @@ test('middleware responde JSON genérico y no revela fallos internos', () => {
     assert.equal(res.statusCode, 500);
     assert.deepEqual(res.body, { error: { codigo: 'INTERNAL_ERROR', mensaje: 'Error interno del servidor' } });
 });
+
+test('middleware informa una falla de fotos sin exponer el error de AWS', () => {
+    const res = respuestaFalsa();
+    const error = Object.assign(new Error('AccessDenied: detalle interno'), {
+        status: 503,
+        code: 'PHOTO_STORAGE_UNAVAILABLE',
+        publicMessage: 'No se pudo guardar la foto. Intentá de nuevo más tarde.'
+    });
+    const errorLogOriginal = console.error;
+    console.error = () => {};
+    try {
+        errorHandler(error, { method: 'POST', path: '/reportes/reporte' }, res, () => {});
+    } finally { console.error = errorLogOriginal; }
+    assert.equal(res.statusCode, 503);
+    assert.deepEqual(res.body, {
+        error: {
+            codigo: 'PHOTO_STORAGE_UNAVAILABLE',
+            mensaje: 'No se pudo guardar la foto. Intentá de nuevo más tarde.'
+        }
+    });
+});
