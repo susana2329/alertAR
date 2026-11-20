@@ -38,7 +38,7 @@ describe('SesionService geolocalización', () => {
     expect(await service.pedirUbicacion()).toBe(true);
     expect(checkSpy).toHaveBeenCalledOnce();
     expect(requestSpy).not.toHaveBeenCalled();
-    expect(positionSpy).toHaveBeenCalledWith({ enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+    expect(positionSpy).toHaveBeenCalledWith({ enableHighAccuracy: true, maximumAge: 0, timeout: 12000 });
     expect(service.coordenadas()).toEqual({ latitud: -28.5, longitud: -59.0 });
     expect(service.estadoUbicacion()).toBe('disponible');
   });
@@ -52,12 +52,28 @@ describe('SesionService geolocalización', () => {
     expect(service.estadoUbicacion()).toBe('permiso-denegado');
   });
 
-  it('clasifica el timeout sin persistirlo como permiso denegado', async () => {
+  it('usa ubicación aproximada cuando solo se concedió ese permiso', async () => {
+    checkSpy.mockResolvedValue({ location: 'denied', coarseLocation: 'granted' });
+
+    expect(await service.pedirUbicacion()).toBe(true);
+    expect(requestSpy).not.toHaveBeenCalled();
+    expect(positionSpy).toHaveBeenCalledWith({ enableHighAccuracy: false, maximumAge: 60000, timeout: 12000 });
+  });
+
+  it('prueba la ubicación de red si el GPS preciso agota el tiempo', async () => {
+    positionSpy.mockRejectedValueOnce(new Error('OS-PLUG-GLOC-0010: Location request timed out'));
+
+    expect(await service.pedirUbicacion()).toBe(true);
+    expect(positionSpy).toHaveBeenCalledTimes(2);
+    expect(positionSpy).toHaveBeenNthCalledWith(2, { enableHighAccuracy: false, maximumAge: 60000, timeout: 12000 });
+  });
+
+  it('conserva el permiso concedido para reintentar después de un timeout', async () => {
     positionSpy.mockRejectedValue(new Error('OS-PLUG-GLOC-0010: Location request timed out'));
     expect(await service.pedirUbicacion()).toBe(false);
     expect(service.estadoUbicacion()).toBe('timeout');
-    expect(service.ubicacionPermitida()).toBe(false);
-    expect(localStorage.getItem('alertar_ubicacion')).toBeNull();
+    expect(service.ubicacionPermitida()).toBe(true);
+    expect(localStorage.getItem('alertar_ubicacion')).toBe('permitida');
   });
 
   it('clasifica errores del proveedor y continúa devolviendo null', async () => {

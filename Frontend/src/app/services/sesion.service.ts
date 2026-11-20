@@ -133,7 +133,7 @@ export class SesionService {
         new Promise<null>(resolve => { timer = setTimeout(() => {
           this.estadoUbicacion.set('timeout');
           resolve(null);
-        }, Capacitor.isNativePlatform() ? 23000 : 12000); })
+        }, Capacitor.isNativePlatform() ? 30000 : 12000); })
       ]);
     } catch (error) {
       this.estadoUbicacion.set(this.esTimeout(error) ? 'timeout' : this.esServicioDesactivado(error) ? 'servicio-desactivado' : 'error');
@@ -145,17 +145,26 @@ export class SesionService {
 
   private async consultarPosicionNativa(solicitarPermiso: boolean): Promise<CoordenadasUsuario | null> {
     let permisos = await Geolocation.checkPermissions();
-    if (permisos.location !== 'granted' && solicitarPermiso) {
+    if (permisos.location !== 'granted' && permisos.coarseLocation !== 'granted' && solicitarPermiso) {
       permisos = await Geolocation.requestPermissions();
     }
-    if (permisos.location !== 'granted') {
+    if (permisos.location !== 'granted' && permisos.coarseLocation !== 'granted') {
       this.estadoUbicacion.set('permiso-denegado');
       this.guardarUbicacion(false);
       return null;
     }
-    // Precisión alta ayuda al GPS simulado y al primer fix en Android. No reutilizar
-    // una posición antigua aquí: una coordenada vieja puede personalizar alertas mal.
-    const posicion = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, maximumAge: 0, timeout: 20000 });
+    this.guardarUbicacion(true);
+    let posicion: Awaited<ReturnType<typeof Geolocation.getCurrentPosition>> | undefined;
+    if (permisos.location === 'granted') {
+      try {
+        posicion = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, maximumAge: 0, timeout: 12000 });
+      } catch (error) {
+        if (!this.esTimeout(error)) throw error;
+      }
+    }
+    // En interiores o con permiso aproximado, el GPS puede no fijar posición.
+    // Aceptar una posición reciente de red evita dejar toda la app sin ubicación.
+    posicion ??= await Geolocation.getCurrentPosition({ enableHighAccuracy: false, maximumAge: 60000, timeout: 12000 });
     this.estadoUbicacion.set('disponible');
     return this.validarCoordenadas(posicion.coords.latitude, posicion.coords.longitude);
   }

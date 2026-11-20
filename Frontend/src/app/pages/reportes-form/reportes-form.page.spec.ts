@@ -1,21 +1,44 @@
 import { ReportesFormPage } from './reportes-form.page';
+import { of } from 'rxjs';
 
 describe('ReportesFormPage', () => {
   function crearPagina() {
     const toast = vi.fn().mockResolvedValue(undefined);
+    const sesion = { ubicacionPermitida: vi.fn().mockReturnValue(false), pedirUbicacion: vi.fn().mockResolvedValue(true), obtenerCoordenadas: vi.fn().mockResolvedValue({ latitud: -34.6, longitud: -58.4 }) };
+    const geocodificacion = { resolver: vi.fn().mockReturnValue(of(null)) };
     const pagina = new ReportesFormPage(
       { snapshot: { queryParams: {} } } as never,
       {} as never,
       {} as never,
       {} as never,
       { create: vi.fn().mockResolvedValue({ present: vi.fn() }) } as never,
-      { ubicacionPermitida: vi.fn(), obtenerCoordenadas: vi.fn() } as never,
-      { resolver: vi.fn() } as never
+      sesion as never,
+      geocodificacion as never
     );
     pagina.toast = toast;
     const crearModal = vi.spyOn(pagina, 'crearModal').mockResolvedValue();
-    return { pagina, toast, crearModal };
+    return { pagina, toast, crearModal, sesion, geocodificacion };
   }
+
+  it('vuelve a pedir permiso al tocar ubicación y conserva coordenadas si falla la geocodificación', async () => {
+    const { pagina, sesion } = crearPagina();
+
+    await pagina.cargarUbicacion(true);
+
+    expect(sesion.pedirUbicacion).toHaveBeenCalledOnce();
+    expect(pagina.reporte.coordenadas).toEqual({ latitud: -34.6, longitud: -58.4 });
+    expect(pagina.reporte.ubicacion).toBe('-34.60000, -58.40000');
+  });
+
+  it('limpia coordenadas anteriores si falla una nueva solicitud', async () => {
+    const { pagina, sesion } = crearPagina();
+    pagina.reporte.coordenadas = { latitud: -35, longitud: -58 };
+    sesion.pedirUbicacion.mockResolvedValue(false);
+
+    await pagina.cargarUbicacion(true);
+
+    expect(pagina.reporte.coordenadas).toBeNull();
+  });
 
   it('bloquea el envío sin coordenadas aunque haya texto descriptivo de ubicación', async () => {
     const { pagina, toast, crearModal } = crearPagina();

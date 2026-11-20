@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import type { FeatureCollection, Point, LineString, Polygon, MultiPolygon } from 'geojson';
-import { Capacitor } from '@capacitor/core';
-import { Geolocation } from '@capacitor/geolocation';
 import {
   Map as MapLibreMap,
   LngLatBounds,
@@ -25,6 +23,7 @@ import { addIcons } from 'ionicons';
 import { IonIcon } from '@ionic/angular';
 import { Alerta, colorPresentacionAlerta, etiquetaNivelAlerta } from '../../models/alerta.model';
 import { AlertaService } from '../../services/alerta.service';
+import { SesionService } from '../../services/sesion.service';
 import { configurarWorkerMapLibre } from './maplibre-worker';
 import { diagnosticarError } from '../../utils/diagnostico-error';
 import { environment } from '../../../environments/environment';
@@ -123,6 +122,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   estiloMapaActual: EstiloMapa = this.recuperarEstiloGuardado();
   estadoAlertas: 'cargando' | 'cargado' | 'error' = 'cargando';
   mensajeError = '';
+  mensajeUbicacion = '';
 
   private recuperarEstiloGuardado(): EstiloMapa {
     try {
@@ -201,6 +201,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   constructor(
     private router: Router,
     private alertaService: AlertaService,
+    private sesion: SesionService,
     private location: Location,
     private changeDetector: ChangeDetectorRef
   ) {
@@ -1431,50 +1432,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
   }
 
   private async obtenerUbicacion(): Promise<void> {
-    try {
-      if (Capacitor.getPlatform() === 'web') {
-        const position = await new Promise<GeolocationPosition>(
-          (resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-              enableHighAccuracy: true,
-              timeout: 15000,
-              maximumAge: 0
-            });
-          }
-        );
-
-        this.ubicacionUsuario = {
-          latitud: position.coords.latitude,
-          longitud: position.coords.longitude
-        };
-      } else {
-        const permissions = await Geolocation.requestPermissions();
-
-        if (permissions.location !== 'granted') {
-          console.error('Permiso de ubicación denegado');
-          return;
-        }
-
-        const position = await Geolocation.getCurrentPosition();
-
-        this.ubicacionUsuario = {
-          latitud: position.coords.latitude,
-          longitud: position.coords.longitude
-        };
-      }
-
-      this.mostrarUbicacionUsuario();
-
-      this.map?.flyTo({
-        center: [
-          this.ubicacionUsuario.longitud,
-          this.ubicacionUsuario.latitud
-        ],
-        zoom: 15
-      });
-    } catch (error) {
-      console.error('Error de geolocalización:', error);
-    }
+    if (!this.sesion.ubicacionPermitida()) return;
+    const coordenadas = await this.sesion.obtenerCoordenadas();
+    if (coordenadas) this.centrarEnCoordenadas(coordenadas);
   }
 
   private mostrarUbicacionUsuario(): void {
@@ -1509,16 +1469,26 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       .addTo(this.map);
   }
 
-  centrarEnMiUbicacion(): void {
-    if (!this.map || !this.ubicacionUsuario) return;
+  async centrarEnMiUbicacion(): Promise<void> {
+    this.mensajeUbicacion = '';
+    const permitida = await this.sesion.pedirUbicacion();
+    const coordenadas = permitida ? this.sesion.coordenadas() : null;
+    if (!coordenadas) {
+      this.mensajeUbicacion = this.sesion.estadoUbicacion() === 'permiso-denegado'
+        ? 'Permití el acceso a la ubicación desde los ajustes del celular.'
+        : 'No pudimos obtener tu ubicación. Revisá que el GPS esté activado.';
+      this.changeDetector.markForCheck();
+      return;
+    }
+    this.centrarEnCoordenadas(coordenadas);
+  }
 
-    this.map.flyTo({
-      center: [
-        this.ubicacionUsuario.longitud,
-        this.ubicacionUsuario.latitud
-      ],
-      zoom: 15
-    });
+  private centrarEnCoordenadas(coordenadas: { latitud: number; longitud: number }): void {
+    this.ubicacionUsuario = coordenadas;
+    this.mensajeUbicacion = '';
+    this.mostrarUbicacionUsuario();
+    this.map?.flyTo({ center: [coordenadas.longitud, coordenadas.latitud], zoom: 15 });
+    this.changeDetector.markForCheck();
   }
 
 }

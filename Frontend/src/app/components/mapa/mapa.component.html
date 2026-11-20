@@ -173,4 +173,7 @@
   >
     <ion-icon name="locate-outline"></ion-icon>
   </button>
+  @if (mensajeUbicacion) {
+    <p class="location-message" role="alert">{{ mensajeUbicacion }}</p>
+  }
 </div>

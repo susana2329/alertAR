@@ -91,27 +91,35 @@ export class ReportesFormPage implements OnInit {
     await this.cargarUbicacion()
   }
 
-  async cargarUbicacion(): Promise<void> {
+  async cargarUbicacion(solicitarPermiso = false): Promise<void> {
+    this.reporte.coordenadas = null;
     try {
-      if (!this.sesion.ubicacionPermitida()) {
+      const permitida = this.sesion.ubicacionPermitida() ||
+        (solicitarPermiso && await this.sesion.pedirUbicacion());
+      if (!permitida) {
         this.reporte.ubicacion = 'Ubicación no disponible';
+        if (solicitarPermiso) await this.toast('Activá el permiso de ubicación del celular e intentá de nuevo.');
         return;
       }
       const coords = await this.sesion.obtenerCoordenadas();
       if (!coords) {
         this.reporte.ubicacion = 'Ubicación no disponible';
+        if (solicitarPermiso) await this.toast('No pudimos obtener tu ubicación. Revisá que el GPS esté activado e intentá de nuevo.');
         return;
       }
       this.reporte.coordenadas = coords;
+      const coordenadasLegibles = `${coords.latitud.toFixed(5)}, ${coords.longitud.toFixed(5)}`;
       const lugar = await firstValueFrom(this.geocodificacion.resolver(coords));
       if (lugar) {
         const partes = [lugar.nombre, lugar.localidad, lugar.provincia].filter(Boolean);
-        this.reporte.ubicacion = partes.length > 0 ? partes.join(', ') : 'Ubicación no disponible';
+        this.reporte.ubicacion = partes.length > 0 ? partes.join(', ') : coordenadasLegibles;
       } else {
-        this.reporte.ubicacion = 'Ubicación no disponible';
+        this.reporte.ubicacion = coordenadasLegibles;
       }
     } catch {
-      this.reporte.ubicacion = 'Ubicación no disponible';
+      this.reporte.ubicacion = this.reporte.coordenadas
+        ? `${this.reporte.coordenadas.latitud.toFixed(5)}, ${this.reporte.coordenadas.longitud.toFixed(5)}`
+        : 'Ubicación no disponible';
     }
   }
 
