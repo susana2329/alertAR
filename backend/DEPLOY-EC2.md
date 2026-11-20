@@ -1,6 +1,6 @@
 # Entrega del backend AlertAR para EC2
 
-Este paquete contiene el backend 1.0.0 que consume el APK. La URL pública esperada es `https://api.alertarapp.com.ar/api`. El archivo `.env` con credenciales **no está incluido**.
+Este paquete contiene el backend que consume el APK. La URL pública esperada es `https://api.alertarapp.com.ar/api`. El archivo `.env` con credenciales **no está incluido**.
 
 Para regenerar el paquete desde la raíz del repositorio (incluye solamente archivos versionados del backend):
 
@@ -18,7 +18,16 @@ El paquete contiene `backend/.env.example`, `backend/package-lock.json` y esta g
 3. Extraer el paquete en un directorio estable, por ejemplo `/opt/alertar/backend`, y ejecutar allí `npm ci --omit=dev`.
 4. Copiar `.env.example` a `.env`, completar las credenciales de MongoDB, JWT y Google por un canal seguro y restringir sus permisos al usuario del servicio. MongoDB Atlas debe permitir la IP de salida de EC2. Asociar a la instancia un rol IAM con permisos `s3:GetObject`, `s3:PutObject` y `s3:DeleteObject` sobre los objetos del bucket configurado. No colocar claves AWS en `.env`; el SDK obtiene las credenciales temporales del rol de EC2.
 5. Mantener `HOST=127.0.0.1`, `PORT=3000` y `TRUST_PROXY_LOOPBACK=true` si Nginx es el único proxy de la misma instancia. `CORS_ORIGINS` debe incluir `https://localhost` para el APK Android; agregar los orígenes web reales que correspondan, separados por comas y sin barra final. La URL de la API (`https://api.alertarapp.com.ar`) no se agrega por sí sola: CORS autoriza el origen desde el que se abre la app.
-6. En Google Cloud Console, usar el mismo cliente OAuth web indicado por `GOOGLE_CLIENT_ID` en el APK/frontend y en EC2. Autorizar el origen real del frontend web para el cliente OAuth. Configurar `GOOGLE_CLIENT_SECRET` en EC2; nunca incluirlo en el frontend ni en el APK. El frontend obtiene el código de Google y el backend lo canjea mediante `POST /api/auth/google`.
+6. En Google Cloud Console, mantener el cliente OAuth web indicado por `GOOGLE_CLIENT_ID` para el frontend web y la verificación de tokens del backend. Autorizar los orígenes reales del frontend web. Configurar `GOOGLE_CLIENT_SECRET` solo en EC2. El frontend web canjea el código mediante `POST /api/auth/google`; Android obtiene un ID token con Credential Manager y lo envía a `POST /api/auth/google/native`. La ruta nativa debe estar desplegada antes de publicar el nuevo APK.
+
+### Google en Android
+
+Quien administre el mismo proyecto de Google Cloud que contiene el cliente OAuth web debe crear un cliente OAuth **de tipo Android** con estos datos del APK firmado:
+
+- Paquete: `ar.alertar.app`
+- SHA-1 del certificado de publicación: `AF:A7:BF:EC:9A:E9:13:D0:93:3B:EA:5C:7C:22:D1:82:C0:9F:2F:69`
+
+Mantener el cliente OAuth web `1047238975139-gt4obqstc0k95l9i7lbpudj2skrtkgs8.apps.googleusercontent.com` en `GOOGLE_CLIENT_ID` del backend y del frontend. El selector nativo solicita un ID token para ese cliente web; el backend verifica firma, audiencia y nonce antes de crear la sesión. No hace falta incorporar `GOOGLE_CLIENT_SECRET` al APK. Si cambia el certificado de firma, registrar también el nuevo SHA-1. Probar el inicio con Google en un dispositivo Android después de desplegar el backend y antes de distribuir el APK.
 
 ## Servicio
 

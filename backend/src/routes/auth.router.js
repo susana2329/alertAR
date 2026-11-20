@@ -11,6 +11,7 @@ const google = crearLimitador({ maximo: 20, ventanaMs: 15 * 60 * 1000 });
 router.post('/registro', registro, authController.registro);
 router.post('/login', login, authController.login);
 router.post('/google', google, authController.google);
+router.post('/google/native', google, authController.googleNativo);
 router.get('/me', verificarToken, authController.me);
 
 module.exports = router;

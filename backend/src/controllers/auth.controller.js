@@ -35,6 +35,15 @@ async function google(req, res) {
   }
 }
 
+async function googleNativo(req, res) {
+  try {
+    const resultado = await authService.entrarConGoogleNativo(req.body.idToken, req.body.nonce);
+    res.json(resultado);
+  } catch (error) {
+    responderError(res, error);
+  }
+}
+
 async function me(req, res) {
   try {
     const resultado = await authService.obtenerPerfil(req.usuarioId);
@@ -44,4 +53,4 @@ async function me(req, res) {
   }
 }
 
-module.exports = { registro, login, google, me };
+module.exports = { registro, login, google, googleNativo, me };

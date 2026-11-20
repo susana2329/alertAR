@@ -123,7 +123,6 @@ async function entrarConGoogle(code) {
   let datos;
   try {
     const { tokens } = await clienteGoogle.getToken(code);
-
     const ticket = await clienteGoogle.verifyIdToken({
       idToken: tokens.id_token,
       audience: process.env.GOOGLE_CLIENT_ID
@@ -134,6 +133,31 @@ async function entrarConGoogle(code) {
     throw new ErrorApp('No se pudo entrar con Google', 401);
   }
 
+  return completarEntradaGoogle(datos);
+}
+
+async function entrarConGoogleNativo(idToken, nonce) {
+  if (typeof idToken !== 'string' || !idToken || idToken.length > 10000 ||
+      typeof nonce !== 'string' || nonce.length < 20 || nonce.length > 200) {
+    throw new ErrorApp('Falta la credencial de Google', 400);
+  }
+  let datos;
+  try {
+    const ticket = await clienteGoogle.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    datos = ticket.getPayload();
+  } catch (error) {
+    console.error('Error al verificar Google nativo:', error.message);
+    throw new ErrorApp('No se pudo entrar con Google', 401);
+  }
+  if (datos?.nonce !== nonce) throw new ErrorApp('La autorización de Google no coincide', 401);
+  return completarEntradaGoogle(datos);
+}
+
+async function completarEntradaGoogle(datos) {
+  if (!datos?.sub || !datos?.email) throw new ErrorApp('Google no devolvió los datos de la cuenta', 401);
   if (!datos.email_verified) {
     throw new ErrorApp('Tu correo de Google no está verificado', 401);
   }
@@ -172,4 +196,4 @@ async function obtenerPerfil(id) {
   return { usuario: datosPublicos(usuario) };
 }
 
-module.exports = { registrar, iniciarSesion, entrarConGoogle, obtenerPerfil, ErrorApp };
+module.exports = { registrar, iniciarSesion, entrarConGoogle, entrarConGoogleNativo, obtenerPerfil, ErrorApp };
