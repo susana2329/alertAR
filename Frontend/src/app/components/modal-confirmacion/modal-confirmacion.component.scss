@@ -134,6 +134,14 @@ ion-textarea::part(bottom) {
   align-items: center;
 }
 
+.estado-fotos {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #475569;
+  font-size: 14px;
+  text-align: center;
+}
+
 ion-label {
   grid-column: 1 / -1;
 }

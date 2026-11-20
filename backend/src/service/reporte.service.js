@@ -64,6 +64,14 @@ async function crearReporteConDependencias(body, files, iduser, dependencias = {
         error.status = 400
         throw error
     }
+    if (body.cantidadFotos !== undefined) {
+        const cantidadEsperada = Number(body.cantidadFotos)
+        if (!Number.isInteger(cantidadEsperada) || cantidadEsperada < 0 || cantidadEsperada > 3 || cantidadEsperada !== archivos.length) {
+            const error = new Error('No se recibieron todas las fotos del reporte. Volvé a seleccionarlas e intentá nuevamente.')
+            error.status = 400
+            throw error
+        }
+    }
     const imagenesValidadas = validarImagenes(archivos)
     const fotos = []
     const clavesIntentadas = []

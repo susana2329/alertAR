@@ -49,6 +49,7 @@ export class ModalConfirmacionComponent implements OnInit {
     formdata.append('fecha', this.reporte.fecha.toISOString())
     formdata.append('latitud', String(this.reporte.coordenadas?.latitud ?? ''))
     formdata.append('longitud', String(this.reporte.coordenadas?.longitud ?? ''))
+    formdata.append('cantidadFotos', String(this.reporte.imagen.length))
     for (let i = 0; i < this.reporte.imagen.length; i++) {
       formdata.append('fotos', this.reporte.imagen[i])
     }

@@ -25,6 +25,18 @@ describe('ModalConfirmacionComponent', () => {
     expect(component.errorEnvio).toBe('');
   });
 
+  it('envía la cantidad de fotos seleccionadas junto a los archivos', async () => {
+    const servicio = { postreporte: vi.fn().mockReturnValue(of({})) };
+    const component = new ModalConfirmacionComponent(servicio as any, { dismiss: vi.fn() } as any);
+    component.reporte = { ...reporte, imagen: [new Blob(['foto'], { type: 'image/jpeg' })] };
+
+    await component.enviar();
+
+    const formulario = servicio.postreporte.mock.calls[0][0] as FormData;
+    expect(formulario.get('cantidadFotos')).toBe('1');
+    expect(formulario.getAll('fotos')).toHaveLength(1);
+  });
+
   it('mantiene visible la confirmación si falla el envío y permite volver', async () => {
     const servicio = { postreporte: vi.fn().mockReturnValue(throwError(() => new Error('falló'))) };
     const modal = { dismiss: vi.fn().mockResolvedValue(true) };

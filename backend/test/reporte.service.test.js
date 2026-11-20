@@ -73,6 +73,18 @@ test('permite crear reportes sin fotos y persiste una lista vacía', async () =>
     assert.equal(reporteGuardado.tipo, 'inundacion');
 });
 
+test('no guarda un reporte si el cliente adjuntó menos fotos de las que seleccionó', async () => {
+    let operaciones = 0;
+    await assert.rejects(
+        _crearReporteConDependencias({ ...bodyValido, cantidadFotos: '1' }, [], 'usuario', {
+            subirImagen: async () => { operaciones++; },
+            guardarReporte: async () => { operaciones++; }
+        }),
+        { status: 400, message: /No se recibieron todas las fotos/ }
+    );
+    assert.equal(operaciones, 0);
+});
+
 test('rechaza ubicaciones fuera de rango antes de subir fotos o guardar', async () => {
     let operaciones = 0;
     await assert.rejects(

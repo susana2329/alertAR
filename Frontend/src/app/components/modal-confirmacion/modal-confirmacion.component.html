@@ -38,6 +38,11 @@
         <div class="buttonadelante">
             <ion-button (click)="fotosiguiente()">🡢</ion-button>
         </div>
+        @if (reporte.imagen.length === 0) {
+            <p class="estado-fotos" role="status">No adjuntaste fotos. El reporte no aparecerá en la moderación de imágenes.</p>
+        } @else {
+            <p class="estado-fotos" role="status">{{ reporte.imagen.length }} {{ reporte.imagen.length === 1 ? 'foto adjunta' : 'fotos adjuntas' }} para moderación.</p>
+        }
     </div>
     <div class="textarea">
         <ion-label>

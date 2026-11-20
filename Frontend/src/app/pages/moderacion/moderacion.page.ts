@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import {
@@ -46,7 +46,7 @@ import { SesionService } from '../../services/sesion.service';
     IonSpinner
   ]
 })
-export class ModeracionPage implements OnInit {
+export class ModeracionPage {
   reportes: ReportePendienteModeracion[] = [];
   cargando = true;
   errorCarga: string | null = null;
@@ -72,7 +72,7 @@ export class ModeracionPage implements OnInit {
     });
   }
 
-  ngOnInit() {
+  ionViewWillEnter() {
     if (!this.sesionService.esModerador()) {
       void this.router.navigate(['/cuenta']);
       return;
