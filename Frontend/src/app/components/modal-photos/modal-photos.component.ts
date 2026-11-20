@@ -3,7 +3,8 @@ import { IonButton, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonTitle,
 import { imageOutline, arrowBackOutline } from 'ionicons/icons';
 import { cameraOutline } from 'ionicons/icons'
 import { addIcons } from 'ionicons';
-import { Camera } from '@capacitor/camera'
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
+import { Capacitor } from '@capacitor/core';
 import { __metadata } from 'tslib';
 import { ModalController } from '@ionic/angular';
 import { leerArchivoFoto } from '../../services/borrador-reporte.service';
@@ -33,7 +34,15 @@ export class ModalPhotosComponent implements OnInit {
   async tomarfoto() {
     this.errorFoto = '';
     try {
-      const result = await Camera.takePhoto({
+      const result = Capacitor.getPlatform() === 'android' ? await Camera.getPhoto({
+        source: CameraSource.Camera,
+        resultType: CameraResultType.Uri,
+        quality: 80,
+        width: 1600,
+        height: 1600,
+        correctOrientation: true,
+        saveToGallery: false,
+      }) : await Camera.takePhoto({
         quality: 80,
         targetWidth: 1600,
         targetHeight: 1600,

@@ -1,24 +1,27 @@
-import { Camera } from '@capacitor/camera';
+import { Capacitor } from '@capacitor/core';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { ModalPhotosComponent } from './modal-photos.component';
 
+const camara = vi.hoisted(() => ({ getPhoto: vi.fn(), takePhoto: vi.fn() }));
 vi.mock('@capacitor/camera', () => ({
-  Camera: { takePhoto: vi.fn(), chooseFromGallery: vi.fn() }
+  Camera: camara, CameraSource: { Camera: 'CAMERA' }, CameraResultType: { Uri: 'uri' }
 }));
 
-describe('ModalPhotosComponent', () => {
-  it('muestra un error y conserva el modal si la foto no puede leerse', async () => {
-    const modal = { dismiss: vi.fn() };
-    const pagina = new ModalPhotosComponent(modal as never);
-    vi.mocked(Camera.takePhoto).mockResolvedValue({} as never);
-    const leerFoto = vi.spyOn(pagina, 'obtenerBlobDeFoto').mockResolvedValue(null);
+describe('Cámara en Android', () => {
+  afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
-    try {
-      await pagina.tomarfoto();
-      expect(pagina.errorFoto).toContain('No se pudo leer');
-      expect(modal.dismiss).not.toHaveBeenCalled();
-    } finally {
-      vi.mocked(Camera.takePhoto).mockReset();
-      leerFoto.mockRestore();
-    }
+  it('usa la captura que conserva el estado nativo y adjunta el archivo al volver', async () => {
+    vi.spyOn(Capacitor, 'getPlatform').mockReturnValue('android');
+    camara.getPhoto.mockResolvedValue({ webPath: '/foto.jpg' });
+    const archivo = new Blob(['foto'], { type: 'image/jpeg' });
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, blob: async () => archivo }));
+    const dismiss = vi.fn().mockResolvedValue(undefined);
+    const componente = new ModalPhotosComponent({ dismiss } as never);
+
+    await componente.tomarfoto();
+
+    expect(Camera.getPhoto).toHaveBeenCalledWith(expect.objectContaining({ source: CameraSource.Camera, resultType: CameraResultType.Uri }));
+    expect(Camera.takePhoto).not.toHaveBeenCalled();
+    expect(dismiss).toHaveBeenCalledWith([archivo]);
   });
 });
