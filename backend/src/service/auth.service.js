@@ -10,6 +10,9 @@ const clienteGoogle = new OAuth2Client(
   process.env.GOOGLE_CLIENT_SECRET,
   'postmessage'
 );
+const clienteGoogleIdToken = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID
+);
 
 class ErrorApp extends Error {
   constructor(mensaje, estado) {
@@ -164,6 +167,73 @@ async function entrarConGoogle(code) {
   return respuestaConSesion(usuario);
 }
 
+async function entrarConGoogleIdToken(idToken) {
+  if (!idToken || typeof idToken !== 'string') {
+    throw new ErrorApp('Falta el ID Token de Google', 400);
+  }
+
+  let datos;
+
+  try {
+    const ticket = await clienteGoogleIdToken.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    datos = ticket.getPayload();
+
+  } catch (error) {
+    logger.error('google_id_token_verificacion_fallida', {
+      mensaje: error.message
+    });
+
+    throw new ErrorApp('No se pudo verificar la cuenta de Google', 401);
+  }
+
+  if (
+    !datos?.sub ||
+    !datos?.email ||
+    datos.email_verified !== true
+  ) {
+    throw new ErrorApp(
+      'La cuenta de Google no pudo ser verificada',
+      401
+    );
+  }
+
+  let usuario = await authRepository.buscarPorGoogleIdOEmail(
+    datos.sub,
+    datos.email
+  );
+
+  if (!usuario) {
+    usuario = await authRepository.crear({
+      nombre: datos.given_name || datos.name || '',
+      apellido: datos.family_name || '',
+      email: datos.email,
+      googleId: datos.sub,
+      foto: datos.picture || '',
+      proveedor: 'google'
+    });
+
+  } else {
+    if (!usuario.googleId) {
+      usuario.googleId = datos.sub;
+    }
+
+    if (!usuario.foto) {
+      usuario.foto = datos.picture || '';
+    }
+
+    usuario.ultimoAcceso = new Date();
+
+    await authRepository.guardar(usuario);
+  }
+
+  return respuestaConSesion(usuario);
+}
+
+
 async function obtenerPerfil(id) {
   const usuario = await authRepository.buscarPorId(id);
   if (!usuario) {
@@ -172,4 +242,11 @@ async function obtenerPerfil(id) {
   return { usuario: datosPublicos(usuario) };
 }
 
-module.exports = { registrar, iniciarSesion, entrarConGoogle, obtenerPerfil, ErrorApp };
+module.exports = {
+  registrar,
+  iniciarSesion,
+  entrarConGoogle,
+  entrarConGoogleIdToken,
+  obtenerPerfil,
+  ErrorApp
+};

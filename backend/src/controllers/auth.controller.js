@@ -34,7 +34,18 @@ async function google(req, res) {
     responderError(res, error);
   }
 }
+async function googleIdToken(req, res) {
+  try {
+    const resultado = await authService.entrarConGoogleIdToken(
+      req.body.idToken
+    );
 
+    return res.json(resultado);
+
+  } catch (error) {
+    return responderError(res, error);
+  }
+}
 async function me(req, res) {
   try {
     const resultado = await authService.obtenerPerfil(req.usuarioId);
@@ -44,4 +55,10 @@ async function me(req, res) {
   }
 }
 
-module.exports = { registro, login, google, me };
+module.exports = {
+  registro,
+  login,
+  google,
+  googleIdToken,
+  me
+};
