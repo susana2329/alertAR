@@ -156,5 +156,5 @@ exports.votarVecinal = async (reporteId, usuarioId, respuesta) => {
             ]
          }
       }
-   }], { new: true, projection: { tipo: 1, estadoVecinal: 1, votosVecinales: 1 } }).lean()
+   }], { updatePipeline: true, new: true, projection: { tipo: 1, estadoVecinal: 1, votosVecinales: 1 } }).lean()
 }
