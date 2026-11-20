@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { App } from '@capacitor/app';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -33,7 +33,7 @@ import { chevronBackOutline, chevronForwardOutline, openOutline,informationCircl
   ]
 })
 export class InformacionPage implements OnInit {
-  version = '1.0.0';
+  readonly version = signal<string | null>(null);
   constructor() {
     addIcons({ chevronBackOutline,
       chevronForwardOutline,
@@ -47,9 +47,10 @@ export class InformacionPage implements OnInit {
 
   async ngOnInit() {
     try {
-      this.version = (await App.getInfo()).version;
+      this.version.set((await App.getInfo()).version);
     } catch {
-      // La versión nativa no está disponible en el navegador.
+      // Evitar mostrar una versión inventada cuando no se puede consultar el APK.
+      this.version.set(null);
     }
   }
 }

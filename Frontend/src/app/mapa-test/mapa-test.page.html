@@ -1,3 +1,5 @@
 <ion-content [fullscreen]="true" [scrollY]="false">
-  <app-mapa></app-mapa>
+  @if (mostrarMapa()) {
+    <app-mapa></app-mapa>
+  }
 </ion-content>

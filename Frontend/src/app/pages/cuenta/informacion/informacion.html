@@ -18,7 +18,9 @@
       </div>
       <h2>Sobre AlertAR</h2>
       <p>Información para anticiparse y herramientas para prepararse</p>
-      <p>Versión {{ version }}</p>
+      @if (version()) {
+        <p>Versión {{ version() }}</p>
+      }
     </div>
 
     <ion-accordion-group class="sources-accordion-group">

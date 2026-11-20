@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { Report } from '../models/reporte';
+
+export const ReportCameraRecovery = registerPlugin<{
+  pending(): Promise<{ pending: boolean; uri?: string }>;
+  clear(): Promise<void>;
+  uploadResult(result: { status: number; durationMs: number }): Promise<void>;
+}>('ReportCameraRecovery');
 
 export async function leerArchivoFoto(foto: { uri?: string; webPath?: string; dataUrl?: string; thumbnail?: string }): Promise<Blob | null> {
   const url = foto.webPath || (foto.uri ? Capacitor.convertFileSrc(foto.uri) : foto.dataUrl);
@@ -47,7 +53,8 @@ export class BorradorReporteService {
     return entrada.reporte as Report;
   }
 
-  limpiar(): Promise<unknown> {
-    return this.ejecutar('readwrite', store => store.delete('camara'));
+  async limpiar(): Promise<void> {
+    await this.ejecutar('readwrite', store => store.delete('camara'));
+    if (Capacitor.getPlatform() === 'android') await ReportCameraRecovery.clear();
   }
 }

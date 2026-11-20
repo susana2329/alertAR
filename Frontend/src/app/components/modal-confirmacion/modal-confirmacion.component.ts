@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, signal } from '@angular/core';
 import { firstValueFrom, TimeoutError, timeout } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { IonButton, IonContent, IonDatetime, IonDatetimeButton, IonFooter, IonHeader, IonInput, IonLabel, IonTextarea, IonTitle, IonToolbar } from '@ionic/angular';
@@ -20,8 +20,8 @@ export class ModalConfirmacionComponent implements OnInit {
   public contador: number = 0
   public fotos: string[] = []
   public fechaiso: string = ""
-  enviando = false
-  errorEnvio = ''
+  readonly enviando = signal(false)
+  readonly errorEnvio = signal('')
 
   constructor(private httpReport: ReporteService, private modalController: ModalController) { }
 
@@ -42,6 +42,10 @@ export class ModalConfirmacionComponent implements OnInit {
     }
   }
   async enviar() {
+    if (this.enviando()) return;
+    this.enviando.set(true);
+    this.errorEnvio.set('');
+    try {
     let formdata = new FormData
     formdata.append('tipo', this.reporte.tipo)
     formdata.append('descripcion', this.reporte.descripcion)
@@ -54,9 +58,6 @@ export class ModalConfirmacionComponent implements OnInit {
       formdata.append('fotos', this.reporte.imagen[i])
     }
     formdata.append('estado', this.reporte.estado)
-    this.enviando = true
-    this.errorEnvio = ''
-    try {
       await firstValueFrom(this.httpReport.postreporte(formdata).pipe(timeout({ first: 45000 })))
       await this.modalController.dismiss({ enviado: true })
     } catch (error) {
@@ -64,13 +65,13 @@ export class ModalConfirmacionComponent implements OnInit {
       const mensajeServidor = error instanceof HttpErrorResponse
         ? error.error?.error?.mensaje || error.error?.mensaje
         : undefined
-      this.errorEnvio = error instanceof TimeoutError
+      this.errorEnvio.set(error instanceof TimeoutError
         ? 'La subida tardó demasiado. Revisá Mis reportes antes de volver a intentarlo.'
         : typeof mensajeServidor === 'string'
           ? mensajeServidor
-          : 'No pudimos enviar el reporte. Revisá tu conexión e intentá nuevamente.'
+          : 'No pudimos enviar el reporte. Revisá tu conexión e intentá nuevamente.')
     } finally {
-      this.enviando = false
+      this.enviando.set(false)
     }
   }
 

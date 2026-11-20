@@ -22,7 +22,7 @@ describe('ModalConfirmacionComponent', () => {
 
     expect(servicio.postreporte).toHaveBeenCalledOnce();
     expect(modal.dismiss).toHaveBeenCalledWith({ enviado: true });
-    expect(component.errorEnvio).toBe('');
+    expect(component.errorEnvio()).toBe('');
   });
 
   it('envía la cantidad de fotos seleccionadas junto a los archivos', async () => {
@@ -46,7 +46,7 @@ describe('ModalConfirmacionComponent', () => {
 
     await component.enviar();
     expect(modal.dismiss).not.toHaveBeenCalled();
-    expect(component.errorEnvio).toContain('No pudimos enviar');
+    expect(component.errorEnvio()).toContain('No pudimos enviar');
 
     await component.cancelar();
     expect(modal.dismiss).toHaveBeenCalledWith({ enviado: false });
@@ -66,8 +66,8 @@ describe('ModalConfirmacionComponent', () => {
       await vi.advanceTimersByTimeAsync(45000);
       await envio;
 
-      expect(component.enviando).toBe(false);
-      expect(component.errorEnvio).toContain('tardó demasiado');
+      expect(component.enviando()).toBe(false);
+      expect(component.errorEnvio()).toContain('tardó demasiado');
       expect(modal.dismiss).not.toHaveBeenCalled();
     } finally {
       log.mockRestore();
